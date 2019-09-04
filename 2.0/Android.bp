@@ -21,6 +21,7 @@ cc_binary {
     proprietary: true,
     init_rc: ["android.hardware.sensors@2.0-service-stmicroelectronics.rc"],
     srcs: [
+        "service.cpp",
         "Sensors.cpp",
         "SensorsCallback.cpp",
     ],
