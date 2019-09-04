@@ -19,6 +19,7 @@ cc_binary {
     relative_install_path: "hw",
     vendor: true,
     proprietary: true,
+    init_rc: ["android.hardware.sensors@2.0-service-stmicroelectronics.rc"],
     srcs: [
         "Sensors.cpp",
         "SensorsCallback.cpp",
