@@ -36,7 +36,6 @@ using ::android::hardware::Void;
 using ::android::sp;
 
 struct Sensors : public ISensors {
-    // Methods from ::android::hardware::sensors::V2_0::ISensors follow.
     Return<void> getSensorsList(getSensorsList_cb _hidl_cb) override;
     Return<V1_0::Result> setOperationMode(V1_0::OperationMode mode) override;
     Return<V1_0::Result> activate(int32_t sensorHandle,
@@ -56,8 +55,6 @@ struct Sensors : public ISensors {
                                     int32_t channelHandle,
                                     V1_0::RateLevel rate,
                                     configDirectReport_cb _hidl_cb) override;
-
-    // Methods from ::android::hidl::base::V1_0::IBase follow.
 };
 
 }  // namespace implementation

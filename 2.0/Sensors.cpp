@@ -23,7 +23,6 @@ namespace sensors {
 namespace V2_0 {
 namespace implementation {
 
-// Methods from ::android::hardware::sensors::V2_0::ISensors follow.
 Return<void> Sensors::getSensorsList(getSensorsList_cb _hidl_cb)
 {
     (void) _hidl_cb;
@@ -112,13 +111,6 @@ Return<void> Sensors::configDirectReport(int32_t sensorHandle,
     return Void();
 }
 
-
-// Methods from ::android::hidl::base::V1_0::IBase follow.
-
-//ISensors* HIDL_FETCH_ISensors(const char* /* name */) {
-    //return new Sensors();
-//}
-//
 }  // namespace implementation
 }  // namespace V2_0
 }  // namespace sensors
