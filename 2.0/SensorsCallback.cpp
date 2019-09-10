@@ -9,12 +9,16 @@ namespace V2_0 {
 namespace implementation {
 
 // Methods from ::android::hardware::sensors::V2_0::ISensorsCallback follow.
-Return<void> SensorsCallback::onDynamicSensorsConnected(const hidl_vec<::android::hardware::sensors::V1_0::SensorInfo>& sensorInfos) {
+Return<void> SensorsCallback::onDynamicSensorsConnected(const hidl_vec<V1_0::SensorInfo>& sensorInfos)
+{
+    (void) sensorInfos;
     // TODO implement
     return Void();
 }
 
-Return<void> SensorsCallback::onDynamicSensorsDisconnected(const hidl_vec<int32_t>& sensorHandles) {
+Return<void> SensorsCallback::onDynamicSensorsDisconnected(const hidl_vec<int32_t>& sensorHandles)
+{
+    (void) sensorHandles;
     // TODO implement
     return Void();
 }
