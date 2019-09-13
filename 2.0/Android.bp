@@ -20,6 +20,7 @@ cc_binary {
     vendor: true,
     proprietary: true,
     init_rc: ["android.hardware.sensors@2.0-service-stmicroelectronics.rc"],
+    vintf_fragments: ["android.hardware.sensors@2.0-stmicroelectronics.xml"],
     srcs: [
         "service.cpp",
         "Sensors.cpp",
