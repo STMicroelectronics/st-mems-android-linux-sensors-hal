@@ -54,7 +54,7 @@ Return<Result> Sensors::initialize(const MQDescriptorSync<V1_0::Event>& eventQue
     (void) wakeLockDescriptor;
     (void) sensorsCallback;
     // TODO implement
-    return Result {};
+    return Result::BAD_VALUE;
 }
 
 Return<Result> Sensors::batch(int32_t sensorHandle,
