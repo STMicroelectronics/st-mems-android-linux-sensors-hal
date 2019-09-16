@@ -30,56 +30,56 @@ Return<void> Sensors::getSensorsList(getSensorsList_cb _hidl_cb)
     return Void();
 }
 
-Return<V1_0::Result> Sensors::setOperationMode(V1_0::OperationMode mode)
+Return<Result> Sensors::setOperationMode(V1_0::OperationMode mode)
 {
     (void) mode;
     // TODO implement
-    return V1_0::Result {};
+    return Result {};
 }
 
-Return<V1_0::Result> Sensors::activate(int32_t sensorHandle,
-                                       bool enabled)
+Return<Result> Sensors::activate(int32_t sensorHandle,
+                                 bool enabled)
 {
     (void) sensorHandle;
     (void) enabled;
     // TODO implement
-    return ::android::hardware::sensors::V1_0::Result {};
+    return Result {};
 }
 
-Return<V1_0::Result> Sensors::initialize(const MQDescriptorSync<V1_0::Event>& eventQueueDescriptor,
-                                         const MQDescriptorSync<uint32_t>& wakeLockDescriptor,
-                                         const sp<ISensorsCallback>& sensorsCallback)
+Return<Result> Sensors::initialize(const MQDescriptorSync<V1_0::Event>& eventQueueDescriptor,
+                                   const MQDescriptorSync<uint32_t>& wakeLockDescriptor,
+                                   const sp<ISensorsCallback>& sensorsCallback)
 {
     (void) eventQueueDescriptor;
     (void) wakeLockDescriptor;
     (void) sensorsCallback;
     // TODO implement
-    return V1_0::Result {};
+    return Result {};
 }
 
-Return<V1_0::Result> Sensors::batch(int32_t sensorHandle,
-                                    int64_t samplingPeriodNs,
-                                    int64_t maxReportLatencyNs)
+Return<Result> Sensors::batch(int32_t sensorHandle,
+                              int64_t samplingPeriodNs,
+                              int64_t maxReportLatencyNs)
 {
     (void) sensorHandle;
     (void) samplingPeriodNs;
     (void) maxReportLatencyNs;
     // TODO implement
-    return V1_0::Result {};
+    return Result {};
 }
 
-Return<V1_0::Result> Sensors::flush(int32_t sensorHandle)
+Return<Result> Sensors::flush(int32_t sensorHandle)
 {
     (void) sensorHandle;
     // TODO implement
-    return V1_0::Result {};
+    return Result {};
 }
 
-Return<V1_0::Result> Sensors::injectSensorData(const V1_0::Event& event)
+Return<Result> Sensors::injectSensorData(const V1_0::Event& event)
 {
     (void) event;
     // TODO implement
-    return V1_0::Result {};
+    return Result {};
 }
 
 Return<void> Sensors::registerDirectChannel(const V1_0::SharedMemInfo& mem,
@@ -91,11 +91,11 @@ Return<void> Sensors::registerDirectChannel(const V1_0::SharedMemInfo& mem,
     return Void();
 }
 
-Return<V1_0::Result> Sensors::unregisterDirectChannel(int32_t channelHandle)
+Return<Result> Sensors::unregisterDirectChannel(int32_t channelHandle)
 {
     (void) channelHandle;
     // TODO implement
-    return V1_0::Result {};
+    return Result {};
 }
 
 Return<void> Sensors::configDirectReport(int32_t sensorHandle,
