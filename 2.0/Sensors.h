@@ -18,8 +18,12 @@
 #pragma once
 
 #include <android/hardware/sensors/2.0/ISensors.h>
+#include <hardware_legacy/power.h>
 #include <hidl/MQDescriptor.h>
+#include <fmq/MessageQueue.h>
 #include <hidl/Status.h>
+#include <atomic>
+#include <thread>
 
 namespace android {
 namespace hardware {
@@ -29,6 +33,8 @@ namespace implementation {
 
 using ::android::hardware::sensors::V1_0::Result;
 using ::android::hardware::sensors::V1_0::Event;
+using ::android::hardware::MQDescriptor;
+using ::android::hardware::MessageQueue;
 using ::android::hardware::hidl_array;
 using ::android::hardware::hidl_memory;
 using ::android::hardware::hidl_string;
@@ -38,6 +44,10 @@ using ::android::hardware::Void;
 using ::android::sp;
 
 struct Sensors : public ISensors {
+public:
+    Sensors(void);
+    ~Sensors(void);
+
     Return<void> getSensorsList(getSensorsList_cb _hidl_cb) override;
 
     Return<Result> setOperationMode(V1_0::OperationMode mode) override;
@@ -67,6 +77,74 @@ struct Sensors : public ISensors {
                                     V1_0::RateLevel rate,
                                     configDirectReport_cb _hidl_cb) override;
 
+private:
+    using EventMessageQueue = MessageQueue<Event, kSynchronizedReadWrite>;
+    using WakeLockMessageQueue = MessageQueue<uint32_t, kSynchronizedReadWrite>;
+
+    /**
+     * FMQ where sensor events are written into
+     */
+    std::unique_ptr<EventMessageQueue> mEventQueue;
+
+    /**
+     * FMQ where wake locks number of handled events are read from
+     */
+    std::unique_ptr<WakeLockMessageQueue> mWakeLockQueue;
+
+    /**
+     * Flag used to indicate if the wake lock thread needs to be stopped or keept running
+     */
+    std::atomic_bool mReadWakeLockQueueRun;
+
+    /**
+     * Thread used to read wake lock FMQ
+     */
+    std::thread mWakeLockThread;
+
+    /**
+     * Lock to make updateWakelock function exclusively executed
+     */
+    std::mutex mWakeLockLock;
+
+    /**
+     * Number of pending WAKE_UP events that the framework did not handled yet
+     */
+    uint32_t mOutstandingWakeUpEvents;
+
+    /**
+     * Timestamp value when the taken wake lock should be (auto)released because of timeout
+     */
+    int64_t mAutoReleaseWakeLockTime;
+
+    /**
+     * Flag used to indicate if the partial wake lock has been taken
+     */
+    bool mHasWakeLock;
+
+    /**
+     * Event flag used to signal the framework when sensors events are available to be read from mEventQueue
+     */
+    EventFlag *mEventQueueFlag;
+
+    /**
+     * Delete event flag (mEventQueueFlag)
+     */
+    void deleteEventFlag(void);
+
+    /**
+     * Wake lock thread entry point
+     */
+    static void startReadWakeLockThread(Sensors *sensors);
+
+    /**
+     * Read the wake lock FMQ and release the wake lock when appropriate
+     */
+    void readWakeLockFMQ(void);
+
+    /**
+     * Acquire and release wake lock when there are unhandled WAKE_UP events
+     */
+    void updateWakeLock(uint32_t eventsWritten, uint32_t eventsHandled);
 };
 
 }  // namespace implementation
