@@ -46,7 +46,7 @@ Return<Result> Sensors::activate(int32_t sensorHandle,
     return Result {};
 }
 
-Return<Result> Sensors::initialize(const MQDescriptorSync<V1_0::Event>& eventQueueDescriptor,
+Return<Result> Sensors::initialize(const MQDescriptorSync<Event>& eventQueueDescriptor,
                                    const MQDescriptorSync<uint32_t>& wakeLockDescriptor,
                                    const sp<ISensorsCallback>& sensorsCallback)
 {
@@ -75,7 +75,7 @@ Return<Result> Sensors::flush(int32_t sensorHandle)
     return Result {};
 }
 
-Return<Result> Sensors::injectSensorData(const V1_0::Event& event)
+Return<Result> Sensors::injectSensorData(const Event& event)
 {
     (void) event;
     // TODO implement
