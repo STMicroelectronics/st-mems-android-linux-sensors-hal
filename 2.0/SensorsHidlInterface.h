@@ -43,10 +43,10 @@ using ::android::hardware::Return;
 using ::android::hardware::Void;
 using ::android::sp;
 
-struct Sensors : public ISensors {
+struct SensorsHidlInterface : public ISensors {
 public:
-    Sensors(void);
-    ~Sensors(void);
+    SensorsHidlInterface(void);
+    ~SensorsHidlInterface(void);
 
     Return<void> getSensorsList(getSensorsList_cb _hidl_cb) override;
 
@@ -134,7 +134,7 @@ private:
     /**
      * Wake lock thread entry point
      */
-    static void startReadWakeLockThread(Sensors *sensors);
+    static void startReadWakeLockThread(SensorsHidlInterface *sensors);
 
     /**
      * Read the wake lock FMQ and release the wake lock when appropriate

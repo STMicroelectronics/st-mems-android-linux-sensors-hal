@@ -23,7 +23,7 @@ cc_binary {
     vintf_fragments: ["android.hardware.sensors@2.0-stmicroelectronics.xml"],
     srcs: [
         "service.cpp",
-        "Sensors.cpp",
+        "SensorsHidlInterface.cpp",
         "SensorsCallback.cpp",
     ],
     shared_libs: [

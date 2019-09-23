@@ -22,12 +22,12 @@
 #include <utils/StrongPointer.h>
 #include <log/log.h>
 
-#include "Sensors.h"
+#include "SensorsHidlInterface.h"
 
 using android::hardware::configureRpcThreadpool;
 using android::hardware::joinRpcThreadpool;
 using android::hardware::sensors::V2_0::ISensors;
-using android::hardware::sensors::V2_0::implementation::Sensors;
+using android::hardware::sensors::V2_0::implementation::SensorsHidlInterface;
 
 int main(int /* argc */, char** /* argv */)
 {
@@ -35,7 +35,7 @@ int main(int /* argc */, char** /* argv */)
 
     configureRpcThreadpool(1, true);
 
-    android::sp<ISensors> sensors = new Sensors();
+    android::sp<ISensors> sensors = new SensorsHidlInterface();
     err = sensors->registerAsService();
     if (err != android::OK) {
         ALOGE("Failed to register STM Sensors-HAL instance");

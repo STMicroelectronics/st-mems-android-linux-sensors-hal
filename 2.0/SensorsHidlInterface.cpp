@@ -20,7 +20,7 @@
 #include <android/hardware/sensors/2.0/types.h>
 #include <log/log.h>
 
-#include "Sensors.h"
+#include "SensorsHidlInterface.h"
 
 namespace android {
 namespace hardware {
@@ -30,23 +30,23 @@ namespace implementation {
 
 constexpr const char *kWakeLockName = "STM_SensorsHAL_WAKELOCK";
 
-Sensors::Sensors(void)
-        : mReadWakeLockQueueRun(false),
-          mOutstandingWakeUpEvents(0),
-          mHasWakeLock(false),
-          mEventQueueFlag(nullptr)
+SensorsHidlInterface::SensorsHidlInterface(void)
+                     : mReadWakeLockQueueRun(false),
+                       mOutstandingWakeUpEvents(0),
+                       mHasWakeLock(false),
+                       mEventQueueFlag(nullptr)
 {
     // TODO implement real scan of IIO sensors
 }
 
-Sensors::~Sensors(void)
+SensorsHidlInterface::~SensorsHidlInterface(void)
 {
     deleteEventFlag();
     mReadWakeLockQueueRun = false;
     mWakeLockThread.join();
 }
 
-Return<void> Sensors::getSensorsList(getSensorsList_cb _hidl_cb)
+Return<void> SensorsHidlInterface::getSensorsList(getSensorsList_cb _hidl_cb)
 {
     std::vector<V1_0::SensorInfo> sensorsList;
 
@@ -55,7 +55,7 @@ Return<void> Sensors::getSensorsList(getSensorsList_cb _hidl_cb)
     return Void();
 }
 
-Return<Result> Sensors::setOperationMode(V1_0::OperationMode mode)
+Return<Result> SensorsHidlInterface::setOperationMode(V1_0::OperationMode mode)
 {
     (void) mode;
 
@@ -64,8 +64,8 @@ Return<Result> Sensors::setOperationMode(V1_0::OperationMode mode)
     return Result::INVALID_OPERATION;
 }
 
-Return<Result> Sensors::activate(int32_t sensorHandle,
-                                 bool enabled)
+Return<Result> SensorsHidlInterface::activate(int32_t sensorHandle,
+                                              bool enabled)
 {
     (void) sensorHandle;
     (void) enabled;
@@ -75,9 +75,9 @@ Return<Result> Sensors::activate(int32_t sensorHandle,
     return Result::INVALID_OPERATION;
 }
 
-Return<Result> Sensors::initialize(const MQDescriptorSync<Event>& eventQueueDescriptor,
-                                   const MQDescriptorSync<uint32_t>& wakeLockDescriptor,
-                                   const sp<ISensorsCallback>& sensorsCallback)
+Return<Result> SensorsHidlInterface::initialize(const MQDescriptorSync<Event>& eventQueueDescriptor,
+                                                const MQDescriptorSync<uint32_t>& wakeLockDescriptor,
+                                                const sp<ISensorsCallback>& sensorsCallback)
 {
     (void) sensorsCallback;
     // TODO store sensorsCallback reference
@@ -118,9 +118,9 @@ Return<Result> Sensors::initialize(const MQDescriptorSync<Event>& eventQueueDesc
     return Result::OK;
 }
 
-Return<Result> Sensors::batch(int32_t sensorHandle,
-                              int64_t samplingPeriodNs,
-                              int64_t maxReportLatencyNs)
+Return<Result> SensorsHidlInterface::batch(int32_t sensorHandle,
+                                           int64_t samplingPeriodNs,
+                                           int64_t maxReportLatencyNs)
 {
     (void) sensorHandle;
     (void) samplingPeriodNs;
@@ -131,7 +131,7 @@ Return<Result> Sensors::batch(int32_t sensorHandle,
     return Result::INVALID_OPERATION;
 }
 
-Return<Result> Sensors::flush(int32_t sensorHandle)
+Return<Result> SensorsHidlInterface::flush(int32_t sensorHandle)
 {
     (void) sensorHandle;
 
@@ -140,7 +140,7 @@ Return<Result> Sensors::flush(int32_t sensorHandle)
     return Result::INVALID_OPERATION;
 }
 
-Return<Result> Sensors::injectSensorData(const Event& event)
+Return<Result> SensorsHidlInterface::injectSensorData(const Event& event)
 {
     (void) event;
 
@@ -149,8 +149,8 @@ Return<Result> Sensors::injectSensorData(const Event& event)
     return Result::INVALID_OPERATION;
 }
 
-Return<void> Sensors::registerDirectChannel(const V1_0::SharedMemInfo& mem,
-                                            registerDirectChannel_cb _hidl_cb)
+Return<void> SensorsHidlInterface::registerDirectChannel(const V1_0::SharedMemInfo& mem,
+                                                         registerDirectChannel_cb _hidl_cb)
 {
     (void) mem;
 
@@ -161,7 +161,7 @@ Return<void> Sensors::registerDirectChannel(const V1_0::SharedMemInfo& mem,
     return Void();
 }
 
-Return<Result> Sensors::unregisterDirectChannel(int32_t channelHandle)
+Return<Result> SensorsHidlInterface::unregisterDirectChannel(int32_t channelHandle)
 {
     (void) channelHandle;
 
@@ -170,10 +170,10 @@ Return<Result> Sensors::unregisterDirectChannel(int32_t channelHandle)
     return Result::INVALID_OPERATION;
 }
 
-Return<void> Sensors::configDirectReport(int32_t sensorHandle,
-                                         int32_t channelHandle,
-                                         V1_0::RateLevel rate,
-                                         configDirectReport_cb _hidl_cb)
+Return<void> SensorsHidlInterface::configDirectReport(int32_t sensorHandle,
+                                                      int32_t channelHandle,
+                                                      V1_0::RateLevel rate,
+                                                      configDirectReport_cb _hidl_cb)
 {
     (void) sensorHandle;
     (void) channelHandle;
@@ -186,7 +186,7 @@ Return<void> Sensors::configDirectReport(int32_t sensorHandle,
     return Void();
 }
 
-void Sensors::deleteEventFlag(void)
+void SensorsHidlInterface::deleteEventFlag(void)
 {
     ::android::status_t status = EventFlag::deleteEventFlag(&mEventQueueFlag);
     if (status != ::android::OK) {
@@ -194,7 +194,7 @@ void Sensors::deleteEventFlag(void)
     }
 }
 
-void Sensors::updateWakeLock(uint32_t eventsWritten, uint32_t eventsHandled)
+void SensorsHidlInterface::updateWakeLock(uint32_t eventsWritten, uint32_t eventsHandled)
 {
     std::lock_guard<std::mutex> lock(mWakeLockLock);
 
@@ -225,7 +225,7 @@ void Sensors::updateWakeLock(uint32_t eventsWritten, uint32_t eventsHandled)
     }
 }
 
-void Sensors::readWakeLockFMQ(void)
+void SensorsHidlInterface::readWakeLockFMQ(void)
 {
     constexpr int64_t kRealTimeoutNs = 500 * 1000 * 1000;
 
@@ -240,7 +240,7 @@ void Sensors::readWakeLockFMQ(void)
     }
 }
 
-void Sensors::startReadWakeLockThread(Sensors *sensors)
+void SensorsHidlInterface::startReadWakeLockThread(SensorsHidlInterface *sensors)
 {
     sensors->readWakeLockFMQ();
 }
