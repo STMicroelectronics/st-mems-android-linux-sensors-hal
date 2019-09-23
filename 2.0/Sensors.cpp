@@ -61,7 +61,7 @@ Return<Result> Sensors::setOperationMode(V1_0::OperationMode mode)
 
     // TODO implement
 
-    return Result {};
+    return Result::INVALID_OPERATION;
 }
 
 Return<Result> Sensors::activate(int32_t sensorHandle,
@@ -72,7 +72,7 @@ Return<Result> Sensors::activate(int32_t sensorHandle,
 
     // TODO implement
 
-    return Result {};
+    return Result::INVALID_OPERATION;
 }
 
 Return<Result> Sensors::initialize(const MQDescriptorSync<Event>& eventQueueDescriptor,
@@ -128,7 +128,7 @@ Return<Result> Sensors::batch(int32_t sensorHandle,
 
     // TODO implement
 
-    return Result {};
+    return Result::INVALID_OPERATION;
 }
 
 Return<Result> Sensors::flush(int32_t sensorHandle)
@@ -137,21 +137,24 @@ Return<Result> Sensors::flush(int32_t sensorHandle)
 
     // TODO implement
 
-    return Result {};
+    return Result::INVALID_OPERATION;
 }
 
 Return<Result> Sensors::injectSensorData(const Event& event)
 {
     (void) event;
+
     // TODO implement
-    return Result {};
+
+    return Result::INVALID_OPERATION;
 }
 
 Return<void> Sensors::registerDirectChannel(const V1_0::SharedMemInfo& mem,
                                             registerDirectChannel_cb _hidl_cb)
 {
     (void) mem;
-    (void) _hidl_cb;
+
+    _hidl_cb(Result::INVALID_OPERATION, -1);
 
     // TODO implement
 
@@ -164,7 +167,7 @@ Return<Result> Sensors::unregisterDirectChannel(int32_t channelHandle)
 
     // TODO implement
 
-    return Result {};
+    return Result::INVALID_OPERATION;
 }
 
 Return<void> Sensors::configDirectReport(int32_t sensorHandle,
@@ -175,7 +178,8 @@ Return<void> Sensors::configDirectReport(int32_t sensorHandle,
     (void) sensorHandle;
     (void) channelHandle;
     (void) rate;
-    (void) _hidl_cb;
+
+    _hidl_cb(Result::INVALID_OPERATION, 0);
 
     // TODO implement
 
