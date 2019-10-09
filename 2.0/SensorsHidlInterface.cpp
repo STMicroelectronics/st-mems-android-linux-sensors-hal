@@ -46,6 +46,10 @@ SensorsHidlInterface::~SensorsHidlInterface(void)
     mWakeLockThread.join();
 }
 
+/**
+ * getSensorsList: HIDL defined function,
+ *                 reference: hardware/interfaces/sensors/2.0/ISensors.hal
+ */
 Return<void> SensorsHidlInterface::getSensorsList(getSensorsList_cb _hidl_cb)
 {
     std::vector<V1_0::SensorInfo> sensorsList;
@@ -55,6 +59,10 @@ Return<void> SensorsHidlInterface::getSensorsList(getSensorsList_cb _hidl_cb)
     return Void();
 }
 
+/**
+ * setOperationMode: HIDL defined function,
+ *                   reference: hardware/interfaces/sensors/2.0/ISensors.hal
+ */
 Return<Result> SensorsHidlInterface::setOperationMode(V1_0::OperationMode mode)
 {
     (void) mode;
@@ -64,6 +72,10 @@ Return<Result> SensorsHidlInterface::setOperationMode(V1_0::OperationMode mode)
     return Result::INVALID_OPERATION;
 }
 
+/**
+ * activate: HIDL defined function,
+ *           reference: hardware/interfaces/sensors/2.0/ISensors.hal
+ */
 Return<Result> SensorsHidlInterface::activate(int32_t sensorHandle,
                                               bool enabled)
 {
@@ -75,6 +87,10 @@ Return<Result> SensorsHidlInterface::activate(int32_t sensorHandle,
     return Result::INVALID_OPERATION;
 }
 
+/**
+ * initialize: HIDL defined function,
+ *             reference: hardware/interfaces/sensors/2.0/ISensors.hal
+ */
 Return<Result> SensorsHidlInterface::initialize(const MQDescriptorSync<Event>& eventQueueDescriptor,
                                                 const MQDescriptorSync<uint32_t>& wakeLockDescriptor,
                                                 const sp<ISensorsCallback>& sensorsCallback)
@@ -118,6 +134,10 @@ Return<Result> SensorsHidlInterface::initialize(const MQDescriptorSync<Event>& e
     return Result::OK;
 }
 
+/**
+ * batch: HIDL defined function,
+ *        reference: hardware/interfaces/sensors/2.0/ISensors.hal
+ */
 Return<Result> SensorsHidlInterface::batch(int32_t sensorHandle,
                                            int64_t samplingPeriodNs,
                                            int64_t maxReportLatencyNs)
@@ -131,6 +151,10 @@ Return<Result> SensorsHidlInterface::batch(int32_t sensorHandle,
     return Result::INVALID_OPERATION;
 }
 
+/**
+ * flush: HIDL defined function,
+ *        reference: hardware/interfaces/sensors/2.0/ISensors.Hal
+ */
 Return<Result> SensorsHidlInterface::flush(int32_t sensorHandle)
 {
     (void) sensorHandle;
@@ -140,6 +164,10 @@ Return<Result> SensorsHidlInterface::flush(int32_t sensorHandle)
     return Result::INVALID_OPERATION;
 }
 
+/**
+ * injectSensorData: HIDL defined function,
+ *                   reference: hardware/interfaces/sensors/2.0/ISensors.hal
+ */
 Return<Result> SensorsHidlInterface::injectSensorData(const Event& event)
 {
     (void) event;
@@ -149,6 +177,10 @@ Return<Result> SensorsHidlInterface::injectSensorData(const Event& event)
     return Result::INVALID_OPERATION;
 }
 
+/**
+ * registerDirectChannel: HIDL defined function,
+ *                        reference: hardware/interfaces/sensors/2.0/ISensors.hal
+ */
 Return<void> SensorsHidlInterface::registerDirectChannel(const V1_0::SharedMemInfo& mem,
                                                          registerDirectChannel_cb _hidl_cb)
 {
@@ -161,6 +193,10 @@ Return<void> SensorsHidlInterface::registerDirectChannel(const V1_0::SharedMemIn
     return Void();
 }
 
+/**
+ * unregisterDirectChannel: HIDL defined function,
+ *                          reference: hardware/interfaces/sensors/2.0/ISensors.hal
+ */
 Return<Result> SensorsHidlInterface::unregisterDirectChannel(int32_t channelHandle)
 {
     (void) channelHandle;
@@ -170,6 +206,10 @@ Return<Result> SensorsHidlInterface::unregisterDirectChannel(int32_t channelHand
     return Result::INVALID_OPERATION;
 }
 
+/**
+ * configDirectReport: HIDL defined function,
+ *                     reference: hardware/interfaces/sensors/2.0/ISensors.hal
+ */
 Return<void> SensorsHidlInterface::configDirectReport(int32_t sensorHandle,
                                                       int32_t channelHandle,
                                                       V1_0::RateLevel rate,
@@ -186,6 +226,9 @@ Return<void> SensorsHidlInterface::configDirectReport(int32_t sensorHandle,
     return Void();
 }
 
+/**
+ * deleteEventFlag: delete event queue flag (mEventQueueFlag)
+ */
 void SensorsHidlInterface::deleteEventFlag(void)
 {
     ::android::status_t status = EventFlag::deleteEventFlag(&mEventQueueFlag);
@@ -194,6 +237,14 @@ void SensorsHidlInterface::deleteEventFlag(void)
     }
 }
 
+/**
+ * updateWakeLock: update the number of WAKE_UP events that are still pending on framework side
+ *                 after a read or write of FMQ has been performed, if needed,
+ *                 acquire or release partial wake lock in order to make sure framework
+ *                 manage the data before system goes to suspend
+ * @eventsWritten: number of events that have been written by the caller.
+ * @eventsHandled: number of events that have been read by the caller.
+ */
 void SensorsHidlInterface::updateWakeLock(uint32_t eventsWritten, uint32_t eventsHandled)
 {
     std::lock_guard<std::mutex> lock(mWakeLockLock);
@@ -225,6 +276,9 @@ void SensorsHidlInterface::updateWakeLock(uint32_t eventsWritten, uint32_t event
     }
 }
 
+/**
+ * readWakeLockFMQ: read the wake lock FMQ and update the events status
+ */
 void SensorsHidlInterface::readWakeLockFMQ(void)
 {
     constexpr int64_t kRealTimeoutNs = 500 * 1000 * 1000;
@@ -240,6 +294,10 @@ void SensorsHidlInterface::readWakeLockFMQ(void)
     }
 }
 
+/**
+ * startReadWakeLockThread: thread entry point function for reading wake lock FMQ
+ * @sensors: this class instance since the method needs to be static.
+ */
 void SensorsHidlInterface::startReadWakeLockThread(SensorsHidlInterface *sensors)
 {
     sensors->readWakeLockFMQ();

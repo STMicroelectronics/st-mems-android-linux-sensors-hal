@@ -126,24 +126,12 @@ private:
      */
     EventFlag *mEventQueueFlag;
 
-    /**
-     * Delete event flag (mEventQueueFlag)
-     */
     void deleteEventFlag(void);
 
-    /**
-     * Wake lock thread entry point
-     */
     static void startReadWakeLockThread(SensorsHidlInterface *sensors);
 
-    /**
-     * Read the wake lock FMQ and release the wake lock when appropriate
-     */
     void readWakeLockFMQ(void);
 
-    /**
-     * Acquire and release wake lock when there are unhandled WAKE_UP events
-     */
     void updateWakeLock(uint32_t eventsWritten, uint32_t eventsHandled);
 };
 
