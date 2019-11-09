@@ -15,32 +15,30 @@
  * limitations under the License.
  */
 
-#include "SensorsCallback.h"
+#define LOG_TAG "sensors@2.0-stmicroelectronics"
 
-namespace android {
-namespace hardware {
-namespace sensors {
-namespace V2_0 {
-namespace implementation {
+#include <iostream>
+#include <log/log.h>
 
-Return<void>
-SensorsCallback::onDynamicSensorsConnected(const hidl_vec<V1_0::SensorInfo> &sensorInfos)
+#include "Console.h"
+
+void Console::info(const std::string &message) const
 {
-    (void) sensorInfos;
-    // TODO implement
-    return Void();
+    std::string messageToPrint = message + "\n";
+
+    ALOGI("%s", messageToPrint.c_str());
 }
 
-Return<void>
-SensorsCallback::onDynamicSensorsDisconnected(const hidl_vec<int32_t> &sensorHandles)
+void Console::error(const std::string &message) const
 {
-    (void) sensorHandles;
-    // TODO implement
-    return Void();
+    std::string messageToPrint = message + "\n";
+
+    ALOGE("%s", messageToPrint.c_str());
 }
 
-}  // namespace implementation
-}  // namespace V2_0
-}  // namespace sensors
-}  // namespace hardware
-}  // namespace android
+void Console::debug(const std::string &message) const
+{
+    std::string messageToPrint = message + "\n";
+
+    ALOGD("%s", messageToPrint.c_str());
+}

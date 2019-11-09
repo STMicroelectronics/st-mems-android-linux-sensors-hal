@@ -25,6 +25,9 @@
 #include <atomic>
 #include <thread>
 
+#include <ISTMSensorsHAL.h>
+#include <IUtils.h>
+
 namespace android {
 namespace hardware {
 namespace sensors {
@@ -43,7 +46,7 @@ using ::android::hardware::Return;
 using ::android::hardware::Void;
 using ::android::sp;
 
-struct SensorsHidlInterface : public ISensors {
+struct SensorsHidlInterface : public ISensors, public ISTMSensorsCallback {
 public:
     SensorsHidlInterface(void);
     ~SensorsHidlInterface(void);
@@ -77,6 +80,10 @@ public:
                                     V1_0::RateLevel rate,
                                     configDirectReport_cb _hidl_cb) override;
 
+    void onNewSensorsData(const std::vector<ISTMSensorsCallbackData> &sensorsData) override;
+
+    void postEvents(const std::vector<Event> &events, bool wakeup);
+
 private:
     using EventMessageQueue = MessageQueue<Event, kSynchronizedReadWrite>;
     using WakeLockMessageQueue = MessageQueue<uint32_t, kSynchronizedReadWrite>;
@@ -95,6 +102,11 @@ private:
      * Flag used to indicate if the wake lock thread needs to be stopped or keept running
      */
     std::atomic_bool mReadWakeLockQueueRun;
+
+    /**
+     * Lock to protect writes to the FMQ
+     */
+    std::mutex mWriteLock;
 
     /**
      * Thread used to read wake lock FMQ
@@ -122,9 +134,20 @@ private:
     bool mHasWakeLock;
 
     /**
-     * Event flag used to signal the framework when sensors events are available to be read from mEventQueue
+     * Event flag used to signal the framework when sensors events are available
+     * to be read from mEventQueue
      */
     EventFlag *mEventQueueFlag;
+
+    /**
+     * Core library object interface
+     */
+    ISTMSensorsHAL &sensorsCore;
+
+    /**
+     * Print console
+     */
+    IConsole &console;
 
     void deleteEventFlag(void);
 

@@ -16,6 +16,7 @@
 
 cc_binary {
     name: "android.hardware.sensors@2.0-service.stmicroelectronics",
+    owner: "STMicroelectronics",
     relative_install_path: "hw",
     vendor: true,
     proprietary: true,
@@ -25,15 +26,31 @@ cc_binary {
         "service.cpp",
         "SensorsHidlInterface.cpp",
         "SensorsCallback.cpp",
+        "Convert.cpp",
+        "IUtils.cpp",
+        "Utils.cpp",
+        "IConsole.cpp",
+        "Console.cpp",
+    ],
+    static_libs: [
+        "stmicroelectronics-sensors-core",
     ],
     shared_libs: [
         "android.hardware.sensors@2.0",
         "android.hardware.sensors@1.0",
         "libhidlbase",
-	"libcutils",
-	"libpower",
+        "libcutils",
+        "libpower",
         "libutils",
-	"libfmq",
-	"liblog",
+        "libfmq",
+        "liblog",
+    ],
+    export_static_lib_headers: [
+        "stmicroelectronics-sensors-core",
+    ],
+    cflags: [
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
     ],
 }

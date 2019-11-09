@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#define LOG_TAG "android.hardware.sensors@2.0-Sensors"
-
 #include <android/hardware/sensors/2.0/types.h>
-#include <log/log.h>
+#include <memory>
 
+#include <IConsole.h>
+#include "Convert.h"
 #include "SensorsHidlInterface.h"
 
 namespace android {
@@ -34,9 +34,10 @@ SensorsHidlInterface::SensorsHidlInterface(void)
                      : mReadWakeLockQueueRun(false),
                        mOutstandingWakeUpEvents(0),
                        mHasWakeLock(false),
-                       mEventQueueFlag(nullptr)
+                       mEventQueueFlag(nullptr),
+                       sensorsCore(ISTMSensorsHAL::getInstance()),
+                       console(IConsole::getInstance())
 {
-    // TODO implement real scan of IIO sensors
 }
 
 SensorsHidlInterface::~SensorsHidlInterface(void)
@@ -52,7 +53,21 @@ SensorsHidlInterface::~SensorsHidlInterface(void)
  */
 Return<void> SensorsHidlInterface::getSensorsList(getSensorsList_cb _hidl_cb)
 {
-    std::vector<V1_0::SensorInfo> sensorsList;
+    const std::vector<STMSensor> &list = sensorsCore.getSensorsList().getList();
+    hidl_vec<V1_0::SensorInfo> sensorsList;
+    size_t n = 0, count = list.size();
+
+    sensorsList.resize(count);
+
+    for (size_t i = 0; i < count; i++) {
+        if (convertFromSTMSensor(list.at(i), &sensorsList[n])) {
+            n++;
+        }
+    }
+
+    if (n != count) {
+        sensorsList.resize(n);
+    }
 
     _hidl_cb(sensorsList);
 
@@ -67,8 +82,6 @@ Return<Result> SensorsHidlInterface::setOperationMode(V1_0::OperationMode mode)
 {
     (void) mode;
 
-    // TODO implement
-
     return Result::INVALID_OPERATION;
 }
 
@@ -79,52 +92,57 @@ Return<Result> SensorsHidlInterface::setOperationMode(V1_0::OperationMode mode)
 Return<Result> SensorsHidlInterface::activate(int32_t sensorHandle,
                                               bool enabled)
 {
-    (void) sensorHandle;
-    (void) enabled;
+    if (sensorsCore.activate(sensorHandle, enabled)) {
+        return Result::INVALID_OPERATION;
+    }
 
-    // TODO implement
-
-    return Result::INVALID_OPERATION;
+    return Result::OK;
 }
 
 /**
  * initialize: HIDL defined function,
  *             reference: hardware/interfaces/sensors/2.0/ISensors.hal
  */
-Return<Result> SensorsHidlInterface::initialize(const MQDescriptorSync<Event>& eventQueueDescriptor,
-                                                const MQDescriptorSync<uint32_t>& wakeLockDescriptor,
-                                                const sp<ISensorsCallback>& sensorsCallback)
+Return<Result>
+SensorsHidlInterface::initialize(const MQDescriptorSync<Event>& eventQueueDescriptor,
+                                 const MQDescriptorSync<uint32_t>& wakeLockDescriptor,
+                                 const sp<ISensorsCallback>& sensorsCallback)
 {
     (void) sensorsCallback;
     // TODO store sensorsCallback reference
     // TODO make sure all sensors are disabled
+
+    sensorsCore.initialize(*dynamic_cast<ISTMSensorsCallback *>(this));
 
     if (mReadWakeLockQueueRun.load()) {
         mReadWakeLockQueueRun = false;
         mWakeLockThread.join();
     }
 
-    mEventQueue = std::make_unique<EventMessageQueue>(eventQueueDescriptor, true /* resetPointers */);
+    mEventQueue = std::make_unique<EventMessageQueue>(eventQueueDescriptor,
+                                                      true /* resetPointers */);
     if ((mEventQueue == nullptr) || !mEventQueue->isValid()) {
-        ALOGE("Failed to create MessageQueue for sensors events");
+        console.error("failed to create MessageQueue for sensors events");
         return Result::BAD_VALUE;
     }
 
     if (mEventQueueFlag != nullptr) {
         if (EventFlag::deleteEventFlag(&mEventQueueFlag) != ::android::OK) {
-            ALOGE("Failed to delete eventQueue flag");
+            console.error("failed to delete eventQueue flag");
             return Result::BAD_VALUE;
         }
     }
 
-    if (EventFlag::createEventFlag(mEventQueue->getEventFlagWord(), &mEventQueueFlag) != ::android::OK) {
-        ALOGE("Failed to create eventQueue flag");
+    if (EventFlag::createEventFlag(mEventQueue->getEventFlagWord(),
+                                   &mEventQueueFlag) != ::android::OK) {
+        console.error("failed to create eventQueue flag");
         return Result::BAD_VALUE;
     }
 
-    mWakeLockQueue = std::make_unique<WakeLockMessageQueue>(wakeLockDescriptor, true /* resetPointers */);
+    mWakeLockQueue = std::make_unique<WakeLockMessageQueue>(wakeLockDescriptor,
+                                                            true /* resetPointers */);
     if ((mWakeLockQueue == nullptr) || !mWakeLockQueue->isValid()) {
-        ALOGE("Failed to create MessageQueue for wake locks");
+        console.error("failed to create MessageQueue for wake locks");
         return Result::BAD_VALUE;
     }
 
@@ -142,13 +160,11 @@ Return<Result> SensorsHidlInterface::batch(int32_t sensorHandle,
                                            int64_t samplingPeriodNs,
                                            int64_t maxReportLatencyNs)
 {
-    (void) sensorHandle;
-    (void) samplingPeriodNs;
-    (void) maxReportLatencyNs;
+    if (sensorsCore.setRate(sensorHandle, samplingPeriodNs, maxReportLatencyNs)) {
+        return Result::INVALID_OPERATION;
+    }
 
-    // TODO implement
-
-    return Result::INVALID_OPERATION;
+    return Result::OK;
 }
 
 /**
@@ -157,11 +173,11 @@ Return<Result> SensorsHidlInterface::batch(int32_t sensorHandle,
  */
 Return<Result> SensorsHidlInterface::flush(int32_t sensorHandle)
 {
-    (void) sensorHandle;
+    if (sensorsCore.flushData(sensorHandle)) {
+        return Result::INVALID_OPERATION;
+    }
 
-    // TODO implement
-
-    return Result::INVALID_OPERATION;
+    return Result::OK;
 }
 
 /**
@@ -171,8 +187,6 @@ Return<Result> SensorsHidlInterface::flush(int32_t sensorHandle)
 Return<Result> SensorsHidlInterface::injectSensorData(const Event& event)
 {
     (void) event;
-
-    // TODO implement
 
     return Result::INVALID_OPERATION;
 }
@@ -188,8 +202,6 @@ Return<void> SensorsHidlInterface::registerDirectChannel(const V1_0::SharedMemIn
 
     _hidl_cb(Result::INVALID_OPERATION, -1);
 
-    // TODO implement
-
     return Void();
 }
 
@@ -200,8 +212,6 @@ Return<void> SensorsHidlInterface::registerDirectChannel(const V1_0::SharedMemIn
 Return<Result> SensorsHidlInterface::unregisterDirectChannel(int32_t channelHandle)
 {
     (void) channelHandle;
-
-    // TODO implement
 
     return Result::INVALID_OPERATION;
 }
@@ -221,9 +231,55 @@ Return<void> SensorsHidlInterface::configDirectReport(int32_t sensorHandle,
 
     _hidl_cb(Result::INVALID_OPERATION, 0);
 
-    // TODO implement
-
     return Void();
+}
+
+/**
+ * onNewSensorsData: receive data from STMSensorsHAL,
+ *                   reference: ISTMSensorsCallbackData class
+ */
+void
+SensorsHidlInterface::onNewSensorsData(const std::vector<ISTMSensorsCallbackData> &sensorsData)
+{
+    bool containsWakeUpEvents = false;
+    std::vector<Event> eventsList;
+
+    eventsList.reserve(sensorsData.size());
+
+    for (auto sdata : sensorsData) {
+        Event event;
+
+        if (!convertFromSTMSensorType(sdata.getSensorType(), event.sensorType)) {
+            console.error("sensor event unknown, discarding...");
+            continue;
+        }
+
+        event.sensorHandle = sdata.getSensorHandle();
+        event.timestamp = sdata.getTimestamp();
+        containsWakeUpEvents |= sdata.isWakeUpSensor();
+        convertFromSTMSensorData(sdata, event);
+        eventsList.push_back(event);
+    }
+
+    postEvents(eventsList, containsWakeUpEvents);
+}
+
+/**
+ * postEvents: write sensors events to queue
+ * @events: sensor events
+ * @wakeup: true if it's a wakeup sensor
+ */
+void SensorsHidlInterface::postEvents(const std::vector<Event> &events, bool wakeup)
+{
+    std::lock_guard<std::mutex> lock(mWriteLock);
+
+    if (mEventQueue->write(events.data(), events.size())) {
+        mEventQueueFlag->wake(static_cast<uint32_t>(EventQueueFlagBits::READ_AND_PROCESS));
+
+        if (wakeup) {
+            updateWakeLock(events.size(), 0);
+        }
+    }
 }
 
 /**
@@ -233,7 +289,8 @@ void SensorsHidlInterface::deleteEventFlag(void)
 {
     ::android::status_t status = EventFlag::deleteEventFlag(&mEventQueueFlag);
     if (status != ::android::OK) {
-        ALOGE("Failed to delete eventQueue flag (error: %d)", status);
+        console.error("failed to delete eventQueue flag (error:" +
+                      std::to_string(status) + ")");
     }
 }
 
@@ -263,8 +320,9 @@ void SensorsHidlInterface::updateWakeLock(uint32_t eventsWritten, uint32_t event
 
     if (mHasWakeLock) {
         if (::android::uptimeMillis() > mAutoReleaseWakeLockTime) {
-            ALOGD("No events read from wake lock FMQ for %d seconds, auto realizing wake lock",
-                  SensorTimeout::WAKE_LOCK_SECONDS);
+            console.debug("no events read from wake lock FMQ for " +
+                          std::to_string(static_cast<int32_t>(SensorTimeout::WAKE_LOCK_SECONDS)) +
+                          " seconds, auto realizing wake lock");
             mOutstandingWakeUpEvents = 0;
         }
         if ((mOutstandingWakeUpEvents == 0) && release_wake_lock(kWakeLockName)) {

@@ -15,32 +15,23 @@
  * limitations under the License.
  */
 
-#include "SensorsCallback.h"
+#pragma once
+
+#include <android/hardware/sensors/2.0/ISensors.h>
+#include <STMSensor.h>
+#include <ISTMSensorsCallbackData.h>
 
 namespace android {
 namespace hardware {
 namespace sensors {
-namespace V2_0 {
-namespace implementation {
 
-Return<void>
-SensorsCallback::onDynamicSensorsConnected(const hidl_vec<V1_0::SensorInfo> &sensorInfos)
-{
-    (void) sensorInfos;
-    // TODO implement
-    return Void();
-}
+bool convertFromSTMSensorType(const STMSensorType &type,
+                              V1_0::SensorType &sensorType);
 
-Return<void>
-SensorsCallback::onDynamicSensorsDisconnected(const hidl_vec<int32_t> &sensorHandles)
-{
-    (void) sensorHandles;
-    // TODO implement
-    return Void();
-}
+bool convertFromSTMSensor(const STMSensor &src, V1_0::SensorInfo *dst);
 
-}  // namespace implementation
-}  // namespace V2_0
+void convertFromSTMSensorData(const ISTMSensorsCallbackData &sensorData, V1_0::Event &event);
+
 }  // namespace sensors
 }  // namespace hardware
 }  // namespace android

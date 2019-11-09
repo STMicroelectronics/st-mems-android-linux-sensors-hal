@@ -15,32 +15,11 @@
  * limitations under the License.
  */
 
-#include "SensorsCallback.h"
+#include <utils/SystemClock.h>
 
-namespace android {
-namespace hardware {
-namespace sensors {
-namespace V2_0 {
-namespace implementation {
+#include "Utils.h"
 
-Return<void>
-SensorsCallback::onDynamicSensorsConnected(const hidl_vec<V1_0::SensorInfo> &sensorInfos)
+int64_t Utils::getTime(void) const
 {
-    (void) sensorInfos;
-    // TODO implement
-    return Void();
+    return android::elapsedRealtimeNano();
 }
-
-Return<void>
-SensorsCallback::onDynamicSensorsDisconnected(const hidl_vec<int32_t> &sensorHandles)
-{
-    (void) sensorHandles;
-    // TODO implement
-    return Void();
-}
-
-}  // namespace implementation
-}  // namespace V2_0
-}  // namespace sensors
-}  // namespace hardware
-}  // namespace android

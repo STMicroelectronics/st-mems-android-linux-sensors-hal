@@ -15,32 +15,22 @@
  * limitations under the License.
  */
 
-#include "SensorsCallback.h"
+#pragma once
 
-namespace android {
-namespace hardware {
-namespace sensors {
-namespace V2_0 {
-namespace implementation {
+#include <string>
 
-Return<void>
-SensorsCallback::onDynamicSensorsConnected(const hidl_vec<V1_0::SensorInfo> &sensorInfos)
-{
-    (void) sensorInfos;
-    // TODO implement
-    return Void();
-}
+#include <IConsole.h>
 
-Return<void>
-SensorsCallback::onDynamicSensorsDisconnected(const hidl_vec<int32_t> &sensorHandles)
-{
-    (void) sensorHandles;
-    // TODO implement
-    return Void();
-}
+class Console : public IConsole {
+public:
+    Console(void) = default;
+    ~Console(void) = default;
+    Console(const Console &) = default;
+    Console& operator= (const Console &) = delete;
 
-}  // namespace implementation
-}  // namespace V2_0
-}  // namespace sensors
-}  // namespace hardware
-}  // namespace android
+    void info(const std::string &message) const override;
+
+    void error(const std::string &message) const override;
+
+    void debug(const std::string &message) const override;
+};
