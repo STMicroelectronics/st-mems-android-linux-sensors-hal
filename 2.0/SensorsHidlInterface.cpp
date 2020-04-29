@@ -80,9 +80,11 @@ Return<void> SensorsHidlInterface::getSensorsList(getSensorsList_cb _hidl_cb)
  */
 Return<Result> SensorsHidlInterface::setOperationMode(V1_0::OperationMode mode)
 {
-    (void) mode;
+    if (mode == V1_0::OperationMode::NORMAL) {
+        return Result::OK;
+    }
 
-    return Result::INVALID_OPERATION;
+    return Result::BAD_VALUE;
 }
 
 /**
@@ -93,7 +95,7 @@ Return<Result> SensorsHidlInterface::activate(int32_t sensorHandle,
                                               bool enabled)
 {
     if (sensorsCore.activate(sensorHandle, enabled)) {
-        return Result::INVALID_OPERATION;
+        return Result::BAD_VALUE;
     }
 
     return Result::OK;
@@ -161,7 +163,7 @@ Return<Result> SensorsHidlInterface::batch(int32_t sensorHandle,
                                            int64_t maxReportLatencyNs)
 {
     if (sensorsCore.setRate(sensorHandle, samplingPeriodNs, maxReportLatencyNs)) {
-        return Result::INVALID_OPERATION;
+        return Result::BAD_VALUE;
     }
 
     return Result::OK;
@@ -174,7 +176,7 @@ Return<Result> SensorsHidlInterface::batch(int32_t sensorHandle,
 Return<Result> SensorsHidlInterface::flush(int32_t sensorHandle)
 {
     if (sensorsCore.flushData(sensorHandle)) {
-        return Result::INVALID_OPERATION;
+        return Result::BAD_VALUE;
     }
 
     return Result::OK;
