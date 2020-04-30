@@ -16,6 +16,7 @@
  */
 
 #include <cstdlib>
+#include <cmath>
 
 #include "halVersion.h"
 #include "Convert.h"
@@ -213,7 +214,7 @@ bool convertFromSTMSensor(const STMSensor &src, struct sensor_t *dst)
     dst->version = src.getVersion();
     dst->handle = src.getHandle();
     dst->type = sensorType;
-    dst->maxRange = src.getMaxRange();
+    dst->maxRange = std::ceil(src.getMaxRange());
     dst->resolution = src.getResolution();
     dst->power = src.getPower();
 
