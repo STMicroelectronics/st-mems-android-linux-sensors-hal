@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#include <cmath>
+
 #include "Convert.h"
 
 namespace android {
@@ -204,7 +206,7 @@ bool convertFromSTMSensor(const STMSensor &src, V1_0::SensorInfo *dst)
     dst->version = src.getVersion();
     dst->type = sensorType;
     dst->typeAsString = "";
-    dst->maxRange = src.getMaxRange();
+    dst->maxRange = std::ceil(src.getMaxRange());
     dst->resolution = src.getResolution();
     dst->power = src.getPower();
 
