@@ -20,10 +20,6 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-PLATFORM_VERSION_MAJOR := $(word 1, $(subst ., ,$(PLATFORM_VERSION)))
-PLATFORM_VERSION_MINOR := $(word 2, $(subst ., ,$(PLATFORM_VERSION)))
-PLATFORM_VERSION_REVISION := $(word 3, $(subst ., ,$(PLATFORM_VERSION)))
-
 LOCAL_SHARED_LIBRARIES := \
     libcutils \
     libhardware \
@@ -61,9 +57,6 @@ endif # ST_HAL_ANDROID_VERSION
 LOCAL_MODULE_OWNER := STMicroelectronics
 
 LOCAL_CFLAGS += \
-    -DPLATFORM_VERSION_MAJOR=$(PLATFORM_VERSION_MAJOR) \
-    -DPLATFORM_VERSION_MINOR=$(PLATFORM_VERSION_MINOR) \
-    -DPLATFORM_VERSION_REVISION=$(PLATFORM_VERSION_REVISION) \
     -DLOG_TAG=\"sensors@legacy-stmicroelectronics\" \
     -Wall \
     -Wextra

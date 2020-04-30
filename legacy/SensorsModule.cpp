@@ -18,7 +18,7 @@
 #include <memory>
 #include <cerrno>
 
-#include "androidVersion.h"
+#include "halVersion.h"
 #include "SensorsLegacyInterface.h"
 #include <IConsole.h>
 
@@ -67,10 +67,10 @@ static int st_hal_open_sensors(const struct hw_module_t *module,
     pollDevice->flush = sensors->flush;
     pollDevice->inject_sensor_data = sensors->injectSensorData;
 
-#if ANDROID_VERSION_CODE >= ANDROID_VERSION(8, 0, 0)
+#if SENSORS_HAL_DEVICE_API_VERSION >= SENSORS_DEVICE_API_VERSION_1_4
     pollDevice->register_direct_channel = sensors->registerDirectChannel;
     pollDevice->config_direct_report = sensors->configDirectChannel;
-#endif /* ANDROID_VERSION_CODE */
+#endif /* SENSORS_HAL_DEVICE_API_VERSION */
 
     *device = &pollDevice->common;
 

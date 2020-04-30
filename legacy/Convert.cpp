@@ -17,7 +17,7 @@
 
 #include <cstdlib>
 
-#include "androidVersion.h"
+#include "halVersion.h"
 #include "Convert.h"
 
 static bool convertFromSTMSensorType(const STMSensorType &type,
@@ -132,14 +132,14 @@ static bool convertFromSTMSensorType(const STMSensorType &type,
         sensorType = SENSOR_TYPE_ADDITIONAL_INFO;
         isPartOfSensorList = false;
         break;
-#if ANDROID_VERSION_CODE >= ANDROID_VERSION(8, 0, 0)
+#if SENSORS_HAL_DEVICE_API_VERSION >= SENSORS_DEVICE_API_VERSION_1_4
     case STMSensorType::LOW_LATENCY_OFFBODY_DETECT:
         sensorType = SENSOR_TYPE_LOW_LATENCY_OFFBODY_DETECT;
         break;
     case STMSensorType::ACCELEROMETER_UNCALIBRATED:
         sensorType = SENSOR_TYPE_ACCELEROMETER_UNCALIBRATED;
         break;
-#endif /* ANDROID_VERSION_CODE */
+#endif /* SENSORS_HAL_DEVICE_API_VERSION */
     default:
         isPartOfSensorList = false;
         return false;

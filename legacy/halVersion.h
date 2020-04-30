@@ -17,14 +17,4 @@
 
 #pragma once
 
-#define ANDROID_VERSION(major, minor, rev) \
-                        ((rev) | (minor << 8) | (major << 16))
-
-#ifndef PLATFORM_VERSION_REVISION
-#define PLATFORM_VERSION_REVISION 0
-#endif /* PLATFORM_VERSION_REVISION */
-
-#define ANDROID_VERSION_CODE \
-    ANDROID_VERSION(PLATFORM_VERSION_MAJOR, \
-                    PLATFORM_VERSION_MINOR, \
-                    PLATFORM_VERSION_REVISION)
+#define SENSORS_HAL_DEVICE_API_VERSION SENSORS_DEVICE_API_VERSION_1_4
