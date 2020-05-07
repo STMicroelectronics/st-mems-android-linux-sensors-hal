@@ -28,9 +28,7 @@ cc_binary {
         "SensorsCallback.cpp",
         "Convert.cpp",
         "IUtils.cpp",
-        "Utils.cpp",
         "IConsole.cpp",
-        "Console.cpp",
     ],
     static_libs: [
         "stmicroelectronics-sensors-core",

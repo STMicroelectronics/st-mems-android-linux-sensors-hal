@@ -15,7 +15,25 @@
  * limitations under the License.
  */
 
-#include "Utils.h"
+#include <utils/SystemClock.h>
+
+#include <IUtils.h>
+
+class Utils : public IUtils {
+public:
+    Utils(void) = default;
+    ~Utils(void) = default;
+
+    Utils(const Utils &) = delete;
+    Utils& operator= (const Utils &) = delete;
+
+    int64_t getTime(void) const override;
+};
+
+int64_t Utils::getTime(void) const
+{
+    return android::elapsedRealtimeNano();
+}
 
 IUtils& IUtils::getInstance(void)
 {
