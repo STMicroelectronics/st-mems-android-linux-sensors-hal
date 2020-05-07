@@ -71,9 +71,7 @@ LOCAL_SRC_FILES := \
     SensorsLegacyInterface.cpp \
     Convert.cpp \
     IUtils.cpp \
-    Utils.cpp \
-    IConsole.cpp \
-    Console.cpp
+    IConsole.cpp
 
 LOCAL_MODULE_TAGS := optional
 
