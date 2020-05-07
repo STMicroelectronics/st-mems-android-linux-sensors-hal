@@ -15,7 +15,31 @@
  * limitations under the License.
  */
 
-#include "Utils.h"
+#include <ctime>
+
+#include <IUtils.h>
+
+class Utils : public IUtils {
+public:
+    Utils(void) = default;
+    ~Utils(void) = default;
+
+    Utils(const Utils &) = delete;
+    Utils& operator= (const Utils &) = delete;
+
+    int64_t getTime(void) const override;
+};
+
+int64_t Utils::getTime(void) const
+{
+    struct timespec ts;
+
+    if (clock_gettime(CLOCK_REALTIME, &ts)) {
+      return 0;
+    }
+
+    return (ts.tv_sec * 1000000000) + ts.tv_nsec;
+}
 
 IUtils& IUtils::getInstance(void)
 {

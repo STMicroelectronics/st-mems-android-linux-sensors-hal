@@ -20,8 +20,8 @@
 #include <chrono>
 #include <thread>
 
+#include <IConsole.h>
 #include "SensorsLinuxInterface.h"
-#include "Console.h"
 
 static IConsole &console = IConsole::getInstance();
 

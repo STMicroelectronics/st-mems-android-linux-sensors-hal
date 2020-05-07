@@ -15,7 +15,44 @@
  * limitations under the License.
  */
 
-#include "Console.h"
+#include <iostream>
+#include <string>
+
+#include <IConsole.h>
+
+class Console : public IConsole {
+public:
+    Console(void) = default;
+    ~Console(void) = default;
+
+    Console(const Console &) = delete;
+    Console& operator= (const Console &) = delete;
+
+    void info(const std::string &message) const override;
+
+    void error(const std::string &message) const override;
+
+    void debug(const std::string &message) const override;
+};
+
+void Console::info(const std::string &message) const
+{
+    std::string messageToPrint = message + "\n";
+
+    std::cout << messageToPrint;
+}
+
+void Console::error(const std::string &message) const
+{
+    std::string messageToPrint = message + "\n";
+
+    std::cerr << messageToPrint;
+}
+
+void Console::debug(const std::string &message) const
+{
+    info(message);
+}
 
 IConsole& IConsole::getInstance(void)
 {

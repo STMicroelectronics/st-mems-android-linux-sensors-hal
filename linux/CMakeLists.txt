@@ -33,9 +33,7 @@ add_executable(${PROJECT_TARGET}
                main.cpp
                SensorsLinuxInterface.cpp
                IUtils.cpp
-               Utils.cpp
-               IConsole.cpp
-               Console.cpp)
+               IConsole.cpp)
 
 target_include_directories(${PROJECT_TARGET} PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR})
