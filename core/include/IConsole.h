@@ -20,11 +20,13 @@
 #include <string>
 
 class IConsole {
-public:
+protected:
     IConsole(void) = default;
-    IConsole(const IConsole &) = default;
-    IConsole& operator= (const IConsole &) = delete;
     virtual ~IConsole(void) = default;
+
+public:
+    IConsole(const IConsole &) = delete;
+    IConsole& operator= (const IConsole &) = delete;
 
     /**
      * getInstance: retrieve console instance
