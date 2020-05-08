@@ -20,11 +20,13 @@
 #include <cstdint>
 
 class IUtils {
-public:
+protected:
     IUtils(void) = default;
+    virtual ~IUtils(void) = default;
+
+public:
     IUtils(const IUtils &) = default;
     IUtils& operator= (const IUtils &) = delete;
-    virtual ~IUtils(void) = default;
 
     /**
      * getInstance: retrieve utils instance
