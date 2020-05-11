@@ -20,9 +20,21 @@
 #include <STMSensorsHAL.h>
 #include <IConsole.h>
 
+class STMSensorsCallback : public ISTMSensorsCallback {
+    void onNewSensorsData(const std::vector<ISTMSensorsCallbackData> &sensorsData) override
+    {
+        (void) sensorsData;
+    }
+};
+
 class STMSensorsHALTest : public ::testing::Test {
+public:
+    const STMSensorsCallback sensorsCallback;
+    STMSensorsHAL hal;
+
 protected:
     void SetUp() override {
+        hal.initialize(sensorsCallback);
     }
 
     void TearDown() override {
@@ -58,13 +70,19 @@ IConsole& IConsole::getInstance(void)
  */
 TEST_F(STMSensorsHALTest, invalidHandle)
 {
-    STMSensorsHAL hal;
-
-    //hal.initialize();
-
+    // Verify that handle 0 is not valid and library return negative value
     ASSERT_LT(hal.activate(0, true), 0);
     ASSERT_LT(hal.activate(0, false), 0);
     ASSERT_LT(hal.setRate(0, 0, 0), 0);
     ASSERT_LT(hal.setRate(0, 1, 100), 0);
     ASSERT_LT(hal.flushData(0), 0);
+
+    auto lastValidHandle = hal.getSensorsList().getList().size();
+
+    // Sensors handles must be consecutive, handles > lastValidHandle are not valid and library must return negative value
+    ASSERT_LT(hal.activate(lastValidHandle + 1, true), 0);
+    ASSERT_LT(hal.activate(lastValidHandle + 1, false), 0);
+    ASSERT_LT(hal.setRate(lastValidHandle + 1, 0, 0), 0);
+    ASSERT_LT(hal.setRate(lastValidHandle + 1, 1, 100), 0);
+    ASSERT_LT(hal.flushData(lastValidHandle + 1), 0);
 }
