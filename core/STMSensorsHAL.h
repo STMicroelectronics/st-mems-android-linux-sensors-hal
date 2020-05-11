@@ -62,4 +62,6 @@ private:
      * Empty default sensors callback
      */
     MySTMSensorCallback emptySTMSensorCallback;
+
+    bool handleIsValid(uint32_t handle) const;
 };

@@ -51,10 +51,13 @@ const STMSensorsList& STMSensorsHAL::getSensorsList(void)
  */
 int STMSensorsHAL::activate(uint32_t handle, bool enable)
 {
-    (void) handle;
     (void) enable;
 
-    return -EINVAL;
+    if (!handleIsValid(handle)) {
+        return -EINVAL;
+    }
+
+    return 0;
 }
 
 /**
@@ -65,11 +68,14 @@ int STMSensorsHAL::setRate(uint32_t handle,
                            int64_t samplingPeriodNanoSec,
                            int64_t maxReportLatencyNanoSec)
 {
-    (void) handle;
     (void) samplingPeriodNanoSec;
     (void) maxReportLatencyNanoSec;
 
-    return -EINVAL;
+    if (!handleIsValid(handle)) {
+        return -EINVAL;
+    }
+
+    return 0;
 }
 
 /**
@@ -78,7 +84,24 @@ int STMSensorsHAL::setRate(uint32_t handle,
  */
 int STMSensorsHAL::flushData(uint32_t handle)
 {
-    (void) handle;
+    if (!handleIsValid(handle)) {
+        return -EINVAL;
+    }
 
-    return -EINVAL;
+    return 0;
+}
+
+/**
+ * handleIsValid: check if given handle is valid or not
+ * @handle: sensor handle to check
+ *
+ * Return value: true if handle is valid, false otherwise.
+ */
+bool STMSensorsHAL::handleIsValid(uint32_t handle) const
+{
+    if ((handle == 0) || (handle > sensorsList.getList().size())) {
+        return false;
+    }
+
+    return true;
 }
