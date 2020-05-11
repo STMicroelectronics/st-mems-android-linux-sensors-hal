@@ -24,7 +24,7 @@
  *
  * Return value: true if added successfully, false in case of error.
  */
-bool STMSensorsList::addSensor(STMSensor &sensor)
+bool STMSensorsList::addSensor(const STMSensor &sensor)
 {
     if (sensor.getHandle() == 0) {
         return false;
