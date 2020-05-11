@@ -33,6 +33,7 @@ protected:
  */
 TEST_F(STMSensorTest, verifyParameters)
 {
+    // Test the first constructor
     STMSensor accel(std::string("name"), // name
                     std::string("vendor"), // vendor
                     1, // handle
@@ -61,4 +62,32 @@ TEST_F(STMSensorTest, verifyParameters)
     ASSERT_EQ(5, accel.getFifoRsvdCount());
     ASSERT_EQ(220, accel.getFifoMaxCount());
     ASSERT_FALSE(accel.isWakeUp());
+
+    // Test the second constructor
+    STMSensor signMotion(std::string("name_2"), // name
+                         std::string("vendor_2"), // vendor
+                         5, // handle
+                         1, // version
+                         STMSensorType::SIGNIFICANT_MOTION, // type
+                         1, //maxRange
+                         1, // resolution
+                         1.0, // power
+                         0, // fifoRsvdCount
+                         0, // fifoMaxCount
+                         true // wakeUp
+                         );
+
+    ASSERT_STREQ("name_2", signMotion.getName().c_str());
+    ASSERT_STREQ("vendor_2", signMotion.getVendor().c_str());
+    ASSERT_EQ(5, signMotion.getHandle());
+    ASSERT_EQ(1, signMotion.getVersion());
+    ASSERT_EQ(STMSensorType::SIGNIFICANT_MOTION, signMotion.getType());
+    ASSERT_FLOAT_EQ(1, signMotion.getMaxRange());
+    ASSERT_FLOAT_EQ(1, signMotion.getResolution());
+    ASSERT_FLOAT_EQ(1, signMotion.getPower());
+    ASSERT_FLOAT_EQ(0, signMotion.getMinRateHz());
+    ASSERT_FLOAT_EQ(0, signMotion.getMaxRateHz());
+    ASSERT_EQ(0, signMotion.getFifoRsvdCount());
+    ASSERT_EQ(0, signMotion.getFifoMaxCount());
+    ASSERT_TRUE(signMotion.isWakeUp());
 }
