@@ -19,155 +19,61 @@
 
 #include <STMSensorsList.h>
 
-const STMSensor accelHandleZero(std::string("name"), // name
+STMSensor accel(std::string("name"), // name
+                std::string("vendor"), // vendor
+                1, // version
+                STMSensorType::ACCELEROMETER, // type
+                1, //maxRange
+                1, // resolution
+                1, // power
+                1, // minRateHz
+                10, // maxRateHz
+                0, // fifoRsvdCount
+                0, // fifoMaxCount
+                false // wakeUp
+                );
+
+STMSensor accelName2(std::string("name_2"), // name
+                     std::string("vendor"), // vendor
+                     1, // version
+                     STMSensorType::ACCELEROMETER, // type
+                     1, //maxRange
+                     1, // resolution
+                     1, // power
+                     1, // minRateHz
+                     10, // maxRateHz
+                     0, // fifoRsvdCount
+                     0, // fifoMaxCount
+                     false // wakeUp
+                     );
+
+STMSensor magnMinRateHzNegative(std::string("name"), // name
                                 std::string("vendor"), // vendor
-                                0, // handle
                                 1, // version
-                                STMSensorType::ACCELEROMETER, // type
+                                STMSensorType::MAGNETOMETER, // type
                                 1, //maxRange
                                 1, // resolution
                                 1, // power
-                                1, // minRateHz
+                                -7, // minRateHz
                                 10, // maxRateHz
                                 0, // fifoRsvdCount
                                 0, // fifoMaxCount
                                 false // wakeUp
                                 );
 
-const STMSensor accelHandleOne(std::string("name"), // name
-                               std::string("vendor"), // vendor
-                               1, // handle
-                               1, // version
-                               STMSensorType::ACCELEROMETER, // type
-                               1, //maxRange
-                               1, // resolution
-                               1, // power
-                               1, // minRateHz
-                               10, // maxRateHz
-                               0, // fifoRsvdCount
-                               0, // fifoMaxCount
-                               false // wakeUp
-                               );
-
-const STMSensor accelHandleTwo(std::string("name"), // name
-                               std::string("vendor"), // vendor
-                               2, // handle
-                               1, // version
-                               STMSensorType::ACCELEROMETER, // type
-                               1, //maxRange
-                               1, // resolution
-                               1, // power
-                               1, // minRateHz
-                               10, // maxRateHz
-                               0, // fifoRsvdCount
-                               0, // fifoMaxCount
-                               false // wakeUp
-                               );
-
-const STMSensor accelHandleThree(std::string("name"), // name
-                                 std::string("vendor"), // vendor
-                                 3, // handle
-                                 1, // version
-                                 STMSensorType::ACCELEROMETER, // type
-                                 1, //maxRange
-                                 1, // resolution
-                                 1, // power
-                                 1, // minRateHz
-                                 10, // maxRateHz
-                                 0, // fifoRsvdCount
-                                 0, // fifoMaxCount
-                                 false // wakeUp
-                                 );
-
-const STMSensor accelHandleTwoName2(std::string("name_2"), // name
-                                    std::string("vendor"), // vendor
-                                    2, // handle
-                                    1, // version
-                                    STMSensorType::ACCELEROMETER, // type
-                                    1, //maxRange
-                                    1, // resolution
-                                    1, // power
-                                    1, // minRateHz
-                                    10, // maxRateHz
-                                    0, // fifoRsvdCount
-                                    0, // fifoMaxCount
-                                    false // wakeUp
-                                    );
-
-const STMSensor gyroHandleOne(std::string("name"), // name
+STMSensor magnMinRateHzBigger(std::string("name"), // name
                               std::string("vendor"), // vendor
-                              1, // handle
                               1, // version
-                              STMSensorType::GYROSCOPE, // type
-                              100, //maxRange
-                              2, // resolution
+                              STMSensorType::MAGNETOMETER, // type
+                              1, //maxRange
+                              1, // resolution
                               1, // power
-                              1, // minRateHz
+                              30, // minRateHz
                               10, // maxRateHz
                               0, // fifoRsvdCount
                               0, // fifoMaxCount
                               false // wakeUp
                               );
-
-const STMSensor gyroHandleTwo(std::string("name"), // name
-                              std::string("vendor"), // vendor
-                              2, // handle
-                              1, // version
-                              STMSensorType::GYROSCOPE, // type
-                              100, //maxRange
-                              2, // resolution
-                              1, // power
-                              1, // minRateHz
-                              10, // maxRateHz
-                              0, // fifoRsvdCount
-                              0, // fifoMaxCount
-                              false // wakeUp
-                              );
-
-const STMSensor magnHandleThree(std::string("name"), // name
-                                std::string("vendor"), // vendor
-                                3, // handle
-                                1, // version
-                                STMSensorType::MAGNETOMETER, // type
-                                100, //maxRange
-                                2, // resolution
-                                1, // power
-                                1, // minRateHz
-                                10, // maxRateHz
-                                0, // fifoRsvdCount
-                                0, // fifoMaxCount
-                                false // wakeUp
-                                );
-
-const STMSensor magnMinRateHzNegative(std::string("name"), // name
-                                      std::string("vendor"), // vendor
-                                      1, // handle
-                                      1, // version
-                                      STMSensorType::MAGNETOMETER, // type
-                                      1, //maxRange
-                                      1, // resolution
-                                      1, // power
-                                      -7, // minRateHz
-                                      10, // maxRateHz
-                                      0, // fifoRsvdCount
-                                      0, // fifoMaxCount
-                                      false // wakeUp
-                                      );
-
-const STMSensor magnMinRateHzBigger(std::string("name"), // name
-                                    std::string("vendor"), // vendor
-                                    1, // handle
-                                    1, // version
-                                    STMSensorType::MAGNETOMETER, // type
-                                    1, //maxRange
-                                    1, // resolution
-                                    1, // power
-                                    30, // minRateHz
-                                    10, // maxRateHz
-                                    0, // fifoRsvdCount
-                                    0, // fifoMaxCount
-                                    false // wakeUp
-                                    );
 
 class STMSensorsListTest : public ::testing::Test {
 public:
@@ -182,22 +88,11 @@ protected:
 };
 
 /**
- * addSensor_handleCheck: verify sensor handle
- * - sensor can't use handle 0 or negative
- * - same handle cannot be reused
+ * addSensor_validSensor: verify that a valid sensor is added correctly
  */
-TEST_F(STMSensorsListTest, addSensor_handleCheck)
+TEST_F(STMSensorsListTest, addSensor_validSensor)
 {
-    // Adding a sensor with handle equal to 0 must fail
-    ASSERT_FALSE(sensorsList.addSensor(accelHandleZero));
-    ASSERT_EQ(0, sensorsList.getList().size());
-
-    // Adding a sensor with valid parameters should succeed
-    ASSERT_TRUE(sensorsList.addSensor(accelHandleOne));
-    EXPECT_EQ(1, sensorsList.getList().size());
-
-    // Adding a sensor with same handle must fail
-    ASSERT_FALSE(sensorsList.addSensor(gyroHandleOne));
+    ASSERT_TRUE(sensorsList.addSensor(accel));
     ASSERT_EQ(1, sensorsList.getList().size());
 }
 
@@ -223,16 +118,16 @@ TEST_F(STMSensorsListTest, addSensor_rateHzCheck)
  */
 TEST_F(STMSensorsListTest, addSensor_sameSensorType)
 {
-    ASSERT_TRUE(sensorsList.addSensor(accelHandleOne));
+    ASSERT_TRUE(sensorsList.addSensor(accel));
     ASSERT_EQ(1, sensorsList.getList().size());
 
     // Adding a sensor with same type and same name must fail
-    ASSERT_FALSE(sensorsList.addSensor(accelHandleTwo));
+    ASSERT_FALSE(sensorsList.addSensor(accel));
     ASSERT_EQ(1, sensorsList.getList().size());
 
     // Adding a sensor with same type but different name should succeed
-    ASSERT_TRUE(sensorsList.addSensor(accelHandleTwoName2));
-    EXPECT_EQ(2, sensorsList.getList().size());
+    ASSERT_TRUE(sensorsList.addSensor(accelName2));
+    ASSERT_EQ(2, sensorsList.getList().size());
 }
 
 /**
@@ -240,20 +135,19 @@ TEST_F(STMSensorsListTest, addSensor_sameSensorType)
  */
 TEST_F(STMSensorsListTest, addSensor_maxRangeNotZero)
 {
-    const STMSensor stepCounterMaxRangeZero(std::string("name"), // name
-                                            std::string("vendor"), // vendor
-                                            1, // handle
-                                            1, // version
-                                            STMSensorType::STEP_COUNTER, // type
-                                            0, //maxRange
-                                            1, // resolution
-                                            1, // power
-                                            0, // minRateHz
-                                            0, // maxRateHz
-                                            0, // fifoRsvdCount
-                                            0, // fifoMaxCount
-                                            false // wakeUp
-                                            );
+    STMSensor stepCounterMaxRangeZero(std::string("name"), // name
+                                      std::string("vendor"), // vendor
+                                      1, // version
+                                      STMSensorType::STEP_COUNTER, // type
+                                      0, //maxRange
+                                      1, // resolution
+                                      1, // power
+                                      0, // minRateHz
+                                      0, // maxRateHz
+                                      0, // fifoRsvdCount
+                                      0, // fifoMaxCount
+                                      false // wakeUp
+                                      );
 
     ASSERT_FALSE(sensorsList.addSensor(stepCounterMaxRangeZero));
     ASSERT_EQ(0, sensorsList.getList().size());
@@ -264,39 +158,20 @@ TEST_F(STMSensorsListTest, addSensor_maxRangeNotZero)
  */
 TEST_F(STMSensorsListTest, addSensor_fifoRsvdAndFifoMax)
 {
-    const STMSensor accelFifoRsvdBigger(std::string("name"), // name
-                                        std::string("vendor"), // vendor
-                                        1, // handle
-                                        1, // version
-                                        STMSensorType::ACCELEROMETER, // type
-                                        20, //maxRange
-                                        1, // resolution
-                                        1, // power
-                                        1, // minRateHz
-                                        100, // maxRateHz
-                                        100, // fifoRsvdCount
-                                        0, // fifoMaxCount
-                                        false // wakeUp
-                                        );
+    STMSensor accelFifoRsvdBigger(std::string("name"), // name
+                                  std::string("vendor"), // vendor
+                                  1, // version
+                                  STMSensorType::ACCELEROMETER, // type
+                                  20, //maxRange
+                                  1, // resolution
+                                  1, // power
+                                  1, // minRateHz
+                                  100, // maxRateHz
+                                  100, // fifoRsvdCount
+                                  0, // fifoMaxCount
+                                  false // wakeUp
+                                  );
 
     ASSERT_FALSE(sensorsList.addSensor(accelFifoRsvdBigger));
     ASSERT_EQ(0, sensorsList.getList().size());
-}
-
-/**
- * addSensor_handleOrder: verify that sensors added have sequential handle ID
- */
-TEST_F(STMSensorsListTest, addSensor_handleOrder)
-{
-    ASSERT_TRUE(sensorsList.addSensor(accelHandleOne));
-    ASSERT_EQ(1, sensorsList.getList().size());
-
-    ASSERT_FALSE(sensorsList.addSensor(magnHandleThree));
-    ASSERT_EQ(1, sensorsList.getList().size());
-
-    ASSERT_TRUE(sensorsList.addSensor(gyroHandleTwo));
-    ASSERT_EQ(2, sensorsList.getList().size());
-
-    ASSERT_TRUE(sensorsList.addSensor(magnHandleThree));
-    ASSERT_EQ(3, sensorsList.getList().size());
 }

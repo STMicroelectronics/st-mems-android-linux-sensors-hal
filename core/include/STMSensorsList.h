@@ -25,7 +25,7 @@ class STMSensorsList {
 public:
     STMSensorsList(void) = default;
 
-    bool addSensor(const STMSensor &sensor);
+    bool addSensor(STMSensor &sensor);
 
     const std::vector<STMSensor>& getList(void) const;
 

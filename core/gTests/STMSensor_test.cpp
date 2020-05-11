@@ -36,7 +36,6 @@ TEST_F(STMSensorTest, verifyParameters)
     // Test the first constructor
     STMSensor accel(std::string("name"), // name
                     std::string("vendor"), // vendor
-                    1, // handle
                     2, // version
                     STMSensorType::ACCELEROMETER, // type
                     10, //maxRange
@@ -51,7 +50,7 @@ TEST_F(STMSensorTest, verifyParameters)
 
     ASSERT_STREQ("name", accel.getName().c_str());
     ASSERT_STREQ("vendor", accel.getVendor().c_str());
-    ASSERT_EQ(1, accel.getHandle());
+    ASSERT_EQ(0, accel.getHandle());
     ASSERT_EQ(2, accel.getVersion());
     ASSERT_EQ(STMSensorType::ACCELEROMETER, accel.getType());
     ASSERT_FLOAT_EQ(10, accel.getMaxRange());
@@ -66,7 +65,6 @@ TEST_F(STMSensorTest, verifyParameters)
     // Test the second constructor
     STMSensor signMotion(std::string("name_2"), // name
                          std::string("vendor_2"), // vendor
-                         5, // handle
                          1, // version
                          STMSensorType::SIGNIFICANT_MOTION, // type
                          1, //maxRange
@@ -79,7 +77,7 @@ TEST_F(STMSensorTest, verifyParameters)
 
     ASSERT_STREQ("name_2", signMotion.getName().c_str());
     ASSERT_STREQ("vendor_2", signMotion.getVendor().c_str());
-    ASSERT_EQ(5, signMotion.getHandle());
+    ASSERT_EQ(0, signMotion.getHandle());
     ASSERT_EQ(1, signMotion.getVersion());
     ASSERT_EQ(STMSensorType::SIGNIFICANT_MOTION, signMotion.getType());
     ASSERT_FLOAT_EQ(1, signMotion.getMaxRange());

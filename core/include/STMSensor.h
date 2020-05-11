@@ -26,7 +26,6 @@ class STMSensor {
 public:
     STMSensor(const std::string &name,
               const std::string &vendor,
-              uint32_t handle,
               int32_t version,
               STMSensorType type,
               float maxRange,
@@ -40,7 +39,6 @@ public:
 
     STMSensor(const std::string &name,
               const std::string &vendor,
-              uint32_t handle,
               int32_t version,
               STMSensorType type,
               float maxRange,
@@ -52,6 +50,7 @@ public:
 
     const std::string& getName(void) const;
     const std::string& getVendor(void)const;
+    void setHandle(uint32_t newHandle);
     uint32_t getHandle(void) const;
     int32_t getVersion(void) const;
     STMSensorType getType(void) const;
@@ -79,7 +78,7 @@ private:
     /**
      * Sensor handle number, used to identify the sensor (unique number)
      */
-    const uint32_t handle;
+    uint32_t handle;
 
     /**
      * Sensor version, if based on algo, updated in case algo get updated

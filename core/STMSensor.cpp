@@ -19,7 +19,6 @@
 
 STMSensor::STMSensor(const std::string &name,
                      const std::string &vendor,
-                     uint32_t handle,
                      int32_t version,
                      STMSensorType type,
                      float maxRange,
@@ -32,7 +31,7 @@ STMSensor::STMSensor(const std::string &name,
                      bool wakeUp)
           : name(name),
             vendor(vendor),
-            handle(handle),
+            handle(0),
             version(version),
             type(type),
             maxRange(maxRange),
@@ -49,7 +48,6 @@ STMSensor::STMSensor(const std::string &name,
 
 STMSensor::STMSensor(const std::string &name,
                      const std::string &vendor,
-                     uint32_t handle,
                      int32_t version,
                      STMSensorType type,
                      float maxRange,
@@ -60,7 +58,7 @@ STMSensor::STMSensor(const std::string &name,
                      bool wakeUp)
           : name(name),
             vendor(vendor),
-            handle(handle),
+            handle(0),
             version(version),
             type(type),
             maxRange(maxRange),
@@ -88,6 +86,11 @@ const std::string& STMSensor::getVendor(void) const
 uint32_t STMSensor::getHandle(void) const
 {
     return handle;
+}
+
+void STMSensor::setHandle(uint32_t newHandle)
+{
+    handle = newHandle;
 }
 
 int32_t STMSensor::getVersion(void) const

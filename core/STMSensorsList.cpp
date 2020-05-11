@@ -24,9 +24,9 @@
  *
  * Return value: true if added successfully, false in case of error.
  */
-bool STMSensorsList::addSensor(const STMSensor &sensor)
+bool STMSensorsList::addSensor(STMSensor &sensor)
 {
-    if ((sensor.getHandle() != list.size() + 1) || (sensor.getMaxRange() == 0)) {
+    if (sensor.getMaxRange() == 0) {
         return false;
     }
 
@@ -39,15 +39,14 @@ bool STMSensorsList::addSensor(const STMSensor &sensor)
     }
 
     for (auto &elem : list) {
-        if (elem.getHandle() == sensor.getHandle()) {
-            return false;
-        } else if (elem.getType() == sensor.getType()) {
+        if (elem.getType() == sensor.getType()) {
             if (std::strcmp(elem.getName().c_str(), sensor.getName().c_str()) == 0) {
                 return false;
             }
         }
     }
 
+    sensor.setHandle(list.size() + 1);
     list.push_back(sensor);
 
     return true;
