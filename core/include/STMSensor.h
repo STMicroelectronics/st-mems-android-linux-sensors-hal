@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (C) 2018 The Android Open Source Project
  * Copyright (C) 2019 STMicroelectronics
  *
