@@ -26,7 +26,7 @@
  */
 bool STMSensorsList::addSensor(const STMSensor &sensor)
 {
-    if ((sensor.getHandle() == 0) || (sensor.getMaxRange() == 0)) {
+    if ((sensor.getHandle() != list.size() + 1) || (sensor.getMaxRange() == 0)) {
         return false;
     }
 

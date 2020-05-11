@@ -64,6 +64,21 @@ const STMSensor accelHandleTwo(std::string("name"), // name
                                false // wakeUp
                                );
 
+const STMSensor accelHandleThree(std::string("name"), // name
+                                 std::string("vendor"), // vendor
+                                 3, // handle
+                                 1, // version
+                                 STMSensorType::ACCELEROMETER, // type
+                                 1, //maxRange
+                                 1, // resolution
+                                 1, // power
+                                 1, // minRateHz
+                                 10, // maxRateHz
+                                 0, // fifoRsvdCount
+                                 0, // fifoMaxCount
+                                 false // wakeUp
+                                 );
+
 const STMSensor accelHandleTwoName2(std::string("name_2"), // name
                                     std::string("vendor"), // vendor
                                     2, // handle
@@ -94,9 +109,39 @@ const STMSensor gyroHandleOne(std::string("name"), // name
                               false // wakeUp
                               );
 
+const STMSensor gyroHandleTwo(std::string("name"), // name
+                              std::string("vendor"), // vendor
+                              2, // handle
+                              1, // version
+                              STMSensorType::GYROSCOPE, // type
+                              100, //maxRange
+                              2, // resolution
+                              1, // power
+                              1, // minRateHz
+                              10, // maxRateHz
+                              0, // fifoRsvdCount
+                              0, // fifoMaxCount
+                              false // wakeUp
+                              );
+
+const STMSensor magnHandleThree(std::string("name"), // name
+                                std::string("vendor"), // vendor
+                                3, // handle
+                                1, // version
+                                STMSensorType::MAGNETOMETER, // type
+                                100, //maxRange
+                                2, // resolution
+                                1, // power
+                                1, // minRateHz
+                                10, // maxRateHz
+                                0, // fifoRsvdCount
+                                0, // fifoMaxCount
+                                false // wakeUp
+                                );
+
 const STMSensor magnMinRateHzNegative(std::string("name"), // name
                                       std::string("vendor"), // vendor
-                                      3, // handle
+                                      1, // handle
                                       1, // version
                                       STMSensorType::MAGNETOMETER, // type
                                       1, //maxRange
@@ -111,7 +156,7 @@ const STMSensor magnMinRateHzNegative(std::string("name"), // name
 
 const STMSensor magnMinRateHzBigger(std::string("name"), // name
                                     std::string("vendor"), // vendor
-                                    4, // handle
+                                    1, // handle
                                     1, // version
                                     STMSensorType::MAGNETOMETER, // type
                                     1, //maxRange
@@ -236,4 +281,22 @@ TEST_F(STMSensorsListTest, addSensor_fifoRsvdAndFifoMax)
 
     ASSERT_FALSE(sensorsList.addSensor(accelFifoRsvdBigger));
     ASSERT_EQ(0, sensorsList.getList().size());
+}
+
+/**
+ * addSensor_handleOrder: verify that sensors added have sequential handle ID
+ */
+TEST_F(STMSensorsListTest, addSensor_handleOrder)
+{
+    ASSERT_TRUE(sensorsList.addSensor(accelHandleOne));
+    ASSERT_EQ(1, sensorsList.getList().size());
+
+    ASSERT_FALSE(sensorsList.addSensor(magnHandleThree));
+    ASSERT_EQ(1, sensorsList.getList().size());
+
+    ASSERT_TRUE(sensorsList.addSensor(gyroHandleTwo));
+    ASSERT_EQ(2, sensorsList.getList().size());
+
+    ASSERT_TRUE(sensorsList.addSensor(magnHandleThree));
+    ASSERT_EQ(3, sensorsList.getList().size());
 }
