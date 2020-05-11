@@ -50,11 +50,14 @@ int main(int /* argc */, char** /* argv */)
     }
 
     const std::vector<STMSensor> &sensorsList = sensors->getSensorsList();
+    if (!sensorsList.size()) {
+        console.error("no sensors available!");
+        return -ENODEV;
+    }
+
     printSensorList(sensorsList);
 
     std::this_thread::sleep_for(std::chrono::seconds(2));
-
-
 
     return 0;
 }
