@@ -26,11 +26,15 @@
  */
 bool STMSensorsList::addSensor(const STMSensor &sensor)
 {
-    if (sensor.getHandle() == 0) {
+    if ((sensor.getHandle() == 0) || (sensor.getMaxRange() == 0)) {
         return false;
     }
 
     if ((sensor.getMinRateHz() < 0) || (sensor.getMaxRateHz() < sensor.getMinRateHz())) {
+        return false;
+    }
+
+    if (sensor.getFifoMaxCount() < sensor.getFifoRsvdCount()) {
         return false;
     }
 
