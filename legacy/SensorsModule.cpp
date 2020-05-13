@@ -37,8 +37,8 @@ static int st_hal_open_sensors(const struct hw_module_t *module,
                                struct hw_device_t **device)
 {
     const std::string sensorsModuleId { SENSORS_HARDWARE_POLL };
-    std::unique_ptr<sensors_poll_device_1> pollDevice;
-    std::unique_ptr<SensorsLegacyInterface> sensors;
+    static std::unique_ptr<sensors_poll_device_1> pollDevice;
+    static std::unique_ptr<SensorsLegacyInterface> sensors;
 
     if (sensorsModuleId.compare(id)) {
         console.error("not a valid module ID");
