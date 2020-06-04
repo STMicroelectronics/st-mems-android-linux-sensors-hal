@@ -34,7 +34,6 @@ LOCAL_C_INCLUDES := \
     $(LOCAL_PATH)/include
 
 LOCAL_CFLAGS += \
-    -DLOG_TAG=\"stmicroelectronics-sensors-core\" \
     -Wall \
     -Wextra \
     -Wpedantic

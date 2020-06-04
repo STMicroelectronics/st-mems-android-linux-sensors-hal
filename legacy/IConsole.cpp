@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "sensors@legacy-stm"
+
 #include <log/log.h>
 #include <iostream>
 #include <string>

@@ -57,7 +57,6 @@ endif # ST_HAL_ANDROID_VERSION
 LOCAL_MODULE_OWNER := STMicroelectronics
 
 LOCAL_CFLAGS += \
-    -DLOG_TAG=\"sensors@legacy-stmicroelectronics\" \
     -Wall \
     -Wextra
 
