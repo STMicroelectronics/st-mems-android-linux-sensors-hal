@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2015-2016 STMicroelectronics
- * Author: Denis Ciocca - <denis.ciocca@st.com>
+ * Copyright (C) 2018 The Android Open Source Project
+ * Copyright (C) 2015-2020 STMicroelectronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,11 @@
  * limitations under the License.
  */
 
-#ifndef ANDROID_SENSOR_HAL_COMMON_DATA
-#define ANDROID_SENSOR_HAL_COMMON_DATA
+#pragma once
 
-#include <hardware/sensors.h>
-
-#include "../configuration.h"
+#include "configuration.h"
 
 #define ST_HAL_GRAVITY_MAX_ON_EARTH			(10.7f)
-
-/*
- * Android version
- */
-#define ST_HAL_KITKAT_VERSION				(0)
-#define ST_HAL_LOLLIPOP_VERSION				(1)
-#define ST_HAL_MARSHMALLOW_VERSION			(2)
-#define ST_HAL_NOUGAT_VERSION				(3)
-#define ST_HAL_OREO_VERSION				(4)
-#define ST_HAL_PIE_VERSION				(5)
-#define ST_HAL_10_VERSION				(6)
 
 #define CONCATENATE_STRING(x, y)			(x y)
 
@@ -46,19 +32,6 @@
 #define ST_HAL_FACTORY_ACCEL_DATA_FILENAME		CONCATENATE_STRING(ST_HAL_FACTORY_DATA_PATH, "/accel.txt")
 #define ST_HAL_FACTORY_MAGN_DATA_FILENAME		CONCATENATE_STRING(ST_HAL_FACTORY_DATA_PATH, "/magn.txt")
 #define ST_HAL_FACTORY_GYRO_DATA_FILENAME		CONCATENATE_STRING(ST_HAL_FACTORY_DATA_PATH, "/gyro.txt")
-
-#define SENSOR_TYPE_ST_CUSTOM_NO_SENSOR			(SENSOR_TYPE_DEVICE_PRIVATE_BASE + 20)
-#define SENSOR_TYPE_ST_ACCEL_MAGN_FUSION6X		(SENSOR_TYPE_ST_CUSTOM_NO_SENSOR + 0)
-#define SENSOR_TYPE_ST_ACCEL_GYRO_FUSION6X		(SENSOR_TYPE_ST_CUSTOM_NO_SENSOR + 1)
-#define SENSOR_TYPE_ST_ACCEL_MAGN_GYRO_FUSION9X		(SENSOR_TYPE_ST_CUSTOM_NO_SENSOR + 2)
-
-#if (CONFIG_ST_HAL_ANDROID_VERSION == ST_HAL_KITKAT_VERSION)
-#define SENSOR_TYPE_TILT_DETECTOR			(SENSOR_TYPE_DEVICE_PRIVATE_BASE + 0)
-#endif /* CONFIG_ST_HAL_ANDROID_VERSION */
-
-#if (CONFIG_ST_HAL_ANDROID_VERSION < ST_HAL_MARSHMALLOW_VERSION)
-#define SENSOR_TYPE_WRIST_TILT_GESTURE			(SENSOR_TYPE_DEVICE_PRIVATE_BASE + 1)
-#endif /* CONFIG_ST_HAL_ANDROID_VERSION */
 
 #define ST_HAL_IIO_MAX_DEVICES				(50)
 
@@ -80,9 +53,3 @@
 #define SENSOR_X_DATA(...)				SENSOR_DATA_X(__VA_ARGS__)
 #define SENSOR_Y_DATA(...)				SENSOR_DATA_Y(__VA_ARGS__)
 #define SENSOR_Z_DATA(...)				SENSOR_DATA_Z(__VA_ARGS__)
-
-#define ST_HAL_DEBUG_INFO				(1)
-#define ST_HAL_DEBUG_VERBOSE				(2)
-#define ST_HAL_DEBUG_EXTRA_VERBOSE			(3)
-
-#endif /* ANDROID_SENSOR_HAL_COMMON_DATA */

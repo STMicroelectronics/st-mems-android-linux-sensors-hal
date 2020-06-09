@@ -16,7 +16,7 @@
 
 cmake_minimum_required(VERSION 3.0.2)
 
-add_compile_options(-Wall -Wextra -pedantic)
+add_compile_options(-Wall -Wextra -pedantic -static)
 
 add_library(stmicroelectronics-sensors-core-linux
             ISTMSensorsHAL.cpp
@@ -25,7 +25,43 @@ add_library(stmicroelectronics-sensors-core-linux
             STMSensorType.cpp
             STMSensor.cpp
             ISTMSensorsCallbackData.cpp
-            STMSensorsCallbackData.cpp)
+            STMSensorsCallbackData.cpp
+            SensorsGraph.cpp
+            SensorsSupported.cpp
+            Accelerometer.cpp
+            ChangeODRTimestampStack.cpp
+            CircularBuffer.cpp
+            DeviceOrientation.cpp
+            FlushBufferStack.cpp
+            FlushRequested.cpp
+            Gesture.cpp
+            Gyroscope.cpp
+            HWSensorBase.cpp
+            Magnetometer.cpp
+            Pressure.cpp
+            RHumidity.cpp
+            SensorAdditionalInfo.cpp
+            SensorBase.cpp
+            SensorHAL.cpp
+            SignificantMotion.cpp
+            StepCounter.cpp
+            StepDetector.cpp
+            Temp.cpp
+            TiltSensor.cpp
+            utils.cpp
+            WristTiltGesture.cpp
+            SWSensorBase.cpp
+            SWAccelerometerUncalibrated.cpp
+            SWMagnetometerUncalibrated.cpp
+            SWGyroscopeUncalibrated.cpp
+            SWAccelGyroFusion6X.cpp
+            SWAccelMagnGyroFusion9X.cpp
+            SWGameRotationVector.cpp
+            SWRotationVector.cpp
+            SWOrientation.cpp
+            SWGravity.cpp
+            SWLinearAccel.cpp
+            SelfTest.cpp)
 
 target_include_directories(stmicroelectronics-sensors-core-linux PUBLIC
                            ${CMAKE_CURRENT_SOURCE_DIR}/include)

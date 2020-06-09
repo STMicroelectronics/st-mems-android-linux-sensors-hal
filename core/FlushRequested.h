@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2015-2016 STMicroelectronics
- * Author: Denis Ciocca - <denis.ciocca@st.com>
+ * Copyright (C) 2018 The Android Open Source Project
+ * Copyright (C) 2015-2020 STMicroelectronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@
  * limitations under the License.
  */
 
-#ifndef ST_FLUSH_REQUESTED_STACK_H
-#define ST_FLUSH_REQUESTED_STACK_H
+#pragma once
 
 #include <sys/cdefs.h>
 #include <sys/types.h>
@@ -25,26 +24,23 @@
 #include <pthread.h>
 #include <errno.h>
 
-#define ST_FLUSH_REQUESTED_STACK_MAX_ELEMENTS		(300)
+#define ST_FLUSH_REQUESTED_STACK_MAX_ELEMENTS      (300)
 
 /*
  * class FlushRequested
  */
 class FlushRequested {
 private:
-	pthread_mutex_t data_mutex;
-	unsigned int elements_available;
+    pthread_mutex_t data_mutex;
+    unsigned int elements_available;
 
-	int handles[ST_FLUSH_REQUESTED_STACK_MAX_ELEMENTS];
+    int handles[ST_FLUSH_REQUESTED_STACK_MAX_ELEMENTS];
 
 public:
-	FlushRequested();
-	~FlushRequested();
+    FlushRequested();
 
-	int writeElement(int handle);
-	int readElement(void);
+    int writeElement(int handle);
+    int readElement(void);
 
-	void resetBuffer();
+    void resetBuffer();
 };
-
-#endif /* ST_FLUSH_REQUESTED_STACK_H */

@@ -17,17 +17,61 @@
 
 #include <functional>
 #include <cerrno>
+#include <cstring>
 
 #include <STMSensorsCallbackData.h>
 #include <STMSensorsHAL.h>
+#include "sensors_legacy.h"
 
 namespace stm {
 namespace core {
 
 STMSensorsHAL::STMSensorsHAL(void)
               : sensorsCallback(&emptySTMSensorCallback),
-                console(IConsole::getInstance())
+                console(IConsole::getInstance()),
+                dataReceivedThreadRunning(false)
 {
+    st_hal_open_sensors(&hal_data, sensorsList);
+
+    if (hal_data) {
+        dataReceivedThreadRunning = true;
+        dataReceivedThread = std::make_unique<std::thread>(internalPoll, this, &dataReceivedThreadRunning);
+    }
+}
+
+STMSensorsHAL::~STMSensorsHAL(void)
+{
+    dataReceivedThreadRunning = false;
+    if (dataReceivedThread != nullptr) {
+        dataReceivedThread->join();
+    }
+}
+
+void STMSensorsHAL::internalPoll(STMSensorsHAL *hal, std::atomic<bool> *running)
+{
+    struct sensors_event_t sdata[10];
+
+    while (running->load()) {
+        auto n = st_hal_dev_poll(hal->hal_data, sdata, 10);
+
+        {
+            std::vector<ISTMSensorsCallbackData> sensorsData;
+            std::vector<float> payload;
+
+            for (auto i = 0; i < n; ++i) {
+                payload.resize(sdata[i].data.dataLen);
+                memcpy(payload.data(), sdata[i].data.data2, sdata[i].data.dataLen * sizeof(float));
+                sensorsData.push_back(STMSensorsCallbackData(sdata[i].sensor,
+                                                             sdata[i].type,
+                                                             sdata[i].timestamp,
+                                                             payload));
+            }
+
+            if (sensorsData.size() > 0) {
+                hal->sensorsCallback->onNewSensorsData(sensorsData);
+            }
+        }
+    }
 }
 
 /**
@@ -54,13 +98,11 @@ const STMSensorsList& STMSensorsHAL::getSensorsList(void)
  */
 int STMSensorsHAL::activate(uint32_t handle, bool enable)
 {
-    (void) enable;
-
     if (!handleIsValid(handle)) {
         return -EINVAL;
     }
 
-    return 0;
+    return st_hal_dev_activate(hal_data, handle, enable);
 }
 
 /**
@@ -71,14 +113,11 @@ int STMSensorsHAL::setRate(uint32_t handle,
                            int64_t samplingPeriodNanoSec,
                            int64_t maxReportLatencyNanoSec)
 {
-    (void) samplingPeriodNanoSec;
-    (void) maxReportLatencyNanoSec;
-
     if (!handleIsValid(handle)) {
         return -EINVAL;
     }
 
-    return 0;
+    return st_hal_dev_batch(hal_data, handle, samplingPeriodNanoSec, maxReportLatencyNanoSec);
 }
 
 /**
@@ -91,7 +130,7 @@ int STMSensorsHAL::flushData(uint32_t handle)
         return -EINVAL;
     }
 
-    return 0;
+    return st_hal_dev_flush(hal_data, handle);
 }
 
 /**

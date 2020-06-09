@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2015-2016 STMicroelectronics
- * Author: Denis Ciocca - <denis.ciocca@st.com>
+ * Copyright (C) 2018 The Android Open Source Project
+ * Copyright (C) 2015-2020 STMicroelectronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@
  * limitations under the License.
  */
 
-#ifndef ST_FLUSH_BUFFER_STACK_H
-#define ST_FLUSH_BUFFER_STACK_H
+#pragma once
 
 #include <sys/cdefs.h>
 #include <sys/types.h>
@@ -25,29 +24,26 @@
 #include <pthread.h>
 #include <errno.h>
 
-#define ST_FLUSH_BUFFER_STACK_MAX_ELEMENTS		(300)
+#define ST_FLUSH_BUFFER_STACK_MAX_ELEMENTS      (300)
 
 /*
  * class FlushBufferStack
  */
 class FlushBufferStack {
 private:
-	pthread_mutex_t data_mutex;
-	unsigned int elements_available;
+    pthread_mutex_t data_mutex;
+    unsigned int elements_available;
 
-	int64_t flush_timestamps[ST_FLUSH_BUFFER_STACK_MAX_ELEMENTS];
-	int flush_handles[ST_FLUSH_BUFFER_STACK_MAX_ELEMENTS];
+    int64_t flush_timestamps[ST_FLUSH_BUFFER_STACK_MAX_ELEMENTS];
+    int flush_handles[ST_FLUSH_BUFFER_STACK_MAX_ELEMENTS];
 
 public:
-	FlushBufferStack();
-	~FlushBufferStack();
+    FlushBufferStack();
 
-	int writeElement(int handle, int64_t timestamp);
-	int readLastElement(int64_t *timestamp);
-	unsigned int ElemetsOnStack();
+    int writeElement(int handle, int64_t timestamp);
+    int readLastElement(int64_t *timestamp);
+    unsigned int ElemetsOnStack();
 
-	void removeLastElement(void);
-	void resetBuffer();
+    void removeLastElement(void);
+    void resetBuffer();
 };
-
-#endif /* ST_FLUSH_BUFFER_STACK_H */

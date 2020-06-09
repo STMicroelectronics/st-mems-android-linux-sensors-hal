@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016 STMicroelectronics
- * Author: Denis Ciocca - <denis.ciocca@st.com>
+ * Copyright (C) 2018 The Android Open Source Project
+ * Copyright (C) 2016-2020 STMicroelectronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,24 @@
  * limitations under the License.
  */
 
-#ifndef ST_WRIST_TILT_GESTURE_SENSOR_H
-#define ST_WRIST_TILT_GESTURE_SENSOR_H
+#pragma once
 
 #include "HWSensorBase.h"
+
+namespace stm {
+namespace core {
 
 /*
  * class WristTiltGesture
  */
 class WristTiltGesture : public HWSensorBase {
 public:
-	WristTiltGesture(HWSensorBaseCommonData *data, const char *name, int handle,
-				unsigned int hw_fifo_len, float power_consumption);
-	virtual ~WristTiltGesture();
+    WristTiltGesture(HWSensorBaseCommonData *data, const char *name, int handle,
+                     unsigned int hw_fifo_len, float power_consumption);
 
-	virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout, bool lock_en_mute);
-	virtual void ProcessData(SensorBaseData *data);
+    virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout, bool lock_en_mute);
+    virtual void ProcessData(SensorBaseData *data);
 };
 
-#endif /* ST_WRIST_TILT_GESTURE_SENSOR_H */
+} // namespace core
+} // namespace stm

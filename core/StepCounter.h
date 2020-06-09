@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2015-2016 STMicroelectronics
- * Author: Denis Ciocca - <denis.ciocca@st.com>
+ * Copyright (C) 2018 The Android Open Source Project
+ * Copyright (C) 2015-2020 STMicroelectronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,26 @@
  * limitations under the License.
  */
 
-#ifndef ST_STEP_COUNTER_SENSOR_H
-#define ST_STEP_COUNTER_SENSOR_H
+#pragma once
 
 #include "HWSensorBase.h"
+
+namespace stm {
+namespace core {
 
 /*
  * class StepCounter
  */
 class StepCounter : public HWSensorBase {
 public:
-	StepCounter(HWSensorBaseCommonData *data, const char *name,
-			int handle, unsigned int hw_fifo_len,
-				float power_consumption, bool wakeup);
-	~StepCounter();
+    StepCounter(HWSensorBaseCommonData *data, const char *name, int handle,
+                unsigned int hw_fifo_len, float power_consumption, bool wakeup);
 
-	virtual int Enable(int handle, bool enable, bool lock_en_mutex);
-	virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout, bool lock_en_mutex);
-	virtual void ProcessData(SensorBaseData *data);
+    virtual int Enable(int handle, bool enable, bool lock_en_mutex);
+    virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout,
+                         bool lock_en_mutex);
+    virtual void ProcessData(SensorBaseData *data);
 };
 
-#endif /* ST_STEP_COUNTER_SENSOR_H */
+} // namespace core
+} // namespace stm

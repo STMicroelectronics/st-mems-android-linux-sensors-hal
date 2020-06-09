@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2017 STMicroelectronics
- * Author: Armando Visconti <armando.visconti@st.com>
+ * Copyright (C) 2018 The Android Open Source Project
+ * Copyright (C) 2017-2020 STMicroelectronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,19 @@
  * limitations under the License.
  */
 
-#ifndef ST_SWACCELEROMETER_UNCALIBRATED_H
-#define ST_SWACCELEROMETER_UNCALIBRATED_H
+#pragma once
 
 #include "SWSensorBase.h"
 
+namespace stm {
+namespace core {
+
 class SWAccelerometerUncalibrated : public SWSensorBaseWithPollrate {
 public:
-	SWAccelerometerUncalibrated(const char *name, int handle);
-	~SWAccelerometerUncalibrated();
+    SWAccelerometerUncalibrated(const char *name, int handle);
 
-	virtual void ProcessData(SensorBaseData *data);
+    virtual void ProcessData(SensorBaseData *data);
 };
 
-#endif /* ST_SWACCELEROMETER_UNCALIBRATED_H */
+} // namespace core
+} // namespace stm

@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2015-2016 STMicroelectronics
- * Author: Denis Ciocca - <denis.ciocca@st.com>
+ * Copyright (C) 2018 The Android Open Source Project
+ * Copyright (C) 2015-2020 STMicroelectronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,46 +15,47 @@
  * limitations under the License.
  */
 
-#ifndef ST_SELFTEST_H
-#define ST_SELFTEST_H
+#pragma once
+
+namespace stm {
+namespace core {
 
 typedef enum {
-	NOT_AVAILABLE = 0,
-	GENERIC_ERROR,
-	FAILURE,
-	PASS
+    NOT_AVAILABLE = 0,
+    GENERIC_ERROR,
+    FAILURE,
+    PASS
 } selftest_status;
 
 struct selftest_cmd_t {
-	int handle;
-	short mode;
+    int handle;
+    short mode;
 };
 
 struct selftest_results_t {
-	int handle;
-	selftest_status status;
+    int handle;
+    selftest_status status;
 };
-
 
 /*
  * class SelfTest
  */
 class SelfTest {
 private:
-	struct STSensorHAL_data *hal_data;
-	bool valid_class;
-	int fd_cmd, fd_results;
-	pthread_t cmd_thread;
+    struct STSensorHAL_data *hal_data;
+    bool valid_class;
+    int fd_cmd, fd_results;
+    pthread_t cmd_thread;
 
-	static void *ThreadCmdWork(void *context);
-	void ThreadCmdTask();
-protected:
+    static void *ThreadCmdWork(void *context);
+    void ThreadCmdTask();
 
 public:
-	SelfTest(struct STSensorHAL_data *ST_hal_data);
-	virtual ~SelfTest();
+    SelfTest(struct STSensorHAL_data *ST_hal_data);
+    virtual ~SelfTest();
 
-	bool IsValidClass();
+    bool IsValidClass();
 };
 
-#endif /* ST_SELFTEST_H */
+} // namespace core
+} // namespace stm

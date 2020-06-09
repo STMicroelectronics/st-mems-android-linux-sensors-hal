@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2015-2016 STMicroelectronics
- * Author: Denis Ciocca - <denis.ciocca@st.com>
+ * Copyright (C) 2018 The Android Open Source Project
+ * Copyright (C) 2015-2020 STMicroelectronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,25 @@
  * limitations under the License.
  */
 
-#ifndef ST_TILT_SENSOR_H
-#define ST_TILT_SENSOR_H
+#pragma once
 
 #include "HWSensorBase.h"
+
+namespace stm {
+namespace core {
 
 /*
  * class TiltSensor
  */
 class TiltSensor : public HWSensorBase {
 public:
-	TiltSensor(HWSensorBaseCommonData *data, const char *name, int handle,
-				unsigned int hw_fifo_len, float power_consumption);
-	virtual ~TiltSensor();
+    TiltSensor(HWSensorBaseCommonData *data, const char *name, int handle,
+               unsigned int hw_fifo_len, float power_consumption);
 
-	virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout, bool lock_en_mute);
-	virtual void ProcessData(SensorBaseData *data);
-	void ProcessEvent(struct device_iio_events *event_data);
+    virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout, bool lock_en_mute);
+    virtual void ProcessData(SensorBaseData *data);
+    void ProcessEvent(struct device_iio_events *event_data);
 };
 
-#endif /* ST_TILT_SENSOR_H */
+} // namespace core
+} // namespace stm

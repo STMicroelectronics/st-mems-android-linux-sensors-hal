@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2015-2016 STMicroelectronics
- * Author: Denis Ciocca - <denis.ciocca@st.com>
+ * Copyright (C) 2018 The Android Open Source Project
+ * Copyright (C) 2015-2020 STMicroelectronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,30 +15,30 @@
  * limitations under the License.
  */
 
-#ifndef ST_ACCELEROMETER_SENSOR_H
-#define ST_ACCELEROMETER_SENSOR_H
+#pragma once
 
 #include "HWSensorBase.h"
+
+namespace stm {
+namespace core {
 
 /*
  * class Accelerometer
  */
 class Accelerometer : public HWSensorBaseWithPollrate {
 private:
-#if (CONFIG_ST_HAL_ANDROID_VERSION >= ST_HAL_PIE_VERSION)
-#if (CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED)
-	size_t getSensorAdditionalInfoPayLoadFramesArray(additional_info_event_t **array_sensorAdditionalInfoPLFrames);
+#if defined(CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED)
+    size_t getSensorAdditionalInfoPayLoadFramesArray(additional_info_event_t **array_sensorAdditionalInfoPLFrames);
 #endif /* CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED */
-#endif /* CONFIG_ST_HAL_ANDROID_VERSION */
-public:
-	Accelerometer(HWSensorBaseCommonData *data, const char *name,
-			struct device_iio_sampling_freqs *sfa, int handle,
-			unsigned int hw_fifo_len,
-			float power_consumption, bool wakeup);
-	~Accelerometer();
 
-	virtual int Enable(int handle, bool enable, bool lock_en_mutex);
-	virtual void ProcessData(SensorBaseData *data);
+public:
+    Accelerometer(HWSensorBaseCommonData *data, const char *name,
+                  struct device_iio_sampling_freqs *sfa, int handle,
+                  unsigned int hw_fifo_len, float power_consumption, bool wakeup);
+
+    virtual int Enable(int handle, bool enable, bool lock_en_mutex);
+    virtual void ProcessData(SensorBaseData *data);
 };
 
-#endif /* ST_ACCELEROMETER_SENSOR_H */
+} // namespace core
+} // namespace stm

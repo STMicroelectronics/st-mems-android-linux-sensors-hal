@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2015-2016 STMicroelectronics
- * Author: Denis Ciocca - <denis.ciocca@st.com>
+ * Copyright (C) 2018 The Android Open Source Project
+ * Copyright (C) 2015-2020 STMicroelectronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,20 @@
  * limitations under the License.
  */
 
-#ifndef ST_SWLINEAR_ACCEL_H
-#define ST_SWLINEAR_ACCEL_H
+#pragma once
 
 #include "SWSensorBase.h"
 
+namespace stm {
+namespace core {
+
 class SWLinearAccel : public SWSensorBaseWithPollrate {
 public:
-	SWLinearAccel(const char *name, int handle);
-	~SWLinearAccel();
+    SWLinearAccel(const char *name, int handle);
 
-	virtual int CustomInit();
-	virtual void ProcessData(SensorBaseData *data);
+    virtual int CustomInit();
+    virtual void ProcessData(SensorBaseData *data);
 };
 
-#endif /* ST_SWLINEAR_ACCEL_H */
+} // namespace core
+} // namespace stm

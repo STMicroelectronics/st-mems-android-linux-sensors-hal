@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2019 STMicroelectronics
- * Author: Matteo Dameno - <matteo.dameno@st.com>
+ * Copyright (C) 2018 The Android Open Source Project
+ * Copyright (C) 2015-2020 STMicroelectronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,10 @@
  * limitations under the License.
  */
 
-#ifndef ST_SENSOR_ADDITIONAL_INFO_H
-#define ST_SENSOR_ADDITIONAL_INFO_H
+#pragma once
 
+#include "temp_struct_porting.h"
 #include "common_data.h"
-
-#if (CONFIG_ST_HAL_ANDROID_VERSION >= ST_HAL_PIE_VERSION)
-#if (CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED)
-
-#include <hardware/sensors.h>
 
 /*
  * class SensorAdditionalInfoEvent
@@ -32,20 +27,13 @@
  */
 class SensorAdditionalInfoEvent {
 private:
-	additional_info_event_t sensor_additional_info_event;
-
-protected:
+    additional_info_event_t sensor_additional_info_event;
 
 public:
-	SensorAdditionalInfoEvent(int32_t payload_type, int32_t serial);
-	~SensorAdditionalInfoEvent();
+    SensorAdditionalInfoEvent(int32_t payload_type, int32_t serial);
+    ~SensorAdditionalInfoEvent();
 
-	static const additional_info_event_t* getBeginFrameEvent();
-	static const additional_info_event_t* getEndFrameEvent();
-	void incrementEventSerial();
+    static const additional_info_event_t* getBeginFrameEvent();
+    static const additional_info_event_t* getEndFrameEvent();
+    void incrementEventSerial();
 };
-
-#endif /* CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED */
-#endif /* CONFIG_ST_HAL_ANDROID_VERSION */
-
-#endif /* ST_SENSOR_ADDITIONAL_INFO_H */

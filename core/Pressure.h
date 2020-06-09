@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2015-2016 STMicroelectronics
- * Author: Denis Ciocca - <denis.ciocca@st.com>
+ * Copyright (C) 2018 The Android Open Source Project
+ * Copyright (C) 2015-2020 STMicroelectronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,24 @@
  * limitations under the License.
  */
 
-#ifndef ST_PRESSURE_SENSOR_H
-#define ST_PRESSURE_SENSOR_H
+#pragma once
 
 #include "HWSensorBase.h"
+
+namespace stm {
+namespace core {
 
 /*
  * class Pressure
  */
 class Pressure : public HWSensorBaseWithPollrate {
 public:
-	Pressure(HWSensorBaseCommonData *data, const char *name,
-			struct device_iio_sampling_freqs *sfa, int handle,
-			unsigned int hw_fifo_len,
-			float power_consumption, bool wakeup);
-	~Pressure();
+    Pressure(HWSensorBaseCommonData *data, const char *name,
+             struct device_iio_sampling_freqs *sfa, int handle,
+             unsigned int hw_fifo_len, float power_consumption, bool wakeup);
 
-	virtual void ProcessData(SensorBaseData *data);
+    virtual void ProcessData(SensorBaseData *data);
 };
 
-#endif /* ST_PRESSURE_SENSOR_H */
+} // namespace core
+} // namespace stm

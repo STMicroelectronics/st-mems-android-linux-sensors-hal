@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016 STMicroelectronics
- * Author: Lorenzo Bianconi - <lorenzo.bianconi@st.com>
+ * Copyright (C) 2018 The Android Open Source Project
+ * Copyright (C) 2016-2020 STMicroelectronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,24 @@
  * limitations under the License.
  */
 
-#ifndef ST_RHUMIDITY_SENSOR_H
-#define ST_RHUMIDITY_SENSOR_H
+#pragma once
 
 #include "HWSensorBase.h"
+
+namespace stm {
+namespace core {
 
 /*
  * class RHumidity
  */
 class RHumidity : public HWSensorBaseWithPollrate {
 public:
-	RHumidity(HWSensorBaseCommonData *data, const char *name,
-		  struct device_iio_sampling_freqs *sfa, int handle,
-		  unsigned int hw_fifo_len, float power_consumption,
-		  bool wakeup);
-	~RHumidity() {};
+    RHumidity(HWSensorBaseCommonData *data, const char *name,
+              struct device_iio_sampling_freqs *sfa, int handle,
+              unsigned int hw_fifo_len, float power_consumption, bool wakeup);
 
-	virtual void ProcessData(SensorBaseData *data);
+    virtual void ProcessData(SensorBaseData *data);
 };
 
-#endif /* ST_RHUMIDITY_SENSOR_H */
+} // namespace core
+} // namespace stm

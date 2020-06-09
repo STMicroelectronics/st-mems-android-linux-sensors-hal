@@ -15,17 +15,19 @@
  * limitations under the License.
  */
 
-#ifndef ST_SWROTATION_VECTOR_H
-#define ST_SWROTATION_VECTOR_H
+#pragma once
 
 #include "SWSensorBase.h"
 
+namespace stm {
+namespace core {
+
 class SWRotationVector : public SWSensorBaseWithPollrate {
 public:
-	SWRotationVector(const char *name, int handle);
-	~SWRotationVector();
+    SWRotationVector(const char *name, int handle);
 
-	virtual void ProcessData(SensorBaseData *data);
+    virtual void ProcessData(SensorBaseData *data);
 };
 
-#endif /* ST_SWROTATION_VECTOR_H */
+} // namespace core
+} // namespace stm

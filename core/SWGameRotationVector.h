@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2015-2016 STMicroelectronics
- * Author: Denis Ciocca - <denis.ciocca@st.com>
+ * Copyright (C) 2015-2020 STMicroelectronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +14,19 @@
  * limitations under the License.
  */
 
-#ifndef ST_SWGAME_ROTATION_VECTOR_H
-#define ST_SWGAME_ROTATION_VECTOR_H
+#pragma once
 
 #include "SWSensorBase.h"
 
+namespace stm {
+namespace core {
+
 class SWGameRotationVector : public SWSensorBaseWithPollrate {
 public:
-	SWGameRotationVector(const char *name, int handle);
-	~SWGameRotationVector();
+    SWGameRotationVector(const char *name, int handle);
 
-	virtual void ProcessData(SensorBaseData *data);
+    virtual void ProcessData(SensorBaseData *data);
 };
 
-#endif /* ST_SWGAME_ROTATION_VECTOR_H */
+} // namespace core
+} // namespace stm

@@ -1,10 +1,18 @@
 /*
- * STMicroelectronics SW Orientation Sensor Class
+ * Copyright (C) 2018 The Android Open Source Project
+ * Copyright (C) 2015-2020 STMicroelectronics
  *
- * Copyright 2015-2016 STMicroelectronics Inc.
- * Author: Denis Ciocca - <denis.ciocca@st.com>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License").
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 #include <fcntl.h>
@@ -13,39 +21,30 @@
 
 #include "SWOrientation.h"
 
-SWOrientation::SWOrientation(const char *name, int handle) :
-		SWSensorBaseWithPollrate(name, handle, SENSOR_TYPE_ORIENTATION,
-			true, false, true, false)
+namespace stm {
+namespace core {
+
+SWOrientation::SWOrientation(const char *name, int handle)
+    : SWSensorBaseWithPollrate(name, handle,
+                               OrientationSensorType,
+                               true, false, true, false)
 {
-#if (CONFIG_ST_HAL_ANDROID_VERSION > ST_HAL_KITKAT_VERSION)
-	sensor_t_data.stringType = SENSOR_STRING_TYPE_ORIENTATION;
-	sensor_t_data.flags |= SENSOR_FLAG_CONTINUOUS_MODE;
-#endif /* CONFIG_ST_HAL_ANDROID_VERSION */
+    sensor_t_data.maxRange = 360.0f;
 
-	sensor_t_data.maxRange = 360.0f;
-
-#ifdef CONFIG_ST_HAL_ORIENTATION_AP_ENABLED_9X
-	dependencies_type_list[SENSOR_DEPENDENCY_ID_0] = SENSOR_TYPE_ST_ACCEL_MAGN_GYRO_FUSION9X;
-#endif /* CONFIG_ST_HAL_ORIENTATION_AP_ENABLED_9X */
-
-#ifdef CONFIG_ST_HAL_ORIENTATION_AP_ENABLED_6X
-	dependencies_type_list[SENSOR_DEPENDENCY_ID_0] = SENSOR_TYPE_ST_ACCEL_MAGN_FUSION6X;
-#endif /* CONFIG_ST_HAL_ORIENTATION_AP_ENABLED_6X */
-
-	id_sensor_trigger = SENSOR_DEPENDENCY_ID_0;
-}
-
-SWOrientation::~SWOrientation()
-{
-
+    dependencies_type_list.push_back(AccelMagnGyroFusion9XSensorType);
+    id_sensor_trigger = SENSOR_DEPENDENCY_ID_0;
+    sensor_event.data.dataLen = SENSOR_DATA_3AXIS;
 }
 
 void SWOrientation::ProcessData(SensorBaseData *data)
 {
-	memcpy(sensor_event.data, data->processed, SENSOR_DATA_3AXIS * sizeof(float));
-	sensor_event.orientation.status = data->accuracy;
-	sensor_event.timestamp = data->timestamp;
+    memcpy(sensor_event.data.data2, data->processed, SENSOR_DATA_3AXIS * sizeof(float));
+    //sensor_event.orientation.status = data->accuracy;
+    sensor_event.timestamp = data->timestamp;
 
-	SWSensorBaseWithPollrate::WriteDataToPipe(data->pollrate_ns);
-	SWSensorBaseWithPollrate::ProcessData(data);
+    SWSensorBaseWithPollrate::WriteDataToPipe(data->pollrate_ns);
+    SWSensorBaseWithPollrate::ProcessData(data);
 }
+
+} // namespace core
+} // namespace stm

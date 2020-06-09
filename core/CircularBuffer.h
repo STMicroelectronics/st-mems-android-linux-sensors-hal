@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2015-2016 STMicroelectronics
- * Author: Denis Ciocca - <denis.ciocca@st.com>
+ * Copyright (C) 2018 The Android Open Source Project
+ * Copyright (C) 2015-2020 STMicroelectronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@
  * limitations under the License.
  */
 
-#ifndef ST_CIRCULAR_BUFFER_H
-#define ST_CIRCULAR_BUFFER_H
+#pragma once
 
 #include <sys/cdefs.h>
 #include <sys/types.h>
@@ -26,13 +25,13 @@
 #include <errno.h>
 
 typedef struct SensorBaseData {
-	float raw[4];
-	float offset[4];
-	float processed[5];
-	int64_t timestamp;
-	int8_t accuracy;
-	int flush_event_handle;
-	int64_t pollrate_ns;
+    float raw[4];
+    float offset[4];
+    float processed[5];
+    int64_t timestamp;
+    int8_t accuracy;
+    int flush_event_handle;
+    int64_t pollrate_ns;
 } SensorBaseData;
 
 /*
@@ -40,21 +39,19 @@ typedef struct SensorBaseData {
  */
 class CircularBuffer {
 private:
-	pthread_mutex_t data_mutex;
-	unsigned int length, elements_available;
+    pthread_mutex_t data_mutex;
+    unsigned int length, elements_available;
 
-	SensorBaseData *data_sensor;
-	SensorBaseData *first_available_element;
-	SensorBaseData *first_free_element;
+    SensorBaseData *data_sensor;
+    SensorBaseData *first_available_element;
+    SensorBaseData *first_free_element;
 
 public:
-	CircularBuffer(unsigned int num_elements);
-	~CircularBuffer();
+    CircularBuffer(unsigned int num_elements);
+    ~CircularBuffer();
 
-	int writeElement(SensorBaseData *data);
-	int readElement(SensorBaseData *data);
-	int readSyncElement(SensorBaseData *data, int64_t timestamp_sync);
-	void resetBuffer();
+    int writeElement(SensorBaseData *data);
+    int readElement(SensorBaseData *data);
+    int readSyncElement(SensorBaseData *data, int64_t timestamp_sync);
+    void resetBuffer();
 };
-
-#endif /* ST_CIRCULAR_BUFFER_H */

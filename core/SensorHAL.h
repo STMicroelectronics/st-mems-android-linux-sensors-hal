@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2015-2016 STMicroelectronics
- * Author: Denis Ciocca - <denis.ciocca@st.com>
+ * Copyright (C) 2018 The Android Open Source Project
+ * Copyright (C) 2015-2020 STMicroelectronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,21 @@
  * limitations under the License.
  */
 
-#ifndef ST_SENSOR_HAL_H
-#define ST_SENSOR_HAL_H
+#pragma once
 
-#include <hardware/hardware.h>
-#include <hardware/sensors.h>
+#include <vector>
+#include <map>
+
 #include <poll.h>
 
+#include <STMSensorsList.h>
 #include "SensorBase.h"
 #include "SelfTest.h"
 #include "common_data.h"
+#include "SensorsGraph.h"
 
-#ifdef CONFIG_ST_HAL_DIRECT_REPORT_SENSOR
-#include <unordered_map>
-#include <utils/Mutex.h>
-#include "RingBuffer.h"
-#endif /* CONFIG_ST_HAL_DIRECT_REPORT_SENSOR */
+namespace stm {
+namespace core {
 
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(a)		(int)((sizeof(a) / sizeof(*(a))) / \
@@ -40,7 +39,6 @@
 /*
  * IIO driver sensors names
  */
-#define ST_SENSORS_LIST_0				"test"
 #define ST_SENSORS_LIST_1				"lsm6ds3"
 #define ST_SENSORS_LIST_2				"lis3mdl"
 #define ST_SENSORS_LIST_3				"lsm303dlhc"
@@ -111,74 +109,18 @@
 #define ST_HAL_NO_MOTION_SUFFIX_IIO			"_no_motion"
 #define ST_HAL_DEVICE_ORIENTATION_SUFFIX_IIO		"_dev_orientation"
 
-#define ST_HAL_NEW_SENSOR_SUPPORTED(DRIVER_NAME, ANDROID_SENSOR_TYPE, IIO_SENSOR_TYPE, ANDROID_NAME, POWER_CONSUMPTION) \
-	{ \
-	.driver_name = DRIVER_NAME, \
-	.android_name = ANDROID_NAME, \
-	.android_sensor_type = ANDROID_SENSOR_TYPE,\
-	.iio_sensor_type = IIO_SENSOR_TYPE, \
-	.power_consumption = POWER_CONSUMPTION,\
-	},
-
-#if (CONFIG_ST_HAL_ANDROID_VERSION >= ST_HAL_MARSHMALLOW_VERSION)
-#define ST_HAL_IIO_DEVICE_API_VERSION			SENSORS_DEVICE_API_VERSION_1_4
-#endif /* CONFIG_ST_HAL_ANDROID_VERSION */
-
-#if (CONFIG_ST_HAL_ANDROID_VERSION == ST_HAL_LOLLIPOP_VERSION)
-#define ST_HAL_IIO_DEVICE_API_VERSION			SENSORS_DEVICE_API_VERSION_1_3
-#endif /* CONFIG_ST_HAL_ANDROID_VERSION */
-
-#if (CONFIG_ST_HAL_ANDROID_VERSION == ST_HAL_KITKAT_VERSION)
-#define ST_HAL_IIO_DEVICE_API_VERSION			SENSORS_DEVICE_API_VERSION_1_1
-#endif /* CONFIG_ST_HAL_ANDROID_VERSION */
-
-#if defined(CONFIG_ST_HAL_HAS_GEOMAG_FUSION) && \
-				(defined(CONFIG_ST_HAL_GEOMAG_ROT_VECTOR_AP_ENABLED) || \
-				defined(CONFIG_ST_HAL_ROT_VECTOR_AP_ENABLED_6X) || \
-				defined(CONFIG_ST_HAL_VIRTUAL_GYRO_ENABLED) || \
-				defined(CONFIG_ST_HAL_ORIENTATION_AP_ENABLED_6X))
-#define ST_HAL_NEEDS_GEOMAG_FUSION			1
-#endif /* CONFIG_ST_HAL_GAME_ROT_VECTOR_AP_ENABLED */
-
-#if defined(CONFIG_ST_HAL_HAS_6AX_FUSION) && \
-				(defined(CONFIG_ST_HAL_GAME_ROT_VECTOR_AP_ENABLED) || \
-				defined(CONFIG_ST_HAL_GRAVITY_AP_ENABLED_6X) || \
-				defined(CONFIG_ST_HAL_LINEAR_AP_ENABLED_6X))
-#define ST_HAL_NEEDS_6AX_FUSION				1
-#endif /* CONFIG_ST_HAL_GAME_ROT_VECTOR_AP_ENABLED */
-
-#if defined(CONFIG_ST_HAL_HAS_9AX_FUSION) && \
-				(defined(CONFIG_ST_HAL_ROT_VECTOR_AP_ENABLED_9X) || \
-				defined(CONFIG_ST_HAL_ORIENTATION_AP_ENABLED_9X) || \
-				defined(CONFIG_ST_HAL_GRAVITY_AP_ENABLED_9X) || \
-				defined(CONFIG_ST_HAL_LINEAR_AP_ENABLED_9X))
-#define ST_HAL_NEEDS_9AX_FUSION				1
-#endif /* CONFIG_ST_HAL_GAME_ROT_VECTOR_AP_ENABLED */
-
-
 struct STSensorHAL_data {
-	sensors_poll_device_1 poll_device;
+    Graph<SensorBase> graph;
 
-	pthread_t *data_threads;
-	pthread_t *events_threads;
-	SensorBase *sensor_classes[ST_HAL_IIO_MAX_DEVICES];
-
-	int last_handle;
-
-	unsigned int sensor_available;
-	struct sensor_t *sensor_t_list;
+    std::map<uint32_t, int> handleToNodeId_;
+    std::map<int, uint32_t> sensorIdToHandle;
 
 #ifdef CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS
-	SelfTest *self_test;
+    SelfTest *self_test;
 #endif /* CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS */
 
-	struct pollfd android_pollfd[ST_HAL_IIO_MAX_DEVICES];
-
-#ifdef CONFIG_ST_HAL_DIRECT_REPORT_SENSOR
-	int mDirectChannelHandle;
-	android::Mutex mDirectChannelLock;
-#endif /* CONFIG_ST_HAL_DIRECT_REPORT_SENSOR */
-
+    std::vector<struct pollfd> androidPollFd;
 } typedef STSensorHAL_data;
 
-#endif /* ST_SENSOR_HAL_H */
+} // namespace core
+} // namespace stm

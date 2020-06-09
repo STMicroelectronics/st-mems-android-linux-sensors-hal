@@ -1,54 +1,52 @@
 /*
- * STMicroelectronics Pressure Sensor Class
+ * Copyright (C) 2018 The Android Open Source Project
+ * Copyright (C) 2015-2020 STMicroelectronics
  *
- * Copyright 2015-2016 STMicroelectronics Inc.
- * Author: Denis Ciocca - <denis.ciocca@st.com>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License").
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 #include <fcntl.h>
 #include <assert.h>
 #include <signal.h>
+#include <cmath>
 
 #include "Pressure.h"
 
+namespace stm {
+namespace core {
+
 Pressure::Pressure(HWSensorBaseCommonData *data, const char *name,
-		struct device_iio_sampling_freqs *sfa, int handle,
-		unsigned int hw_fifo_len, float power_consumption, bool wakeup) :
-			HWSensorBaseWithPollrate(data, name, sfa, handle,
-			SENSOR_TYPE_PRESSURE, hw_fifo_len, power_consumption)
+                   struct device_iio_sampling_freqs *sfa, int handle,
+                   unsigned int hw_fifo_len, float power_consumption, bool wakeup)
+    : HWSensorBaseWithPollrate(data, name, sfa, handle,
+                               PressureSensorType,
+                               hw_fifo_len, power_consumption)
 {
-#if (CONFIG_ST_HAL_ANDROID_VERSION > ST_HAL_KITKAT_VERSION)
-	sensor_t_data.stringType = SENSOR_STRING_TYPE_PRESSURE;
-	sensor_t_data.flags |= SENSOR_FLAG_CONTINUOUS_MODE;
+    (void)wakeup;
 
-	if (wakeup)
-		sensor_t_data.flags |= SENSOR_FLAG_WAKE_UP;
-#else /* CONFIG_ST_HAL_ANDROID_VERSION */
-	(void)wakeup;
-#endif /* CONFIG_ST_HAL_ANDROID_VERSION */
-
-	sensor_t_data.resolution = data->channels[0].scale;
-	sensor_t_data.maxRange = sensor_t_data.resolution * (pow(2, data->channels[0].bits_used) - 1);
-}
-
-Pressure::~Pressure()
-{
-
+    sensor_t_data.resolution = data->channels[0].scale;
+    sensor_t_data.maxRange = sensor_t_data.resolution * (std::pow(2, data->channels[0].bits_used) - 1);
+    sensor_event.data.dataLen = 1;
 }
 
 void Pressure::ProcessData(SensorBaseData *data)
 {
-#if (CONFIG_ST_HAL_DEBUG_LEVEL >= ST_HAL_DEBUG_EXTRA_VERBOSE)
-	ALOGD("\"%s\": received new sensor data: p=%f, timestamp=%" PRIu64 "ns, deltatime=%" PRIu64 "ns (sensor type: %d).",
-				sensor_t_data.name, data->raw[0], data->timestamp,
-				data->timestamp - sensor_event.timestamp, sensor_t_data.type);
-#endif /* CONFIG_ST_HAL_DEBUG_LEVEL */
+    sensor_event.data.data2[0] = data->raw[0];
+    sensor_event.timestamp = data->timestamp;
 
-	sensor_event.pressure = data->raw[0];
-	sensor_event.timestamp = data->timestamp;
-
-	HWSensorBaseWithPollrate::WriteDataToPipe(data->pollrate_ns);
-	HWSensorBaseWithPollrate::ProcessData(data);
+    HWSensorBaseWithPollrate::WriteDataToPipe(data->pollrate_ns);
+    HWSensorBaseWithPollrate::ProcessData(data);
 }
+
+} // namespace core
+} // namespace stm

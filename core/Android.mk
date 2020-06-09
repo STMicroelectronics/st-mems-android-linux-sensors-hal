@@ -35,8 +35,7 @@ LOCAL_C_INCLUDES := \
 
 LOCAL_CFLAGS += \
     -Wall \
-    -Wextra \
-    -Wpedantic
+    -Wextra
 
 ifeq ($(DEBUG),y)
 LOCAL_CFLAGS += -g -O0
@@ -50,7 +49,43 @@ LOCAL_SRC_FILES := \
     STMSensorType.cpp \
     STMSensor.cpp \
     ISTMSensorsCallbackData.cpp \
-    STMSensorsCallbackData.cpp
+    STMSensorsCallbackData.cpp \
+    SensorsGraph.cpp \
+    SensorsSupported.cpp \
+    Accelerometer.cpp \
+    ChangeODRTimestampStack.cpp \
+    CircularBuffer.cpp \
+    DeviceOrientation.cpp \
+    FlushBufferStack.cpp \
+    FlushRequested.cpp \
+    Gesture.cpp \
+    Gyroscope.cpp \
+    HWSensorBase.cpp \
+    Magnetometer.cpp \
+    Pressure.cpp \
+    RHumidity.cpp \
+    SensorAdditionalInfo.cpp \
+    SensorBase.cpp \
+    SensorHAL.cpp \
+    SignificantMotion.cpp \
+    StepCounter.cpp \
+    StepDetector.cpp \
+    Temp.cpp \
+    TiltSensor.cpp \
+    utils.cpp \
+    WristTiltGesture.cpp \
+    SWSensorBase.cpp \
+    SWAccelerometerUncalibrated.cpp \
+    SWMagnetometerUncalibrated.cpp \
+    SWGyroscopeUncalibrated.cpp \
+    SWAccelGyroFusion6X.cpp \
+    SWAccelMagnGyroFusion9X.cpp \
+    SWGameRotationVector.cpp \
+    SWRotationVector.cpp \
+    SWOrientation.cpp \
+    SWGravity.cpp \
+    SWLinearAccel.cpp \
+    SelfTest.cpp
 
 LOCAL_EXPORT_C_INCLUDE_DIRS := \
     $(LOCAL_PATH)/include

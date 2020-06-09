@@ -19,7 +19,9 @@
 
 #include <STMSensorsHAL.h>
 #include <IConsole.h>
+#include <IUtils.h>
 
+using stm::core::IUtils;
 using stm::core::IConsole;
 using stm::core::ISTMSensorsHAL;
 using stm::core::STMSensorsHAL;
@@ -48,17 +50,17 @@ protected:
 };
 
 class Console : public IConsole {
-    void info(const std::string &message) const
+    void info(const std::string &message) const override
     {
         (void) message;
     }
 
-    void error(const std::string &message) const
+    void error(const std::string &message) const override
     {
         (void) message;
     }
 
-    void debug(const std::string &message) const
+    void debug(const std::string &message) const override
     {
         (void) message;
     }
@@ -67,6 +69,29 @@ class Console : public IConsole {
 IConsole& IConsole::getInstance(void)
 {
     static Console instance;
+
+    return instance;
+}
+
+class Utils : public IUtils {
+public:
+    int64_t getTime(void) const override;
+};
+
+int64_t Utils::getTime(void) const
+{
+    struct timespec ts;
+
+    if (clock_gettime(CLOCK_REALTIME, &ts)) {
+      return 0;
+    }
+
+    return (ts.tv_sec * 1000000000) + ts.tv_nsec;
+}
+
+IUtils& IUtils::getInstance(void)
+{
+    static Utils instance;
 
     return instance;
 }

@@ -17,6 +17,10 @@
 
 #pragma once
 
+#include <thread>
+#include <memory>
+#include <atomic>
+
 #include <ISTMSensorsHAL.h>
 
 namespace stm {
@@ -25,6 +29,7 @@ namespace core {
 class STMSensorsHAL : public ISTMSensorsHAL {
 public:
     STMSensorsHAL(void);
+    ~STMSensorsHAL(void);
 
     void initialize(const ISTMSensorsCallback &sensorsCallback) final;
 
@@ -66,7 +71,15 @@ private:
      */
     MySTMSensorCallback emptySTMSensorCallback;
 
+    std::atomic<bool> dataReceivedThreadRunning;
+
+    std::unique_ptr<std::thread> dataReceivedThread;
+
+    void *hal_data;
+
     bool handleIsValid(uint32_t handle) const;
+
+    static void internalPoll(STMSensorsHAL *hal, std::atomic<bool> *running);
 };
 
 } // namespace core

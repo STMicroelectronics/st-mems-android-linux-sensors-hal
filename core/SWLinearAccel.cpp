@@ -1,10 +1,18 @@
 /*
- * STMicroelectronics SW Linear Acceleration Sensor Class
+ * Copyright (C) 2018 The Android Open Source Project
+ * Copyright (C) 2015-2020 STMicroelectronics
  *
- * Copyright 2015-2016 STMicroelectronics Inc.
- * Author: Denis Ciocca - <denis.ciocca@st.com>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License").
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 #include <fcntl.h>
@@ -13,50 +21,42 @@
 
 #include "SWLinearAccel.h"
 
-SWLinearAccel::SWLinearAccel(const char *name, int handle) :
-		SWSensorBaseWithPollrate(name, handle, SENSOR_TYPE_LINEAR_ACCELERATION,
-			true, false, true, false)
+namespace stm {
+namespace core {
+
+SWLinearAccel::SWLinearAccel(const char *name, int handle)
+    : SWSensorBaseWithPollrate(name, handle,
+                               LinearAccelSensorType,
+                               true, false, true, false)
 {
-#if (CONFIG_ST_HAL_ANDROID_VERSION > ST_HAL_KITKAT_VERSION)
-	sensor_t_data.stringType = SENSOR_STRING_TYPE_LINEAR_ACCELERATION;
-	sensor_t_data.flags |= SENSOR_FLAG_CONTINUOUS_MODE;
-#endif /* CONFIG_ST_HAL_ANDROID_VERSION */
-
-#ifdef CONFIG_ST_HAL_LINEAR_AP_ENABLED_9X
-	dependencies_type_list[SENSOR_DEPENDENCY_ID_0] = SENSOR_TYPE_ST_ACCEL_MAGN_GYRO_FUSION9X;
-#endif /* CONFIG_ST_HAL_LINEAR_AP_ENABLED_9X */
-
-#ifdef CONFIG_ST_HAL_LINEAR_AP_ENABLED_6X
-	dependencies_type_list[SENSOR_DEPENDENCY_ID_0] = SENSOR_TYPE_ST_ACCEL_GYRO_FUSION6X;
-#endif /* CONFIG_ST_HAL_LINEAR_AP_ENABLED_6X */
-
-	id_sensor_trigger = SENSOR_DEPENDENCY_ID_0;
-}
-
-SWLinearAccel::~SWLinearAccel()
-{
-
+    dependencies_type_list.push_back(AccelMagnGyroFusion9XSensorType);
+    id_sensor_trigger = SENSOR_DEPENDENCY_ID_0;
+    sensor_event.data.dataLen = SENSOR_DATA_3AXIS;
 }
 
 int SWLinearAccel::CustomInit()
 {
-	bool valid;
-	float maxRange = 0;
+    bool valid;
+    float maxRange = 0;
 
-	valid = GetDependencyMaxRange(SENSOR_TYPE_ACCELEROMETER, &maxRange);
-	if (!valid)
-		return -EINVAL;
+    valid = GetDependencyMaxRange(AccelSensorType, &maxRange);
+    if (!valid) {
+        return -EINVAL;
+    }
 
-	sensor_t_data.maxRange = maxRange;
+    sensor_t_data.maxRange = maxRange;
 
-	return 0;
+    return 0;
 }
 
 void SWLinearAccel::ProcessData(SensorBaseData *data)
 {
-	memcpy(sensor_event.data, data->processed, SENSOR_DATA_3AXIS * sizeof(float));
-	sensor_event.timestamp = data->timestamp;
+    memcpy(sensor_event.data.data2, data->processed, SENSOR_DATA_3AXIS * sizeof(float));
+    sensor_event.timestamp = data->timestamp;
 
-	SWSensorBaseWithPollrate::WriteDataToPipe(data->pollrate_ns);
-	SWSensorBaseWithPollrate::ProcessData(data);
+    SWSensorBaseWithPollrate::WriteDataToPipe(data->pollrate_ns);
+    SWSensorBaseWithPollrate::ProcessData(data);
 }
+
+} // namespace core
+} // namespace stm

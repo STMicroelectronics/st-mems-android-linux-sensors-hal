@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018 The Android Open Source Project
- * Copyright (C) 2015-2020 STMicroelectronics
+ * Copyright (C) 2019-2020 STMicroelectronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,22 @@
 
 #pragma once
 
-#include "SWSensorBase.h"
+#include <STMSensorsList.h>
+#include "temp_struct_porting.h"
 
 namespace stm {
 namespace core {
 
-class SWGravity : public SWSensorBaseWithPollrate {
-public:
-    SWGravity(const char *name, int handle);
+int st_hal_open_sensors(void **data, STMSensorsList &sensorsList);
 
-    virtual void ProcessData(SensorBaseData *data);
-};
+int st_hal_dev_activate(void *data, uint32_t handle, bool enable);
+
+int st_hal_dev_batch(void *data, int handle, int64_t period_ns,
+                     int64_t timeout);
+
+int st_hal_dev_flush(void *data, uint32_t handle);
+
+int st_hal_dev_poll(void *data, sensors_event_t *sdata, int count);
 
 } // namespace core
 } // namespace stm
