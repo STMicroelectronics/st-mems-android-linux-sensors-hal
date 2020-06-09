@@ -20,13 +20,13 @@
 #include <STMSensorsList.h>
 
 using stm::core::STMSensor;
-using stm::core::STMSensorType;
+using stm::core::SensorType;
 using stm::core::STMSensorsList;
 
 STMSensor accel(std::string("name"), // name
                 std::string("vendor"), // vendor
                 1, // version
-                STMSensorType::ACCELEROMETER, // type
+                SensorType::ACCELEROMETER, // type
                 1, //maxRange
                 1, // resolution
                 1, // power
@@ -40,7 +40,7 @@ STMSensor accel(std::string("name"), // name
 STMSensor accelName2(std::string("name_2"), // name
                      std::string("vendor"), // vendor
                      1, // version
-                     STMSensorType::ACCELEROMETER, // type
+                     SensorType::ACCELEROMETER, // type
                      1, //maxRange
                      1, // resolution
                      1, // power
@@ -54,7 +54,7 @@ STMSensor accelName2(std::string("name_2"), // name
 STMSensor magnMinRateHzNegative(std::string("name"), // name
                                 std::string("vendor"), // vendor
                                 1, // version
-                                STMSensorType::MAGNETOMETER, // type
+                                SensorType::MAGNETOMETER, // type
                                 1, //maxRange
                                 1, // resolution
                                 1, // power
@@ -68,7 +68,7 @@ STMSensor magnMinRateHzNegative(std::string("name"), // name
 STMSensor magnMinRateHzBigger(std::string("name"), // name
                               std::string("vendor"), // vendor
                               1, // version
-                              STMSensorType::MAGNETOMETER, // type
+                              SensorType::MAGNETOMETER, // type
                               1, //maxRange
                               1, // resolution
                               1, // power
@@ -142,7 +142,7 @@ TEST_F(STMSensorsListTest, addSensor_maxRangeNotZero)
     STMSensor stepCounterMaxRangeZero(std::string("name"), // name
                                       std::string("vendor"), // vendor
                                       1, // version
-                                      STMSensorType::STEP_COUNTER, // type
+                                      SensorType::STEP_COUNTER, // type
                                       0, //maxRange
                                       1, // resolution
                                       1, // power
@@ -165,7 +165,7 @@ TEST_F(STMSensorsListTest, addSensor_fifoRsvdAndFifoMax)
     STMSensor accelFifoRsvdBigger(std::string("name"), // name
                                   std::string("vendor"), // vendor
                                   1, // version
-                                  STMSensorType::ACCELEROMETER, // type
+                                  SensorType::ACCELEROMETER, // type
                                   20, //maxRange
                                   1, // resolution
                                   1, // power

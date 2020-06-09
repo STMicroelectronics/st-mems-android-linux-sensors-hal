@@ -15,21 +15,44 @@
  * limitations under the License.
  */
 
-#include <STMSensorsCallbackData.h>
+#include <STMSensorType.h>
 
 namespace stm {
 namespace core {
 
-STMSensorsCallbackData::STMSensorsCallbackData(uint32_t sensorHandle,
-                                               SensorType sensorType,
-                                               int64_t timestamp,
-                                               const std::vector<float> &data)
+STMSensorType::STMSensorType(SensorType type)
+    : isInternalType(false), sType(type)
 {
-    this->sensorHandle = sensorHandle;
-    this->sensorType = sensorType;
-    this->timestamp = timestamp;
-    this->wakeUpSensor = false;
-    this->sensorsData.assign(data.begin(), data.end());
+
+}
+
+STMSensorType::STMSensorType(SensorTypeInternal type)
+    : isInternalType(true), sTypeInt(type)
+{
+
+}
+
+bool STMSensorType::isInternal(void) const
+{
+    return isInternalType;
+}
+
+bool STMSensorType::operator==(const STMSensorType &other) const
+{
+    if (other.isInternalType == isInternalType) {
+        if (isInternalType) {
+            return other.sTypeInt == sTypeInt;
+        } else {
+            return other.sType == sType;
+        }
+    }
+
+    return false;
+}
+
+bool STMSensorType::operator!=(const STMSensorType &other) const
+{
+    return !(*this == other);
 }
 
 } // namespace core

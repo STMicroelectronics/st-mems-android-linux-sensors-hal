@@ -28,7 +28,7 @@ protected:
     virtual ~IUtils(void) = default;
 
 public:
-    IUtils(const IUtils &) = default;
+    IUtils(const IUtils &) = delete;
     IUtils& operator= (const IUtils &) = delete;
 
     /**

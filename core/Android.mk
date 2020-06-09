@@ -47,6 +47,7 @@ LOCAL_SRC_FILES := \
     ISTMSensorsHAL.cpp \
     STMSensorsHAL.cpp \
     STMSensorsList.cpp \
+    STMSensorType.cpp \
     STMSensor.cpp \
     ISTMSensorsCallbackData.cpp \
     STMSensorsCallbackData.cpp

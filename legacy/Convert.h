@@ -21,7 +21,7 @@
 #include <STMSensor.h>
 #include <ISTMSensorsCallbackData.h>
 
-bool convertFromSTMSensorType(const stm::core::STMSensorType &type,
+bool convertFromSTMSensorType(const stm::core::SensorType &type,
                               int &sensorType);
 
 bool convertFromSTMSensor(const stm::core::STMSensor &src,

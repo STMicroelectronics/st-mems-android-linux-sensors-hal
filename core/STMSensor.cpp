@@ -23,7 +23,7 @@ namespace core {
 STMSensor::STMSensor(const std::string &name,
                      const std::string &vendor,
                      int32_t version,
-                     STMSensorType type,
+                     SensorType type,
                      float maxRange,
                      float resolution,
                      float power,
@@ -52,7 +52,7 @@ STMSensor::STMSensor(const std::string &name,
 STMSensor::STMSensor(const std::string &name,
                      const std::string &vendor,
                      int32_t version,
-                     STMSensorType type,
+                     SensorType type,
                      float maxRange,
                      float resolution,
                      float power,
@@ -86,14 +86,14 @@ const std::string& STMSensor::getVendor(void) const
     return vendor;
 }
 
-uint32_t STMSensor::getHandle(void) const
-{
-    return handle;
-}
-
 void STMSensor::setHandle(uint32_t newHandle)
 {
     handle = newHandle;
+}
+
+uint32_t STMSensor::getHandle(void) const
+{
+    return handle;
 }
 
 int32_t STMSensor::getVersion(void) const
@@ -101,7 +101,7 @@ int32_t STMSensor::getVersion(void) const
     return version;
 }
 
-STMSensorType STMSensor::getType(void) const
+SensorType STMSensor::getType(void) const
 {
     return type;
 }

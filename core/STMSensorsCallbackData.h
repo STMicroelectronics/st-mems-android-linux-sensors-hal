@@ -25,7 +25,7 @@ namespace core {
 class STMSensorsCallbackData : public ISTMSensorsCallbackData {
 public:
     STMSensorsCallbackData(uint32_t sensorHandle,
-                           STMSensorType sensorType,
+                           SensorType sensorType,
                            int64_t timestamp,
                            const std::vector<float> &data);
 

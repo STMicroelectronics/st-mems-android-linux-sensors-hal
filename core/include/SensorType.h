@@ -23,9 +23,9 @@ namespace stm {
 namespace core {
 
 /**
- * STM sensors core types
+ * Sensors core types
  */
-enum class STMSensorType : int16_t {
+enum class SensorType : uint16_t {
     META_DATA,                      /* dimensionless */
     ACCELEROMETER,                  /* m/s^2 */
     MAGNETOMETER,                   /* uT */
@@ -62,7 +62,6 @@ enum class STMSensorType : int16_t {
     ADDITIONAL_INFO,                /* dimensionless */
     LOW_LATENCY_OFFBODY_DETECT,     /* dimensionless */
     ACCELEROMETER_UNCALIBRATED,     /* m/s^2 */
-    INTERNAL_LIB_TYPE,              /* INTERNAL USE ONLY */
 };
 
 } // namespace core

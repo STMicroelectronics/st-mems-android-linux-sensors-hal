@@ -19,7 +19,8 @@
 
 #include <cstdint>
 #include <vector>
-#include <STMSensorType.h>
+
+#include <SensorType.h>
 
 namespace stm {
 namespace core {
@@ -41,7 +42,7 @@ public:
     /**
      * Return sensor type
      */
-    STMSensorType getSensorType(void) const;
+    SensorType getSensorType(void) const;
 
     /**
      * Return sensor handle
@@ -67,7 +68,7 @@ protected:
     /**
      * Sensor type
      */
-    STMSensorType sensorType;
+    SensorType sensorType;
 
     /**
      * Sensor handle

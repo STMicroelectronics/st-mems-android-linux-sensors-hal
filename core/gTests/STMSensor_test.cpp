@@ -20,7 +20,7 @@
 #include <STMSensor.h>
 
 using stm::core::STMSensor;
-using stm::core::STMSensorType;
+using stm::core::SensorType;
 
 class STMSensorTest : public ::testing::Test {
 protected:
@@ -40,7 +40,7 @@ TEST_F(STMSensorTest, verifyParameters)
     STMSensor accel(std::string("name"), // name
                     std::string("vendor"), // vendor
                     2, // version
-                    STMSensorType::ACCELEROMETER, // type
+                    SensorType::ACCELEROMETER, // type
                     10, //maxRange
                     0.2, // resolution
                     1.3, // power
@@ -55,7 +55,7 @@ TEST_F(STMSensorTest, verifyParameters)
     ASSERT_STREQ("vendor", accel.getVendor().c_str());
     ASSERT_EQ(0, accel.getHandle());
     ASSERT_EQ(2, accel.getVersion());
-    ASSERT_EQ(STMSensorType::ACCELEROMETER, accel.getType());
+    ASSERT_EQ(SensorType::ACCELEROMETER, accel.getType());
     ASSERT_FLOAT_EQ(10, accel.getMaxRange());
     ASSERT_FLOAT_EQ(0.2, accel.getResolution());
     ASSERT_FLOAT_EQ(1.3, accel.getPower());
@@ -69,7 +69,7 @@ TEST_F(STMSensorTest, verifyParameters)
     STMSensor signMotion(std::string("name_2"), // name
                          std::string("vendor_2"), // vendor
                          1, // version
-                         STMSensorType::SIGNIFICANT_MOTION, // type
+                         SensorType::SIGNIFICANT_MOTION, // type
                          1, //maxRange
                          1, // resolution
                          1.0, // power
@@ -82,7 +82,7 @@ TEST_F(STMSensorTest, verifyParameters)
     ASSERT_STREQ("vendor_2", signMotion.getVendor().c_str());
     ASSERT_EQ(0, signMotion.getHandle());
     ASSERT_EQ(1, signMotion.getVersion());
-    ASSERT_EQ(STMSensorType::SIGNIFICANT_MOTION, signMotion.getType());
+    ASSERT_EQ(SensorType::SIGNIFICANT_MOTION, signMotion.getType());
     ASSERT_FLOAT_EQ(1, signMotion.getMaxRange());
     ASSERT_FLOAT_EQ(1, signMotion.getResolution());
     ASSERT_FLOAT_EQ(1, signMotion.getPower());

@@ -22,6 +22,7 @@ add_library(stmicroelectronics-sensors-core-linux
             ISTMSensorsHAL.cpp
             STMSensorsHAL.cpp
             STMSensorsList.cpp
+            STMSensorType.cpp
             STMSensor.cpp
             ISTMSensorsCallbackData.cpp
             STMSensorsCallbackData.cpp)

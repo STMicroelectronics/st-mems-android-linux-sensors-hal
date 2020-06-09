@@ -20,17 +20,19 @@
 #include <cstdint>
 #include <string>
 
-#include <STMSensorType.h>
+#include <SensorType.h>
 
 namespace stm {
 namespace core {
 
 class STMSensor {
 public:
+    STMSensor(void) = delete;
+
     STMSensor(const std::string &name,
               const std::string &vendor,
               int32_t version,
-              STMSensorType type,
+              SensorType type,
               float maxRange,
               float resolution,
               float power,
@@ -43,7 +45,7 @@ public:
     STMSensor(const std::string &name,
               const std::string &vendor,
               int32_t version,
-              STMSensorType type,
+              SensorType type,
               float maxRange,
               float resolution,
               float power,
@@ -56,7 +58,7 @@ public:
     void setHandle(uint32_t newHandle);
     uint32_t getHandle(void) const;
     int32_t getVersion(void) const;
-    STMSensorType getType(void) const;
+    SensorType getType(void) const;
     float getMaxRange(void) const;
     float getResolution(void) const;
     float getPower(void) const;
@@ -91,7 +93,7 @@ private:
     /**
      * Sensor type
      */
-    const STMSensorType type;
+    const SensorType type;
 
     /**
      * Sensor measurement max range,

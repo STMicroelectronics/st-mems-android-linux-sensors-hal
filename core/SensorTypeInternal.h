@@ -15,22 +15,20 @@
  * limitations under the License.
  */
 
-#include <STMSensorsCallbackData.h>
+#pragma once
+
+#include <cstdint>
 
 namespace stm {
 namespace core {
 
-STMSensorsCallbackData::STMSensorsCallbackData(uint32_t sensorHandle,
-                                               SensorType sensorType,
-                                               int64_t timestamp,
-                                               const std::vector<float> &data)
-{
-    this->sensorHandle = sensorHandle;
-    this->sensorType = sensorType;
-    this->timestamp = timestamp;
-    this->wakeUpSensor = false;
-    this->sensorsData.assign(data.begin(), data.end());
-}
+/**
+ * Sensors core internal types
+ */
+enum class SensorTypeInternal : uint16_t {
+    ACCEL_GYRO_FUSION_6X,           /* ACCEL AND GYRO FUSION */
+    ACCEL_MAGN_GYRO_FUSION_9X,      /* ACCEL, MAGN AND GYRO FUSION */
+};
 
 } // namespace core
 } // namespace stm

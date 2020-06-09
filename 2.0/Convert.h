@@ -25,7 +25,7 @@ namespace android {
 namespace hardware {
 namespace sensors {
 
-bool convertFromSTMSensorType(const stm::core::STMSensorType &type,
+bool convertFromSTMSensorType(const stm::core::SensorType &type,
                               V1_0::SensorType &sensorType);
 
 bool convertFromSTMSensor(const stm::core::STMSensor &src,

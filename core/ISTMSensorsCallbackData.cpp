@@ -30,7 +30,7 @@ int64_t ISTMSensorsCallbackData::getTimestamp(void) const
     return timestamp;
 }
 
-STMSensorType ISTMSensorsCallbackData::getSensorType(void) const
+SensorType ISTMSensorsCallbackData::getSensorType(void) const
 {
     return sensorType;
 }

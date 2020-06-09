@@ -23,122 +23,122 @@ namespace android {
 namespace hardware {
 namespace sensors {
 
-static bool convertFromSTMSensorType(const stm::core::STMSensorType &type,
+static bool convertFromSTMSensorType(const stm::core::SensorType &type,
                                      V1_0::SensorType &sensorType,
                                      bool &isPartOfSensorList)
 {
     isPartOfSensorList = true;
 
     switch (type) {
-    case stm::core::STMSensorType::META_DATA:
+    case stm::core::SensorType::META_DATA:
         sensorType = V1_0::SensorType::META_DATA;
         isPartOfSensorList = false;
         break;
-    case stm::core::STMSensorType::ACCELEROMETER:
+    case stm::core::SensorType::ACCELEROMETER:
         sensorType = V1_0::SensorType::ACCELEROMETER;
         break;
-    case stm::core::STMSensorType::MAGNETOMETER:
+    case stm::core::SensorType::MAGNETOMETER:
         sensorType = V1_0::SensorType::MAGNETIC_FIELD;
         break;
-    case stm::core::STMSensorType::ORIENTATION:
+    case stm::core::SensorType::ORIENTATION:
         sensorType = V1_0::SensorType::ORIENTATION;
         break;
-    case stm::core::STMSensorType::GYROSCOPE:
+    case stm::core::SensorType::GYROSCOPE:
         sensorType = V1_0::SensorType::GYROSCOPE;
         break;
-    case stm::core::STMSensorType::LIGHT:
+    case stm::core::SensorType::LIGHT:
         sensorType = V1_0::SensorType::LIGHT;
         break;
-    case stm::core::STMSensorType::PRESSURE:
+    case stm::core::SensorType::PRESSURE:
         sensorType = V1_0::SensorType::PRESSURE;
         break;
-    case stm::core::STMSensorType::INTERNAL_TEMPERATURE:
+    case stm::core::SensorType::INTERNAL_TEMPERATURE:
         isPartOfSensorList = false;
         return false;
-    case stm::core::STMSensorType::PROXIMITY:
+    case stm::core::SensorType::PROXIMITY:
         sensorType = V1_0::SensorType::PROXIMITY;
         break;
-    case stm::core::STMSensorType::GRAVITY:
+    case stm::core::SensorType::GRAVITY:
         sensorType = V1_0::SensorType::GRAVITY;
         break;
-    case stm::core::STMSensorType::LINEAR_ACCELERATION:
+    case stm::core::SensorType::LINEAR_ACCELERATION:
         sensorType = V1_0::SensorType::LINEAR_ACCELERATION;
         break;
-    case stm::core::STMSensorType::ROTATION_VECTOR:
+    case stm::core::SensorType::ROTATION_VECTOR:
         sensorType = V1_0::SensorType::ROTATION_VECTOR;
         break;
-    case stm::core::STMSensorType::RELATIVE_HUMIDITY:
+    case stm::core::SensorType::RELATIVE_HUMIDITY:
         sensorType = V1_0::SensorType::RELATIVE_HUMIDITY;
         break;
-    case stm::core::STMSensorType::AMBIENT_TEMPERATURE:
+    case stm::core::SensorType::AMBIENT_TEMPERATURE:
         sensorType = V1_0::SensorType::AMBIENT_TEMPERATURE;
         break;
-    case stm::core::STMSensorType::MAGNETOMETER_UNCALIBRATED:
+    case stm::core::SensorType::MAGNETOMETER_UNCALIBRATED:
         sensorType = V1_0::SensorType::MAGNETIC_FIELD_UNCALIBRATED;
         break;
-    case stm::core::STMSensorType::GAME_ROTATION_VECTOR:
+    case stm::core::SensorType::GAME_ROTATION_VECTOR:
         sensorType = V1_0::SensorType::GAME_ROTATION_VECTOR;
         break;
-    case stm::core::STMSensorType::GYROSCOPE_UNCALIBRATED:
+    case stm::core::SensorType::GYROSCOPE_UNCALIBRATED:
         sensorType = V1_0::SensorType::GYROSCOPE_UNCALIBRATED;
         break;
-    case stm::core::STMSensorType::SIGNIFICANT_MOTION:
+    case stm::core::SensorType::SIGNIFICANT_MOTION:
         sensorType = V1_0::SensorType::SIGNIFICANT_MOTION;
         break;
-    case stm::core::STMSensorType::STEP_DETECTOR:
+    case stm::core::SensorType::STEP_DETECTOR:
         sensorType = V1_0::SensorType::STEP_DETECTOR;
         break;
-    case stm::core::STMSensorType::STEP_COUNTER:
+    case stm::core::SensorType::STEP_COUNTER:
         sensorType = V1_0::SensorType::STEP_COUNTER;
         break;
-    case stm::core::STMSensorType::GEOMAGNETIC_ROTATION_VECTOR:
+    case stm::core::SensorType::GEOMAGNETIC_ROTATION_VECTOR:
         sensorType = V1_0::SensorType::GEOMAGNETIC_ROTATION_VECTOR;
         break;
-    case stm::core::STMSensorType::HEART_RATE:
+    case stm::core::SensorType::HEART_RATE:
         sensorType = V1_0::SensorType::HEART_RATE;
         break;
-    case stm::core::STMSensorType::TILT_DETECTOR:
+    case stm::core::SensorType::TILT_DETECTOR:
         sensorType = V1_0::SensorType::TILT_DETECTOR;
         break;
-    case stm::core::STMSensorType::WAKE_GESTURE:
+    case stm::core::SensorType::WAKE_GESTURE:
         sensorType = V1_0::SensorType::WAKE_GESTURE;
         break;
-    case stm::core::STMSensorType::GLANCE_GESTURE:
+    case stm::core::SensorType::GLANCE_GESTURE:
         sensorType = V1_0::SensorType::GLANCE_GESTURE;
         break;
-    case stm::core::STMSensorType::PICK_UP_GESTURE:
+    case stm::core::SensorType::PICK_UP_GESTURE:
         sensorType = V1_0::SensorType::PICK_UP_GESTURE;
         break;
-    case stm::core::STMSensorType::WRIST_TILT_GESTURE:
+    case stm::core::SensorType::WRIST_TILT_GESTURE:
         sensorType = V1_0::SensorType::WRIST_TILT_GESTURE;
         break;
-    case stm::core::STMSensorType::DEVICE_ORIENTATION:
+    case stm::core::SensorType::DEVICE_ORIENTATION:
         sensorType = V1_0::SensorType::DEVICE_ORIENTATION;
         break;
-    case stm::core::STMSensorType::POSE_6DOF:
+    case stm::core::SensorType::POSE_6DOF:
         sensorType = V1_0::SensorType::POSE_6DOF;
         break;
-    case stm::core::STMSensorType::STATIONARY_DETECT:
+    case stm::core::SensorType::STATIONARY_DETECT:
         sensorType = V1_0::SensorType::STATIONARY_DETECT;
         break;
-    case stm::core::STMSensorType::MOTION_DETECT:
+    case stm::core::SensorType::MOTION_DETECT:
         sensorType = V1_0::SensorType::MOTION_DETECT;
         break;
-    case stm::core::STMSensorType::HEART_BEAT:
+    case stm::core::SensorType::HEART_BEAT:
         sensorType = V1_0::SensorType::HEART_BEAT;
         break;
-    case stm::core::STMSensorType::DYNAMIC_SENSOR_META:
+    case stm::core::SensorType::DYNAMIC_SENSOR_META:
         sensorType = V1_0::SensorType::DYNAMIC_SENSOR_META;
         isPartOfSensorList = false;
         break;
-    case stm::core::STMSensorType::ADDITIONAL_INFO:
+    case stm::core::SensorType::ADDITIONAL_INFO:
         sensorType = V1_0::SensorType::ADDITIONAL_INFO;
         isPartOfSensorList = false;
         break;
-    case stm::core::STMSensorType::LOW_LATENCY_OFFBODY_DETECT:
+    case stm::core::SensorType::LOW_LATENCY_OFFBODY_DETECT:
         sensorType = V1_0::SensorType::LOW_LATENCY_OFFBODY_DETECT;
         break;
-    case stm::core::STMSensorType::ACCELEROMETER_UNCALIBRATED:
+    case stm::core::SensorType::ACCELEROMETER_UNCALIBRATED:
         sensorType = V1_0::SensorType::ACCELEROMETER_UNCALIBRATED;
         break;
     default:
@@ -149,7 +149,7 @@ static bool convertFromSTMSensorType(const stm::core::STMSensorType &type,
     return true;
 }
 
-bool convertFromSTMSensorType(const stm::core::STMSensorType &type,
+bool convertFromSTMSensorType(const stm::core::SensorType &type,
                               V1_0::SensorType &sensorType)
 {
     bool isPartOfSensorList;
@@ -245,15 +245,15 @@ bool convertFromSTMSensor(const stm::core::STMSensor &src,
 void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorData,
                               V1_0::Event &event)
 {
-    using stm::core::STMSensorType;
+    using stm::core::SensorType;
 
     switch (sensorData.getSensorType()) {
-    case STMSensorType::ACCELEROMETER:
-    case STMSensorType::MAGNETOMETER:
-    case STMSensorType::ORIENTATION:
-    case STMSensorType::GYROSCOPE:
-    case STMSensorType::GRAVITY:
-    case STMSensorType::LINEAR_ACCELERATION:
+    case SensorType::ACCELEROMETER:
+    case SensorType::MAGNETOMETER:
+    case SensorType::ORIENTATION:
+    case SensorType::GYROSCOPE:
+    case SensorType::GRAVITY:
+    case SensorType::LINEAR_ACCELERATION:
         if (sensorData.getData().size() < 3) {
             return;
         }
@@ -261,7 +261,7 @@ void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorDa
         event.u.vec3.y = sensorData.getData().at(1);
         event.u.vec3.z = sensorData.getData().at(2);
         break;
-    case STMSensorType::GAME_ROTATION_VECTOR:
+    case SensorType::GAME_ROTATION_VECTOR:
         if (sensorData.getData().size() < 4) {
             return;
         }
@@ -270,9 +270,9 @@ void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorDa
         event.u.vec4.z = sensorData.getData().at(2);
         event.u.vec4.w = sensorData.getData().at(3);
         break;
-    case STMSensorType::MAGNETOMETER_UNCALIBRATED:
-    case STMSensorType::GYROSCOPE_UNCALIBRATED:
-    case STMSensorType::ACCELEROMETER_UNCALIBRATED:
+    case SensorType::MAGNETOMETER_UNCALIBRATED:
+    case SensorType::GYROSCOPE_UNCALIBRATED:
+    case SensorType::ACCELEROMETER_UNCALIBRATED:
         if (sensorData.getData().size() < 6) {
             return;
         }
@@ -283,7 +283,7 @@ void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorDa
         event.u.uncal.y_bias = sensorData.getData().at(4);
         event.u.uncal.z_bias = sensorData.getData().at(5);
         break;
-    case STMSensorType::META_DATA:
+    case SensorType::META_DATA:
         event.u.meta.what = V1_0::MetaDataEventType::META_DATA_FLUSH_COMPLETE;
         break;
     default:
