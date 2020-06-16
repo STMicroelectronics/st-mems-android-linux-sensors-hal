@@ -17,6 +17,9 @@
 
 #include <STMSensorsCallbackData.h>
 
+namespace stm {
+namespace core {
+
 STMSensorsCallbackData::STMSensorsCallbackData(uint32_t sensorHandle,
                                                STMSensorType sensorType,
                                                int64_t timestamp,
@@ -28,3 +31,6 @@ STMSensorsCallbackData::STMSensorsCallbackData(uint32_t sensorHandle,
     this->wakeUpSensor = false;
     this->sensorsData.assign(data.begin(), data.end());
 }
+
+} // namespace core
+} // namespace stm

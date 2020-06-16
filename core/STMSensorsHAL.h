@@ -19,6 +19,9 @@
 
 #include <ISTMSensorsHAL.h>
 
+namespace stm {
+namespace core {
+
 class STMSensorsHAL : public ISTMSensorsHAL {
 public:
     STMSensorsHAL(void);
@@ -65,3 +68,6 @@ private:
 
     bool handleIsValid(uint32_t handle) const;
 };
+
+} // namespace core
+} // namespace stm

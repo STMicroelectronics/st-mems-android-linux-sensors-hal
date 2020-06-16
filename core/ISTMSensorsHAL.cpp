@@ -18,9 +18,15 @@
 #include <STMSensorsHAL.h>
 #include <ISTMSensorsHAL.h>
 
+namespace stm {
+namespace core {
+
 ISTMSensorsHAL& ISTMSensorsHAL::getInstance(void)
 {
     static STMSensorsHAL instance;
 
     return instance;
 }
+
+} // namespace core
+} // namespace stm

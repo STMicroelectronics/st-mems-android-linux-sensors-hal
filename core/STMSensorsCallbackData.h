@@ -19,6 +19,9 @@
 
 #include <ISTMSensorsCallbackData.h>
 
+namespace stm {
+namespace core {
+
 class STMSensorsCallbackData : public ISTMSensorsCallbackData {
 public:
     STMSensorsCallbackData(uint32_t sensorHandle,
@@ -28,3 +31,6 @@ public:
 
     virtual ~STMSensorsCallbackData(void) {};
 };
+
+} // namespace core
+} // namespace stm

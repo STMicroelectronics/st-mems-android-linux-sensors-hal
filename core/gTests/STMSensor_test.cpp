@@ -19,6 +19,9 @@
 
 #include <STMSensor.h>
 
+using stm::core::STMSensor;
+using stm::core::STMSensorType;
+
 class STMSensorTest : public ::testing::Test {
 protected:
     void SetUp() override {

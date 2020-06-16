@@ -22,6 +22,9 @@
 
 #include <STMSensorType.h>
 
+namespace stm {
+namespace core {
+
 class STMSensor {
 public:
     STMSensor(const std::string &name,
@@ -137,3 +140,6 @@ private:
      */
     const bool wakeUp;
 };
+
+} // namespace core
+} // namespace stm

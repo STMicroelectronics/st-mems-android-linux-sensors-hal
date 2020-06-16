@@ -22,6 +22,12 @@
 #include <ISTMSensorsHAL.h>
 #include <IUtils.h>
 
+using stm::core::ISTMSensorsHAL;
+using stm::core::ISTMSensorsCallback;
+using stm::core::ISTMSensorsCallbackData;
+using stm::core::STMSensor;
+using stm::core::IConsole;
+
 struct SensorsLinuxInterface : public ISTMSensorsCallback {
 public:
     SensorsLinuxInterface(void);

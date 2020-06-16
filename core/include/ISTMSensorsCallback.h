@@ -21,6 +21,9 @@
 
 #include <ISTMSensorsCallbackData.h>
 
+namespace stm {
+namespace core {
+
 class ISTMSensorsCallback {
 public:
     virtual ~ISTMSensorsCallback(void) = default;
@@ -31,3 +34,6 @@ public:
      */
     virtual void onNewSensorsData(const std::vector<ISTMSensorsCallbackData> &sensorsData) = 0;
 };
+
+} // namespace core
+} // namespace stm

@@ -17,6 +17,9 @@
 
 #include <STMSensor.h>
 
+namespace stm {
+namespace core {
+
 STMSensor::STMSensor(const std::string &name,
                      const std::string &vendor,
                      int32_t version,
@@ -147,3 +150,6 @@ bool STMSensor::isWakeUp(void) const
 {
     return wakeUp;
 }
+
+} // namespace core
+} // namespace stm

@@ -25,6 +25,9 @@
 #include <STMSensorsList.h>
 #include <ISTMSensorsCallback.h>
 
+namespace stm {
+namespace core {
+
 class ISTMSensorsHAL {
 public:
     ISTMSensorsHAL(void) = default;
@@ -83,3 +86,6 @@ public:
      */
     virtual int32_t flushData(uint32_t handle) = 0;
 };
+
+} // namespace core
+} // namespace stm

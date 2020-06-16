@@ -20,6 +20,8 @@
 
 #include <IConsole.h>
 
+using stm::core::IConsole;
+
 class Console : public IConsole {
 public:
     Console(void) = default;

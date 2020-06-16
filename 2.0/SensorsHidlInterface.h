@@ -46,6 +46,11 @@ using ::android::hardware::Return;
 using ::android::hardware::Void;
 using ::android::sp;
 
+using stm::core::ISTMSensorsCallback;
+using stm::core::ISTMSensorsCallbackData;
+using stm::core::ISTMSensorsHAL;
+using stm::core::IConsole;
+
 struct SensorsHidlInterface : public ISensors, public ISTMSensorsCallback {
 public:
     SensorsHidlInterface(void);

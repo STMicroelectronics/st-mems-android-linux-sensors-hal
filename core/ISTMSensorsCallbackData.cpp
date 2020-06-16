@@ -17,6 +17,9 @@
 
 #include <ISTMSensorsCallbackData.h>
 
+namespace stm {
+namespace core {
+
 const std::vector<float>& ISTMSensorsCallbackData::getData(void) const
 {
     return sensorsData;
@@ -41,3 +44,6 @@ bool ISTMSensorsCallbackData::isWakeUpSensor(void) const
 {
     return wakeUpSensor;
 }
+
+} // namespace core
+} // namespace stm

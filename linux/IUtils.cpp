@@ -19,6 +19,8 @@
 
 #include <IUtils.h>
 
+using stm::core::IUtils;
+
 class Utils : public IUtils {
 public:
     Utils(void) = default;

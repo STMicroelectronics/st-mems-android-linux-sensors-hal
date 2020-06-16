@@ -64,7 +64,7 @@ int SensorsLegacyInterface::initialize(void)
  */
 unsigned int SensorsLegacyInterface::getSensorsList(struct sensor_t const **sensorsList) const
 {
-    const std::vector<STMSensor> &list = sensorsCore.getSensorsList().getList();
+    const std::vector<stm::core::STMSensor> &list = sensorsCore.getSensorsList().getList();
     auto count = list.size();
     auto n {0U};
 

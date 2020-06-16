@@ -53,7 +53,7 @@ SensorsHidlInterface::~SensorsHidlInterface(void)
  */
 Return<void> SensorsHidlInterface::getSensorsList(getSensorsList_cb _hidl_cb)
 {
-    const std::vector<STMSensor> &list = sensorsCore.getSensorsList().getList();
+    const std::vector<stm::core::STMSensor> &list = sensorsCore.getSensorsList().getList();
     hidl_vec<V1_0::SensorInfo> sensorsList;
     size_t n = 0, count = list.size();
 

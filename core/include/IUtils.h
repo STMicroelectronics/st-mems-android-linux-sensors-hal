@@ -19,6 +19,9 @@
 
 #include <cstdint>
 
+namespace stm {
+namespace core {
+
 class IUtils {
 protected:
     IUtils(void) = default;
@@ -42,3 +45,6 @@ public:
      */
     virtual int64_t getTime(void) const = 0;
 };
+
+} // namespace core
+} // namespace stm

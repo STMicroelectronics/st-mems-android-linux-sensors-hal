@@ -21,6 +21,9 @@
 #include <vector>
 #include <STMSensorType.h>
 
+namespace stm {
+namespace core {
+
 class ISTMSensorsCallbackData {
 public:
     virtual ~ISTMSensorsCallbackData(void) = default;
@@ -76,3 +79,6 @@ protected:
      */
     bool wakeUpSensor;
 };
+
+} // namespace core
+} // namespace stm

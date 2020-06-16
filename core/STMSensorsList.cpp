@@ -18,6 +18,9 @@
 #include <cstring>
 #include <STMSensorsList.h>
 
+namespace stm {
+namespace core {
+
 /**
  * addSensor: add new sensor to the list
  * @sensor: sensor reference to add
@@ -61,3 +64,6 @@ const std::vector<STMSensor>& STMSensorsList::getList(void) const
 {
     return list;
 }
+
+} // namespace core
+} // namespace stm

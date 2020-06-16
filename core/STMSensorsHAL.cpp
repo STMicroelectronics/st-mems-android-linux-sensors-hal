@@ -21,6 +21,9 @@
 #include <STMSensorsCallbackData.h>
 #include <STMSensorsHAL.h>
 
+namespace stm {
+namespace core {
+
 STMSensorsHAL::STMSensorsHAL(void)
               : sensorsCallback(&emptySTMSensorCallback),
                 console(IConsole::getInstance())
@@ -105,3 +108,6 @@ bool STMSensorsHAL::handleIsValid(uint32_t handle) const
 
     return true;
 }
+
+} // namespace core
+} // namespace stm

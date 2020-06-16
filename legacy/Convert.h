@@ -21,10 +21,11 @@
 #include <STMSensor.h>
 #include <ISTMSensorsCallbackData.h>
 
-bool convertFromSTMSensorType(const STMSensorType &type,
+bool convertFromSTMSensorType(const stm::core::STMSensorType &type,
                               int &sensorType);
 
-bool convertFromSTMSensor(const STMSensor &src, struct sensor_t *dst);
+bool convertFromSTMSensor(const stm::core::STMSensor &src,
+                          struct sensor_t *dst);
 
-void convertFromSTMSensorData(const ISTMSensorsCallbackData &sensorData,
+void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorData,
                               struct sensors_event_t *event);

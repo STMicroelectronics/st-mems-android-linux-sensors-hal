@@ -19,6 +19,9 @@
 
 #include <cstdint>
 
+namespace stm {
+namespace core {
+
 /**
  * STM sensors core types
  */
@@ -61,3 +64,6 @@ enum class STMSensorType : int16_t {
     ACCELEROMETER_UNCALIBRATED,     /* m/s^2 */
     INTERNAL_LIB_TYPE,              /* INTERNAL USE ONLY */
 };
+
+} // namespace core
+} // namespace stm

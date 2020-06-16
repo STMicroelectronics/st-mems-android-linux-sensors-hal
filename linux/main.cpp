@@ -23,9 +23,11 @@
 #include <IConsole.h>
 #include "SensorsLinuxInterface.h"
 
+using stm::core::IConsole;
+
 static IConsole &console = IConsole::getInstance();
 
-static void printSensorList(const std::vector<STMSensor> &sensorsList)
+static void printSensorList(const std::vector<stm::core::STMSensor> &sensorsList)
 {
     int index { 0 };
 
@@ -49,7 +51,7 @@ int main(int /* argc */, char** /* argv */)
         return err;
     }
 
-    const std::vector<STMSensor> &sensorsList = sensors->getSensorsList();
+    const std::vector<stm::core::STMSensor> &sensorsList = sensors->getSensorsList();
     if (!sensorsList.size()) {
         console.error("no sensors available!");
         return -ENODEV;

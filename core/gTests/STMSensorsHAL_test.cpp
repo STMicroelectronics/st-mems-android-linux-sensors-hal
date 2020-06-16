@@ -20,6 +20,12 @@
 #include <STMSensorsHAL.h>
 #include <IConsole.h>
 
+using stm::core::IConsole;
+using stm::core::ISTMSensorsHAL;
+using stm::core::STMSensorsHAL;
+using stm::core::ISTMSensorsCallback;
+using stm::core::ISTMSensorsCallbackData;
+
 class STMSensorsCallback : public ISTMSensorsCallback {
     void onNewSensorsData(const std::vector<ISTMSensorsCallbackData> &sensorsData) override
     {

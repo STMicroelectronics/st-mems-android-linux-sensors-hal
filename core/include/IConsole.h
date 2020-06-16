@@ -19,6 +19,9 @@
 
 #include <string>
 
+namespace stm {
+namespace core {
+
 class IConsole {
 protected:
     IConsole(void) = default;
@@ -53,3 +56,6 @@ public:
      */
     virtual void debug(const std::string &message) const = 0;
 };
+
+} // namespace core
+} // namespace stm

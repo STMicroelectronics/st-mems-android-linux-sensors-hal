@@ -18,19 +18,21 @@
 #pragma once
 
 #include <android/hardware/sensors/2.0/ISensors.h>
-#include <STMSensor.h>
 #include <ISTMSensorsCallbackData.h>
+#include <STMSensor.h>
 
 namespace android {
 namespace hardware {
 namespace sensors {
 
-bool convertFromSTMSensorType(const STMSensorType &type,
+bool convertFromSTMSensorType(const stm::core::STMSensorType &type,
                               V1_0::SensorType &sensorType);
 
-bool convertFromSTMSensor(const STMSensor &src, V1_0::SensorInfo *dst);
+bool convertFromSTMSensor(const stm::core::STMSensor &src,
+                          V1_0::SensorInfo *dst);
 
-void convertFromSTMSensorData(const ISTMSensorsCallbackData &sensorData, V1_0::Event &event);
+    void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorData,
+                              V1_0::Event &event);
 
 }  // namespace sensors
 }  // namespace hardware

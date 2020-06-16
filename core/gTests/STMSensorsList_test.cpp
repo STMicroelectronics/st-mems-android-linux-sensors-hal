@@ -19,6 +19,10 @@
 
 #include <STMSensorsList.h>
 
+using stm::core::STMSensor;
+using stm::core::STMSensorType;
+using stm::core::STMSensorsList;
+
 STMSensor accel(std::string("name"), // name
                 std::string("vendor"), // vendor
                 1, // version

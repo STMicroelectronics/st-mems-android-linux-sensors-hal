@@ -21,6 +21,9 @@
 #include <vector>
 #include <STMSensor.h>
 
+namespace stm {
+namespace core {
+
 class STMSensorsList {
 public:
     STMSensorsList(void) = default;
@@ -35,3 +38,6 @@ private:
      */
     std::vector<STMSensor> list;
 };
+
+} // namespace core
+} // namespace stm
