@@ -31,7 +31,7 @@ static void printSensorList(const std::vector<STMSensor> &sensorsList)
 
     console.info("<<Sensor List>> - BEGIN");
 
-    for (auto sensor : sensorsList) {
+    for (auto &sensor : sensorsList) {
         console.info(std::to_string(++index) + ". Name: " + sensor.getName());
     }
 
