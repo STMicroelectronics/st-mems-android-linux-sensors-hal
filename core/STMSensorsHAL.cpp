@@ -80,6 +80,10 @@ void STMSensorsHAL::internalPoll(STMSensorsHAL *hal, std::atomic<bool> *running)
  */
 void STMSensorsHAL::initialize(const ISTMSensorsCallback &sensorsCallback)
 {
+    for (auto &sensor : getSensorsList().getList()) {
+        activate(sensor.getHandle(), false);
+    }
+
     this->sensorsCallback = (ISTMSensorsCallback *)&sensorsCallback;
 }
 

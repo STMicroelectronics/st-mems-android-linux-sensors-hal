@@ -112,7 +112,6 @@ SensorsHidlInterface::initialize(const MQDescriptorSync<Event>& eventQueueDescri
 {
     (void) sensorsCallback;
     // TODO store sensorsCallback reference
-    // TODO make sure all sensors are disabled
 
     sensorsCore.initialize(*dynamic_cast<ISTMSensorsCallback *>(this));
 
