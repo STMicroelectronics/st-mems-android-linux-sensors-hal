@@ -62,6 +62,7 @@ enum class SensorType : uint16_t {
     ADDITIONAL_INFO,                /* dimensionless */
     LOW_LATENCY_OFFBODY_DETECT,     /* dimensionless */
     ACCELEROMETER_UNCALIBRATED,     /* m/s^2 */
+    ODR_SWITCH_INFO,                /* dimensionless */
 };
 
 } // namespace core

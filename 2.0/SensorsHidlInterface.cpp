@@ -252,7 +252,9 @@ SensorsHidlInterface::onNewSensorsData(const std::vector<ISTMSensorsCallbackData
         Event event;
 
         if (!convertFromSTMSensorType(sdata.getSensorType(), event.sensorType)) {
-            console.error("sensor event unknown, discarding...");
+            if (sdata.getSensorType() != stm::core::SensorType::ODR_SWITCH_INFO) {
+                console.error("sensor event unknown, discarding...");
+            }
             continue;
         }
 

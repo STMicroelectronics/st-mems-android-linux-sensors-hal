@@ -221,7 +221,9 @@ void SensorsLegacyInterface::onNewSensorsData(const std::vector<ISTMSensorsCallb
         sensors_event_t event;
 
         if (!convertFromSTMSensorType(sdata.getSensorType(), event.type)) {
-            console.error("sensor event unknown, discarding...");
+            if (sdata.getSensorType() != stm::core::SensorType::ODR_SWITCH_INFO) {
+                console.error("sensor event unknown, discarding...");
+            }
             continue;
         }
 

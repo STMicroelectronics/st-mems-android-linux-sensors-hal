@@ -200,6 +200,7 @@ public:
     virtual int FlushData(int handle, bool lock_en_mute);
     virtual void ProcessFlushData(int handle, int64_t timestamp);
 
+    void WriteOdrChangeEventToPipe(int64_t timestamp, int64_t pollrate);
     void WriteFlushEventToPipe();
     virtual void WriteDataToPipe(int64_t hw_pollrate);
 

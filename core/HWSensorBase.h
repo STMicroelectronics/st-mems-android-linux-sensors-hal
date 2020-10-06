@@ -85,6 +85,8 @@ protected:
     uint8_t *injection_data;
     bool has_event_channels;
 
+    int64_t lastDecimatedPollrate = 0;
+
     int WriteBufferLenght(unsigned int buf_len);
 
     IConsole &console { IConsole::getInstance() };

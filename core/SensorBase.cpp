@@ -539,6 +539,22 @@ void SensorBase::ProcessFlushData(int __attribute__((unused))handle,
     return;
 }
 
+void SensorBase::WriteOdrChangeEventToPipe(int64_t timestamp, int64_t pollrate)
+{
+    sensors_event_t odr_change_event_data;
+
+    odr_change_event_data.sensor = sensor_t_data.handle;
+    odr_change_event_data.timestamp = timestamp;
+    odr_change_event_data.type = SensorType::ODR_SWITCH_INFO;
+    odr_change_event_data.data.dataLen = 1;
+    odr_change_event_data.data.data2[0] = pollrate;
+
+    auto err = write(write_pipe_fd, &odr_change_event_data, sizeof(sensors_event_t));
+    if (err <= 0) {
+        console.error(android_name + std::string(": Failed to write odr change event data to pipe."));
+    }
+}
+
 void SensorBase::WriteFlushEventToPipe()
 {
     int err;

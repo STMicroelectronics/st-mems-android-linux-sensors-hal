@@ -460,8 +460,15 @@ void SWSensorBaseWithPollrate::WriteDataToPipe(int64_t hw_pollrate)
     decimator = (int)(temp + (temp / 20));
     samples_counter++;
 
-    if (decimator == 0)
+    if (decimator == 0) {
         decimator = 1;
+    }
+
+    int64_t decimatedPollrate = decimator * hw_pollrate;
+    if (decimatedPollrate != lastDecimatedPollrate) {
+        WriteOdrChangeEventToPipe(sensor_event.timestamp, decimatedPollrate);
+    }
+    lastDecimatedPollrate = decimatedPollrate;
 
     if (((samples_counter % decimator) == 0) || odr_changed) {
         err = write(write_pipe_fd, &sensor_event, sizeof(sensors_event_t));
