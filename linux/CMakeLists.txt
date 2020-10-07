@@ -42,5 +42,5 @@ find_package(Threads)
 target_link_libraries(${PROJECT_TARGET} Threads::Threads)
 
 target_link_libraries(${PROJECT_TARGET} stmicroelectronics-sensors-core-linux)
-target_compile_features(${PROJECT_TARGET} PUBLIC cxx_std_11)
+target_compile_features(${PROJECT_TARGET} PUBLIC cxx_std_14)
 set_target_properties(${PROJECT_TARGET} PROPERTIES CXX_EXTENSIONS OFF)

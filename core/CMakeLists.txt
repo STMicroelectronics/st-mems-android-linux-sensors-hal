@@ -63,6 +63,9 @@ add_library(stmicroelectronics-sensors-core-linux
             SWLinearAccel.cpp
             SelfTest.cpp)
 
+target_compile_features(stmicroelectronics-sensors-core-linux PUBLIC cxx_std_14)
+set_target_properties(stmicroelectronics-sensors-core-linux PROPERTIES CXX_EXTENSIONS OFF)
+
 target_include_directories(stmicroelectronics-sensors-core-linux PUBLIC
                            ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
