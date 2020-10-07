@@ -652,8 +652,8 @@ int st_hal_dev_poll(void *data, sensors_event_t *sdata, int count)
     int err, read_size, remaining_event = count, event_read;
     STSensorHAL_data *hal_data = (STSensorHAL_data *)data;
 
-    err = poll(hal_data->androidPollFd.data(), hal_data->androidPollFd.size(), -1);
-    if (err < 0) {
+    err = poll(hal_data->androidPollFd.data(), hal_data->androidPollFd.size(), 200);
+    if (err <= 0) {
         return 0;
     }
 
