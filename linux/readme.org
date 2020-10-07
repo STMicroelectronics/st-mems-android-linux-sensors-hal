@@ -1,0 +1,29 @@
+#+TITLE: sensors-hal-iio Linux
+#+SUBTITLE: notes
+#+AUTHOR: Denis Ciocca
+
+* debug build
+#+begin_src sh
+cmake -DCMAKE_BUILD_TYPE=Debug ./
+#+end_src
+
+* export compile commands
+#+begin_src sh
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ./
+#+end_src
+
+* cross-compile
+- arm64
+#+begin_src sh
+cmake -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-arm64.cmake ./
+#+end_src
+
+- arm32
+#+begin_src sh
+cmake -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-arm32.cmake ./
+#+end_src
+
+* ninja build
+#+begin_src sh
+cmake -GNinja ./
+#+end_src
