@@ -48,7 +48,7 @@ Gyroscope::Gyroscope(HWSensorBaseCommonData *data, const char *name,
 #endif /* CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED */
 
 #ifdef CONFIG_ST_HAL_GYRO_GBIAS_ESTIMATION_ENABLED
-    dependencies_type_list[SENSOR_DEPENDENCY_ID_0] = SENSOR_TYPE_ACCELEROMETER;
+    dependencies_type_list.push_back(AccelSensorType);
 #endif /* CONFIG_ST_HAL_GYRO_GBIAS_ESTIMATION_ENABLED */
 }
 
