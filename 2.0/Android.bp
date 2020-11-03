@@ -29,6 +29,8 @@ cc_binary {
         "Convert.cpp",
         "IUtils.cpp",
         "IConsole.cpp",
+        "SensorsDataProxyManager.cpp",
+        "DirectChannel.cpp"
     ],
     static_libs: [
         "stmicroelectronics-sensors-core",
@@ -50,5 +52,6 @@ cc_binary {
         "-Wall",
         "-Wextra",
         "-Wpedantic",
+        "-DHAL_ENABLE_DIRECT_REPORT_CHANNEL=1",
     ],
 }

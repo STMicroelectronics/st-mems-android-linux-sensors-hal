@@ -239,6 +239,24 @@ bool convertFromSTMSensor(const stm::core::STMSensor &src,
         dst->flags |= V1_0::SensorFlagBits::WAKE_UP;
     }
 
+    if (HAL_ENABLE_DIRECT_REPORT_CHANNEL == 1) {
+        if (!src.isOnChange()) {
+            dst->flags |= V1_0::SensorFlagBits::DIRECT_CHANNEL_ASHMEM;
+            // TODO add support for gralloc
+            // dst->flags |= V1_0::SensorFlagBits::DIRECT_CHANNEL_GRALLOC;
+
+            uint32_t directReportMaxRate = static_cast<int32_t>(V1_0::RateLevel::NORMAL);
+            if (src.getMaxRateHz() > 180) {
+                directReportMaxRate = static_cast<int32_t>(V1_0::RateLevel::FAST);
+            }
+            if (src.getMaxRateHz() > 780) {
+                directReportMaxRate = static_cast<int32_t>(V1_0::RateLevel::VERY_FAST);
+            }
+
+            dst->flags |= (directReportMaxRate << static_cast<uint8_t>(V1_0::SensorFlagShift::DIRECT_REPORT));
+        }
+    }
+
     return true;
 }
 

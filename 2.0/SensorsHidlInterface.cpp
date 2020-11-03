@@ -17,6 +17,7 @@
 
 #include <android/hardware/sensors/2.0/types.h>
 #include <memory>
+#include <utility>
 
 #include <IConsole.h>
 #include "Convert.h"
@@ -30,13 +31,16 @@ namespace implementation {
 
 constexpr const char *kWakeLockName = "STM_SensorsHAL_WAKELOCK";
 
+constexpr int64_t hzToNs(int64_t hz) { return 1e9 / hz; };
+
 SensorsHidlInterface::SensorsHidlInterface(void)
                      : mReadWakeLockQueueRun(false),
                        mOutstandingWakeUpEvents(0),
                        mHasWakeLock(false),
                        mEventQueueFlag(nullptr),
                        sensorsCore(ISTMSensorsHAL::getInstance()),
-                       console(IConsole::getInstance())
+                       console(IConsole::getInstance()),
+                       lastDirectChannelHandle(0)
 {
 }
 
@@ -61,6 +65,7 @@ Return<void> SensorsHidlInterface::getSensorsList(getSensorsList_cb _hidl_cb)
 
     for (size_t i = 0; i < count; i++) {
         if (convertFromSTMSensor(list.at(i), &sensorsList[n])) {
+            sensorFlags[sensorsList[n].sensorHandle] = sensorsList[n].flags;
             n++;
         }
     }
@@ -94,8 +99,36 @@ Return<Result> SensorsHidlInterface::setOperationMode(V1_0::OperationMode mode)
 Return<Result> SensorsHidlInterface::activate(int32_t sensorHandle,
                                               bool enabled)
 {
-    if (sensorsCore.activate(sensorHandle, enabled)) {
+    const stm::core::STMSensor *sensor = getSTMSensor(sensorHandle);
+    int64_t maxReportLatencyNs = 0;
+    int64_t samplingPeriodNs = 0;
+
+    if (sensor == nullptr) {
         return Result::BAD_VALUE;
+    }
+
+    if (sensor->isOnChange()) {
+        if (sensorsCore.activate(sensorHandle, enabled)) {
+            return Result::BAD_VALUE;
+        }
+    } else {
+        if (enabled) {
+            samplingPeriodNs = frameworkRequestPollrateNs[sensorHandle];
+            maxReportLatencyNs = frameworkRequestLatencyNs[sensorHandle];
+            if (mSensorProxyMngr.registerSensorToChannel(sensorHandle, frameworkChHandle)) {
+                return Result::BAD_VALUE;
+            }
+        }
+
+        int ret = updateSensorsRequests(sensorHandle, frameworkChHandle, samplingPeriodNs, maxReportLatencyNs);
+        if ((ret < 0) && (ret != -ENODEV)) {
+            mSensorProxyMngr.unregisterSensorFromChannel(sensorHandle, frameworkChHandle);
+            return Result::BAD_VALUE;
+        }
+
+        if (!enabled) {
+            mSensorProxyMngr.unregisterSensorFromChannel(sensorHandle, frameworkChHandle);
+        }
     }
 
     return Result::OK;
@@ -113,7 +146,16 @@ SensorsHidlInterface::initialize(const MQDescriptorSync<Event>& eventQueueDescri
     (void) sensorsCallback;
     // TODO store sensorsCallback reference
 
+    std::lock_guard<std::mutex> lock(mInitLock);
+
+    frameworkRequestPollrateNs.clear();
+    frameworkRequestLatencyNs.clear();
+    sensorCurrentPollrateNs.clear();
+
     sensorsCore.initialize(*dynamic_cast<ISTMSensorsCallback *>(this));
+
+    mSensorProxyMngr.reset();
+    mSensorProxyMngr.addChannel(frameworkChHandle);
 
     if (mReadWakeLockQueueRun.load()) {
         mReadWakeLockQueueRun = false;
@@ -161,8 +203,27 @@ Return<Result> SensorsHidlInterface::batch(int32_t sensorHandle,
                                            int64_t samplingPeriodNs,
                                            int64_t maxReportLatencyNs)
 {
-    if (sensorsCore.setRate(sensorHandle, samplingPeriodNs, maxReportLatencyNs)) {
+    const stm::core::STMSensor *sensor = getSTMSensor(sensorHandle);
+    if (sensor == nullptr) {
         return Result::BAD_VALUE;
+    }
+
+    if (sensor->isOnChange()) {
+        if (sensorsCore.setRate(sensorHandle, samplingPeriodNs, maxReportLatencyNs)) {
+            return Result::BAD_VALUE;
+        }
+    } else {
+        frameworkRequestPollrateNs[sensorHandle] = samplingPeriodNs;
+        frameworkRequestLatencyNs[sensorHandle] = maxReportLatencyNs;
+
+        auto channelsHandles = mSensorProxyMngr.getChannels(sensorHandle);
+        for (auto &ch : channelsHandles) {
+            if (ch == frameworkChHandle) {
+              if (updateSensorsRequests(sensorHandle, frameworkChHandle, samplingPeriodNs, maxReportLatencyNs)) {
+                return Result::BAD_VALUE;
+              }
+            }
+        }
     }
 
     return Result::OK;
@@ -196,12 +257,49 @@ Return<Result> SensorsHidlInterface::injectSensorData(const Event& event)
  * registerDirectChannel: HIDL defined function,
  *                        reference: hardware/interfaces/sensors/2.0/ISensors.hal
  */
-Return<void> SensorsHidlInterface::registerDirectChannel(const V1_0::SharedMemInfo& mem,
+Return<void> SensorsHidlInterface::registerDirectChannel(const V1_0::SharedMemInfo &mem,
                                                          registerDirectChannel_cb _hidl_cb)
 {
-    (void) mem;
+    std::unique_ptr<DirectChannelBufferBase> directChannelBuffer;
 
-    _hidl_cb(Result::INVALID_OPERATION, -1);
+    // TODO verify memory region is valid
+
+    switch (mem.type) {
+    case V1_0::SharedMemType::ASHMEM:
+        directChannelBuffer = std::make_unique<AshmemDirectChannelBuffer>(mem);
+        break;
+    case V1_0::SharedMemType::GRALLOC:
+        directChannelBuffer = std::make_unique<GrallocDirectChannelBuffer>(mem);
+        break;
+    default:
+        _hidl_cb(Result::BAD_VALUE, -1);
+        return Void();
+        break;
+    }
+
+    if (directChannelBuffer == nullptr) {
+        _hidl_cb(Result::NO_MEMORY, -1);
+        return Void();
+    }
+    if (!directChannelBuffer->isValid()) {
+        _hidl_cb(Result::BAD_VALUE, -1);
+        return Void();
+    }
+
+    int32_t channelHandle = lastDirectChannelHandle + 1;
+
+    if (mSensorProxyMngr.addChannel(channelHandle)) {
+        _hidl_cb(Result::BAD_VALUE, -1);
+        return Void();
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(mDirectChannelBufferLock);
+        mDirectChannelBuffer.insert(std::make_pair(channelHandle, std::move(directChannelBuffer)));
+    }
+
+    lastDirectChannelHandle = channelHandle;
+    _hidl_cb(Result::OK, channelHandle);
 
     return Void();
 }
@@ -212,9 +310,14 @@ Return<void> SensorsHidlInterface::registerDirectChannel(const V1_0::SharedMemIn
  */
 Return<Result> SensorsHidlInterface::unregisterDirectChannel(int32_t channelHandle)
 {
-    (void) channelHandle;
+    if (mSensorProxyMngr.removeChannel(channelHandle)) {
+        return Result::BAD_VALUE;
+    }
 
-    return Result::INVALID_OPERATION;
+    std::lock_guard<std::mutex> lock(mDirectChannelBufferLock);
+    mDirectChannelBuffer.erase(channelHandle);
+
+    return Result::OK;
 }
 
 /**
@@ -226,11 +329,81 @@ Return<void> SensorsHidlInterface::configDirectReport(int32_t sensorHandle,
                                                       V1_0::RateLevel rate,
                                                       configDirectReport_cb _hidl_cb)
 {
-    (void) sensorHandle;
-    (void) channelHandle;
-    (void) rate;
+    if (sensorHandle == -1) {
+        if (rate == V1_0::RateLevel::STOP) {
+            // stop all active sensors in that particular channel handle
+            auto sensorsHandles = mSensorProxyMngr.getRegisteredSensorsInChannel(channelHandle);
+            for (auto &sh : sensorsHandles) {
+                updateSensorsRequests(sh, channelHandle, 0, 0);
+                mSensorProxyMngr.unregisterSensorFromChannel(sh, channelHandle);
+            }
 
-    _hidl_cb(Result::INVALID_OPERATION, 0);
+            _hidl_cb(Result::OK, sensorHandle);
+            return Void();
+        } else {
+            _hidl_cb(Result::BAD_VALUE, 0);
+            return Void();
+        }
+    }
+
+    const stm::core::STMSensor *sensor = getSTMSensor(sensorHandle);
+    if (sensor == nullptr) {
+        _hidl_cb(Result::BAD_VALUE, 0);
+        return Void();
+    }
+
+    if (!(sensorFlags[sensorHandle] &
+          (V1_0::SensorFlagBits::DIRECT_CHANNEL_ASHMEM | V1_0::SensorFlagBits::DIRECT_CHANNEL_GRALLOC))) {
+        _hidl_cb(Result::BAD_VALUE, 0);
+        return Void();
+    }
+
+    uint64_t rateInNs;
+
+    int32_t supportedMaxRate = (sensorFlags[sensorHandle] & V1_0::SensorFlagBits::MASK_DIRECT_REPORT) >>
+                               static_cast<uint8_t>(V1_0::SensorFlagShift::DIRECT_REPORT);
+
+    switch (rate) {
+    case V1_0::RateLevel::STOP:
+        rateInNs = 0;
+        break;
+    case V1_0::RateLevel::NORMAL:
+        rateInNs = hzToNs(50);
+        break;
+    case V1_0::RateLevel::FAST:
+        if (supportedMaxRate < static_cast<int32_t>(V1_0::RateLevel::FAST)) {
+            _hidl_cb(Result::BAD_VALUE, 0);
+            return Void();
+        }
+        rateInNs = hzToNs(200);
+        break;
+    case V1_0::RateLevel::VERY_FAST:
+        if (supportedMaxRate < static_cast<int32_t>(V1_0::RateLevel::VERY_FAST)) {
+            _hidl_cb(Result::BAD_VALUE, 0);
+            return Void();
+        }
+        rateInNs = hzToNs(800);
+        break;
+    default:
+        _hidl_cb(Result::BAD_VALUE, 0);
+        return Void();
+    }
+
+    if (rateInNs != 0) {
+        mSensorProxyMngr.registerSensorToChannel(sensorHandle, channelHandle);
+    }
+
+    if (updateSensorsRequests(sensorHandle, channelHandle, rateInNs, 0)) {
+        mSensorProxyMngr.unregisterSensorFromChannel(sensorHandle, channelHandle);
+        _hidl_cb(Result::BAD_VALUE, 0);
+        return Void();
+    }
+
+    if (rateInNs == 0) {
+        mSensorProxyMngr.unregisterSensorFromChannel(sensorHandle, channelHandle);
+    }
+
+    _hidl_cb(Result::OK, sensorHandle);
 
     return Void();
 }
@@ -245,14 +418,20 @@ SensorsHidlInterface::onNewSensorsData(const std::vector<ISTMSensorsCallbackData
     bool containsWakeUpEvents = false;
     std::vector<Event> eventsList;
 
+    if (!mInitLock.try_lock()) {
+        return;
+    }
+
     eventsList.reserve(sensorsData.size());
 
-    for (auto sdata : sensorsData) {
+    for (auto &sdata : sensorsData) {
         Event event;
 
         if (!convertFromSTMSensorType(sdata.getSensorType(), event.sensorType)) {
             if (sdata.getSensorType() != stm::core::SensorType::ODR_SWITCH_INFO) {
                 console.error("sensor event unknown, discarding...");
+            } else {
+                sensorCurrentPollrateNs[sdata.getSensorHandle()] = sdata.getData()[0];
             }
             continue;
         }
@@ -261,10 +440,38 @@ SensorsHidlInterface::onNewSensorsData(const std::vector<ISTMSensorsCallbackData
         event.timestamp = sdata.getTimestamp();
         containsWakeUpEvents |= sdata.isWakeUpSensor();
         convertFromSTMSensorData(sdata, event);
-        eventsList.push_back(event);
+
+        if (sdata.getSensorType() == stm::core::SensorType::META_DATA) {
+            eventsList.push_back(event);
+        } else {
+            const stm::core::STMSensor *sensor = getSTMSensor(sdata.getSensorHandle());
+            if (sensor == nullptr) continue;
+
+            if (sensor->isOnChange()) {
+                eventsList.push_back(event);
+            } else {
+                auto channelsHandles =
+                    mSensorProxyMngr.getValidPushChannels(sdata.getTimestamp(),
+                                                          sdata.getSensorHandle(),
+                                                          sensorCurrentPollrateNs[sdata.getSensorHandle()]);
+
+                for (auto &channel : channelsHandles) {
+                    if (channel == frameworkChHandle) {
+                        eventsList.push_back(event);
+                    } else {
+                        if (mDirectChannelBufferLock.try_lock()) {
+                            mDirectChannelBuffer[channel]->writeEvent(event);
+                            mDirectChannelBufferLock.unlock();
+                        }
+                    }
+                }
+            }
+        }
     }
 
     postEvents(eventsList, containsWakeUpEvents);
+
+    mInitLock.unlock();
 }
 
 /**
@@ -362,6 +569,69 @@ void SensorsHidlInterface::readWakeLockFMQ(void)
 void SensorsHidlInterface::startReadWakeLockThread(SensorsHidlInterface *sensors)
 {
     sensors->readWakeLockFMQ();
+}
+
+/**
+ * updateSensorsRequests: manage the update requests from different channels
+ * @sensorHandle: sensor handle.
+ * @channelHandle: channel handle.
+ * @samplingPeriodNs: requested pollrate in nanoseconds.
+ * @maxReportLatencyNs: maximum latency of data reporting in nanoseconds.
+ *
+ * Return value: 0 on success, else a negative error code.
+ */
+int SensorsHidlInterface::updateSensorsRequests(int32_t sensorHandle,
+                                                int32_t channelHandle,
+                                                int64_t samplingPeriodNs,
+                                                int64_t maxReportLatencyNs)
+{
+    int err = mSensorProxyMngr.configureSensorInChannel(sensorHandle, channelHandle, samplingPeriodNs);
+    if (err < 0) {
+        return -ENODEV;
+    }
+
+    int64_t maxPollrateNs = mSensorProxyMngr.getMaxPollrateNs(sensorHandle);
+    if (maxPollrateNs) {
+        // This is a power-on request or a pollrate change request
+        if (sensorsCore.setRate(sensorHandle, maxPollrateNs, maxReportLatencyNs)) {
+            return -1;
+        }
+        if (sensorsCore.activate(sensorHandle, true)) {
+            return -1;
+        }
+
+        const stm::core::IUtils &utils = stm::core::IUtils::getInstance();
+        auto addInfoEvents = addInfoMng->getPayload(sensorHandle, utils.getTime());
+        if (addInfoEvents.size()) {
+            postEvents(addInfoEvents, false);
+        }
+    } else {
+        // This is a power-off request
+        if (sensorsCore.activate(sensorHandle, false)) {
+            return -1;
+        }
+    }
+
+    return 0;
+}
+
+/**
+ * getSTMSensor: return the pointer of an STMSensor object
+ * @sensorHandle: sensor handle.
+ *
+ * Return value: STMSensor object pointer if sensorHandle is valid, else a nullptr.
+ */
+const stm::core::STMSensor *SensorsHidlInterface::getSTMSensor(int32_t sensorHandle) const
+{
+    const std::vector<stm::core::STMSensor> &list = sensorsCore.getSensorsList().getList();
+
+    for (const auto &sensor : list) {
+        if ((int32_t)sensor.getHandle() == sensorHandle) {
+            return &sensor;
+        }
+    }
+
+    return nullptr;
 }
 
 }  // namespace implementation
