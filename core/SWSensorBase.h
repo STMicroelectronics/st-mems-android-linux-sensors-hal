@@ -50,6 +50,8 @@ protected:
 
     int64_t lastDecimatedPollrate = 0;
 
+    virtual bool ValidDataToPush(int64_t timestamp) override;
+
 public:
 SWSensorBase(const char *name, int handle, STMSensorType sensor_type,
              bool use_dependency_resolution, bool use_dependency_range,

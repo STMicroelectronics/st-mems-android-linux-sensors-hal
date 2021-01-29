@@ -71,6 +71,7 @@ int SWSensorBase::Enable(int handle, bool enable, bool lock_en_mutex)
 {
     int err;
     bool old_status, old_status_no_handle;
+    int64_t timestampEnable;
 
     if (lock_en_mutex) {
         pthread_mutex_lock(&enable_mutex);
@@ -78,6 +79,7 @@ int SWSensorBase::Enable(int handle, bool enable, bool lock_en_mutex)
 
     old_status = GetStatus(false);
     old_status_no_handle = GetStatusExcludeHandle(handle);
+    timestampEnable = utils.getTime();
 
     err = SensorBase::Enable(handle, enable, false);
     if (err < 0) {
@@ -86,7 +88,7 @@ int SWSensorBase::Enable(int handle, bool enable, bool lock_en_mutex)
 
     if ((enable && !old_status) || (!enable && !old_status_no_handle)) {
         if (enable) {
-            sensor_global_enable = utils.getTime();
+            sensor_global_enable = timestampEnable;
         } else {
             sensor_global_disable = utils.getTime();
         }
@@ -94,7 +96,7 @@ int SWSensorBase::Enable(int handle, bool enable, bool lock_en_mutex)
 
     if (sensor_t_data.handle == handle) {
         if (enable) {
-            sensor_my_enable = utils.getTime();
+            sensor_my_enable = timestampEnable;
         } else {
             sensor_my_disable = utils.getTime();
         }
@@ -210,6 +212,21 @@ unlock_mutex:
     return -EINVAL;
 }
 
+bool SWSensorBase::ValidDataToPush(int64_t timestamp)
+{
+    if (sensor_my_enable > sensor_my_disable) {
+        if (timestamp > sensor_my_disable) {
+            return true;
+        }
+    } else {
+        if ((timestamp > sensor_my_enable) && (timestamp < sensor_my_disable)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void SWSensorBase::ProcessFlushData(int handle, int64_t timestamp)
 {
     unsigned int i;
@@ -267,17 +284,14 @@ void SWSensorBase::ReceiveDataFromDependency(int handle, SensorBaseData *data)
         } else {
             SensorBase::ReceiveDataFromDependency(handle, data);
         }
-    } else {
-        if (data->flush_event_handle >= 0) {
-            ProcessFlushData(data->flush_event_handle, 0);
-        }
     }
 }
 
 void SWSensorBase::ThreadDataTask()
 {
-    int err;
+    int err, flush_handle;
     unsigned int i, fifo_len;
+    int64_t timestamp_flush;
 
     if (sensor_t_data.fifoMaxEventCount > 0) {
         fifo_len = 2 * sensor_t_data.fifoMaxEventCount;
@@ -307,6 +321,19 @@ void SWSensorBase::ThreadDataTask()
                 pthread_mutex_lock(&sample_in_processing_mutex);
                 sample_in_processing_timestamp = sensors_tmp_data[i].timestamp;
                 pthread_mutex_unlock(&sample_in_processing_mutex);
+
+                bool retry = false;
+
+                do {
+                    flush_handle = flush_stack.readLastElement(&timestamp_flush);
+                    if ((flush_handle >= 0) && (timestamp_flush <= sensors_tmp_data[i].timestamp)) {
+                        sensors_tmp_data[i].flushEventHandles[sensors_tmp_data[i].flushEventsNum++] = flush_handle;
+                        flush_stack.removeLastElement();
+                        retry = true;
+                    } else {
+                        retry = false;
+                    }
+                } while (retry  && sensors_tmp_data[i].flushEventsNum <= (int)sensors_tmp_data[i].flushEventHandles.size());
 
                 this->ProcessData(&sensors_tmp_data[i]);
             }
@@ -444,10 +471,10 @@ unlock_mutex:
 
 void SWSensorBaseWithPollrate::WriteDataToPipe(int64_t hw_pollrate)
 {
-    float temp;
-    int err, flush_handle;
+    int64_t timestamp_change = 0, new_pollrate = 0;
     bool odr_changed = false;
-    int64_t timestamp_change = 0, new_pollrate = 0, timestamp_flush;
+    float temp;
+    int err;
 
     err = CheckLatestNewPollrate(&timestamp_change, &new_pollrate);
     if ((err >= 0) && (sensor_event.timestamp > timestamp_change)) {
@@ -481,21 +508,6 @@ void SWSensorBaseWithPollrate::WriteDataToPipe(int64_t hw_pollrate)
         samples_counter = 0;
         last_data_timestamp = sensor_event.timestamp;
     }
-
-    do {
-        flush_handle = flush_stack.readLastElement(&timestamp_flush);
-        if (flush_handle >= 0) {
-            if (timestamp_flush <= sensor_event.timestamp) {
-                flush_stack.removeLastElement();
-
-                if (flush_handle == sensor_t_data.handle) {
-                    WriteFlushEventToPipe();
-                }
-            } else {
-                break;
-            }
-        }
-    } while (flush_handle >= 0);
 }
 
 } // namespace core

@@ -178,7 +178,7 @@ public:
     int GetMaxFifoLenght();
     struct sensor_t GetSensor_tData(void);
     const std::vector<STMSensorType>& GetDepenciesTypeList(void) const;
-    bool ValidDataToPush(int64_t timestamp);
+    virtual bool ValidDataToPush(int64_t timestamp);
     bool GetDependencyMaxRange(STMSensorType type, float *maxRange);
 
     virtual int AddSensorDependency(SensorBase *p);

@@ -193,7 +193,8 @@ void SWAccelGyroFusion6X::ProcessData(SensorBaseData *data)
 void SWAccelGyroFusion6X::ProcessData(SensorBaseData *data)
 {
     outdata.timestamp = data->timestamp;
-    outdata.flush_event_handle = data->flush_event_handle;
+    outdata.flushEventHandles = data->flushEventHandles;
+    outdata.flushEventsNum = data->flushEventsNum;
     outdata.accuracy = data->accuracy;
     outdata.pollrate_ns = data->pollrate_ns;
 

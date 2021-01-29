@@ -23,6 +23,7 @@
 #include <time.h>
 #include <pthread.h>
 #include <errno.h>
+#include <array>
 
 typedef struct SensorBaseData {
     float raw[4];
@@ -30,7 +31,8 @@ typedef struct SensorBaseData {
     float processed[5];
     int64_t timestamp;
     int8_t accuracy;
-    int flush_event_handle;
+    std::array<int, 10> flushEventHandles;
+    int flushEventsNum;
     int64_t pollrate_ns;
 } SensorBaseData;
 

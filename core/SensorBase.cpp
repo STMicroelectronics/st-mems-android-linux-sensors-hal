@@ -621,8 +621,10 @@ void SensorBase::ProcessData(SensorBaseData *data)
 {
     unsigned int i;
 
-    if (data->flush_event_handle == sensor_t_data.handle) {
-        WriteFlushEventToPipe();
+    for (int i = 0; i < data->flushEventsNum; ++i) {
+        if (data->flushEventHandles[i] == sensor_t_data.handle) {
+            WriteFlushEventToPipe();
+        }
     }
 
     for (i = 0; i < push_data.num; i++) {

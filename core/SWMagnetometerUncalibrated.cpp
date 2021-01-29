@@ -41,6 +41,7 @@ void SWMagnetometerUncalibrated::ProcessData(SensorBaseData *data)
     sensor_event.timestamp = data->timestamp;
 
     SWSensorBaseWithPollrate::WriteDataToPipe(data->pollrate_ns);
+    SWSensorBaseWithPollrate::ProcessData(data);
 }
 
 } // namespace core

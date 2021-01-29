@@ -375,6 +375,7 @@ int HWSensorBase::Enable(int handle, bool enable, bool lock_en_mutex)
 {
     int err = 0;
     bool old_status, old_status_no_handle;
+    int64_t timestampEnable;
 
 #if (CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED)
     additional_info_event_t *array_sensorAdditionalInfoDataFrames = nullptr;
@@ -387,6 +388,7 @@ int HWSensorBase::Enable(int handle, bool enable, bool lock_en_mutex)
 
     old_status = GetStatus(false);
     old_status_no_handle = GetStatusExcludeHandle(handle);
+    timestampEnable = utils.getTime();
 
     err = SensorBase::Enable(handle, enable, false);
     if (err < 0) {
@@ -402,7 +404,7 @@ int HWSensorBase::Enable(int handle, bool enable, bool lock_en_mutex)
         }
 
         if (enable) {
-            sensor_global_enable = utils.getTime();
+            sensor_global_enable = timestampEnable;
         } else {
             sensor_global_disable = utils.getTime();
         }
@@ -410,7 +412,7 @@ int HWSensorBase::Enable(int handle, bool enable, bool lock_en_mutex)
 
     if (sensor_t_data.handle == handle) {
         if (enable) {
-            sensor_my_enable = utils.getTime();
+            sensor_my_enable = timestampEnable;
 #if (CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED)
             if (supportsSensorAdditionalInfo) {
                 frames = getSensorAdditionalInfoPayLoadFramesArray(&array_sensorAdditionalInfoDataFrames);
@@ -771,13 +773,20 @@ void HWSensorBase::ThreadDataTask()
                     sensor_data.pollrate_ns = old_pollrate;
                 }
 
-                flush_handle = flush_stack.readLastElement(&timestamp_flush);
-                if ((flush_handle >= 0) && (timestamp_flush <= sensor_data.timestamp)) {
-                    sensor_data.flush_event_handle = flush_handle;
-                    flush_stack.removeLastElement();
-                } else {
-                    sensor_data.flush_event_handle = -1;
-                }
+                sensor_data.flushEventsNum = 0;
+
+                bool tryAgain = false;
+
+                do {
+                    flush_handle = flush_stack.readLastElement(&timestamp_flush);
+                    if ((flush_handle >= 0) && (timestamp_flush <= sensor_data.timestamp)) {
+                        sensor_data.flushEventHandles[sensor_data.flushEventsNum++] = flush_handle;
+                        flush_stack.removeLastElement();
+                        tryAgain = true;
+                    } else {
+                        tryAgain = false;
+                    }
+                } while (tryAgain && sensor_data.flushEventsNum <= (int)sensor_data.flushEventHandles.size());
 
                 ProcessData(&sensor_data);
             }
