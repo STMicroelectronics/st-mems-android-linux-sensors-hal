@@ -93,6 +93,7 @@ int StepCounter::SetDelay(int handle, int64_t period_ns, int64_t timeout, bool l
     err = device_iio_utils::set_max_delivery_rate(common_data.device_iio_sysfs_path,
                                                   NS_TO_MS(min_pollrate_ns));
     if (err < 0) {
+        console.error(GetName() + std::string(": failed to set max delivery rate"));
         if (lock_en_mutex) {
             pthread_mutex_unlock(&enable_mutex);
         }

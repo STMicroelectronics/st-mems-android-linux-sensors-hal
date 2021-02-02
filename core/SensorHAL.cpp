@@ -816,10 +816,12 @@ int st_hal_open_sensors(void **pdata, STMSensorsList &sensorsList)
 
     int deviceFoundNum = loadIIODevices(iioDataList);
     if (deviceFoundNum < 0) {
+        console.error("Failed to read IIO sensors");
         free(*pdata);
         return deviceFoundNum;
     }
     if (iioDataList.size() == 0) {
+        console.error("No IIO sensors found!");
         return 0;
     }
 
