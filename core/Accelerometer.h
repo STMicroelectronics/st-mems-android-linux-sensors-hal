@@ -26,11 +26,6 @@ namespace core {
  * class Accelerometer
  */
 class Accelerometer : public HWSensorBaseWithPollrate {
-private:
-#if defined(CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED)
-    size_t getSensorAdditionalInfoPayLoadFramesArray(additional_info_event_t **array_sensorAdditionalInfoPLFrames);
-#endif /* CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED */
-
 public:
     Accelerometer(HWSensorBaseCommonData *data, const char *name,
                   struct device_iio_sampling_freqs *sfa, int handle,

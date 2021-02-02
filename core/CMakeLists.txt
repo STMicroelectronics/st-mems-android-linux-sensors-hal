@@ -40,7 +40,6 @@ add_library(stmicroelectronics-sensors-core-linux
             Magnetometer.cpp
             Pressure.cpp
             RHumidity.cpp
-            SensorAdditionalInfo.cpp
             SensorBase.cpp
             SensorHAL.cpp
             SignificantMotion.cpp

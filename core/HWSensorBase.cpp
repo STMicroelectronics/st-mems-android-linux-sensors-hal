@@ -289,10 +289,6 @@ HWSensorBase::HWSensorBase(HWSensorBaseCommonData *data, const char *name,
         break;
     }
 
-#if (CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED)
-    sensor_t_data.flags |= SENSOR_FLAG_ADDITIONAL_INFO;
-    supportsSensorAdditionalInfo = false;
-#endif /* CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED */
     free(buffer_path);
 
     return;
@@ -377,11 +373,6 @@ int HWSensorBase::Enable(int handle, bool enable, bool lock_en_mutex)
     bool old_status, old_status_no_handle;
     int64_t timestampEnable;
 
-#if (CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED)
-    additional_info_event_t *array_sensorAdditionalInfoDataFrames = nullptr;
-    size_t frames;
-#endif /* CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED */
-
     if (lock_en_mutex) {
         pthread_mutex_lock(&enable_mutex);
     }
@@ -413,18 +404,6 @@ int HWSensorBase::Enable(int handle, bool enable, bool lock_en_mutex)
     if (sensor_t_data.handle == handle) {
         if (enable) {
             sensor_my_enable = timestampEnable;
-#if (CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED)
-            if (supportsSensorAdditionalInfo) {
-                frames = getSensorAdditionalInfoPayLoadFramesArray(&array_sensorAdditionalInfoDataFrames);
-                if (array_sensorAdditionalInfoDataFrames) {
-                    ALOGD("%s : %s, ENABLE: Sending Report.", GetName(), __func__);
-                    if (frames > 0) {
-                        WriteSensorAdditionalInfoReport(array_sensorAdditionalInfoDataFrames, frames);
-                    }
-                    free(array_sensorAdditionalInfoDataFrames);
-                }
-            }
-#endif /* CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED */
         } else {
             sensor_my_disable = utils.getTime();
         }
@@ -586,24 +565,6 @@ void HWSensorBase::ProcessEvent(struct device_iio_events *event_data)
 void HWSensorBase::ProcessData(SensorBaseData *data)
 {
     SensorBase::ProcessData(data);
-
-#if (CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED)
-    additional_info_event_t *array_sensorAdditionalInfoPLFrames = nullptr;
-    size_t frames;
-
-    if (data->flush_event_handle == sensor_t_data.handle) {
-        if (supportsSensorAdditionalInfo) {
-            frames = getSensorAdditionalInfoPayLoadFramesArray(&array_sensorAdditionalInfoPLFrames);
-            if (array_sensorAdditionalInfoPLFrames) {
-                ALOGD("%s %s: FLUSH: Sending Report.", GetName(), __func__);
-                if (frames > 0) {
-                    WriteSensorAdditionalInfoReport(array_sensorAdditionalInfoPLFrames, frames);
-                }
-                free(array_sensorAdditionalInfoPLFrames);
-            }
-        }
-    }
-#endif /* CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED */
 }
 
 int HWSensorBase::FlushData(int handle, bool lock_en_mutex)
@@ -681,42 +642,6 @@ void HWSensorBase::ProcessFlushData(int __attribute__((unused))handle, int64_t t
 
     pthread_mutex_unlock(&sample_in_processing_mutex);
 }
-
-#if (CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED)
-void HWSensorBase::WriteSensorAdditionalInfoFrames(additional_info_event_t array_sensorAdditionaInfoDataFrames[], size_t frames_numb)
-{
-    for (size_t i = 0; i < frames_numb; ++i) {
-        ALOGV("%s : Before: item #: %zu of %zu",__func__, (i+1), frames_numb);
-        SensorBase::WriteSensorAdditionalInfoFrameToPipe(&array_sensorAdditionaInfoDataFrames[i]);
-        ALOGV("%s : Frame #:(%zu) of %zu sent.", __func__, (i=1),frames_numb);
-    }
-}
-
-void HWSensorBase::WriteSensorAdditionalInfoReport(additional_info_event_t array_sensorAdditionaInfoDataFrames[], size_t frames_numb)
-{
-    const additional_info_event_t *begin_additional_info = SensorAdditionalInfoEvent::getBeginFrameEvent();
-    const additional_info_event_t *end_additional_info = SensorAdditionalInfoEvent::getEndFrameEvent();
-
-    SensorBase::WriteSensorAdditionalInfoFrameToPipe(const_cast<additional_info_event_t*>(begin_additional_info));
-    WriteSensorAdditionalInfoFrames(array_sensorAdditionaInfoDataFrames, frames_numb);
-    SensorBase::WriteSensorAdditionalInfoFrameToPipe(const_cast<additional_info_event_t*>(end_additional_info));
-    ALOGD("%s : Sensor Additional Info Report sent.", __func__);
-}
-
-size_t HWSensorBase::getSensorAdditionalInfoPayLoadFramesArray(additional_info_event_t **array_sensorAdditionalInfoPLFrames)
-{
-    size_t frames = 1;
-
-    *array_sensorAdditionalInfoPLFrames = (additional_info_event_t *)malloc(frames * sizeof(additional_info_event_t));
-    if (!*array_sensorAdditionalInfoPLFrames) {
-        ALOGE("%s: Failed to allocate memory.", GetName());
-        return (size_t)-ENOMEM;
-    }
-
-    *array_sensorAdditionalInfoPLFrames[0] = defaultSensorPlacement_additional_info_event;
-    return sizeof(**array_sensorAdditionalInfoPLFrames)/sizeof(*array_sensorAdditionalInfoPLFrames[0]);
-}
-#endif /* CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED */
 
 void HWSensorBase::ThreadDataTask()
 {

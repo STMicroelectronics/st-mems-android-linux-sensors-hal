@@ -23,10 +23,6 @@
 #include <IUtils.h>
 #include <IConsole.h>
 
-#if (CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED)
-#include "SensorAdditionalInfo.h"
-#endif /* CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED */
-
 extern "C" {
     #include "utils.h"
 }
@@ -64,10 +60,6 @@ class HWSensorBaseWithPollrate;
  * class HWSensorBase
  */
 class HWSensorBase : public SensorBase {
-private:
-#if (CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED)
-    void WriteSensorAdditionalInfoFrames(additional_info_event_t array_sensorAdditionaInfoDataFrames[], size_t frames_numb);
-#endif /* CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED */
 protected:
     ssize_t scan_size;
     struct pollfd pollfd_iio[2];
@@ -91,20 +83,6 @@ protected:
 
     IConsole &console { IConsole::getInstance() };
     IUtils &utils { IUtils::getInstance() };
-
-#if (CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED)
-    bool supportsSensorAdditionalInfo;
-
-    const additional_info_event_t defaultSensorPlacement_additional_info_event = {
-        .type = AINFO_SENSOR_PLACEMENT,
-        .serial = 0,
-        .data_float = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0 },
-    };
-
-    virtual size_t getSensorAdditionalInfoPayLoadFramesArray(additional_info_event_t **array_sensorAdditionalInfoPLFrames);
-    void WriteSensorAdditionalInfoReport(additional_info_event_t array_sensorAdditionaInfoDataFrames[], size_t frames);
-    void getSensorAdditionalInfoDataFramesArray(additional_info_event_t **array_sensorAdditionalInfoDataFrames, size_t *p_array_size);
-#endif /* CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED */
 
 public:
     HWSensorBase(HWSensorBaseCommonData *data,

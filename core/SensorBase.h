@@ -204,10 +204,6 @@ public:
     void WriteFlushEventToPipe();
     virtual void WriteDataToPipe(int64_t hw_pollrate);
 
-#if (CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED)
-    void WriteSensorAdditionalInfoFrameToPipe(additional_info_event_t *p_additional_info_event);
-#endif /* CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED */
-
     virtual void ProcessData(SensorBaseData *data);
     virtual void ReceiveDataFromDependency(int handle, SensorBaseData *data);
     virtual int GetLatestValidDataFromDependency(int dependency_id, SensorBaseData *data, int64_t timesync);

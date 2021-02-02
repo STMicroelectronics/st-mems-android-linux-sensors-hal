@@ -64,7 +64,6 @@ LOCAL_SRC_FILES := \
     Magnetometer.cpp \
     Pressure.cpp \
     RHumidity.cpp \
-    SensorAdditionalInfo.cpp \
     SensorBase.cpp \
     SensorHAL.cpp \
     SignificantMotion.cpp \

@@ -578,28 +578,6 @@ void SensorBase::WriteFlushEventToPipe()
     }
 }
 
-#if (CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED)
-void SensorBase::WriteSensorAdditionalInfoFrameToPipe(additional_info_event_t *p_sensor_additional_info_event)
-{
-    int err;
-    sensors_event_t sens_info_singleframe;
-
-    memset(&sens_info_singleframe, 0, sizeof(sensors_event_t));
-
-    sens_info_singleframe.version = sizeof(sensors_event_t);
-    sens_info_singleframe.sensor = sensor_event.sensor;
-    sens_info_singleframe.type = SENSOR_TYPE_ADDITIONAL_INFO;
-    sens_info_singleframe.additional_info = *p_sensor_additional_info_event;
-    sens_info_singleframe.timestamp = android::elapsedRealtimeNano();
-
-    //TODO: check correctness of additional_info
-    err = write(write_pipe_fd, &sens_info_singleframe, sizeof(sensors_event_t));
-    if (err <= 0)
-        ALOGE("%s: Failed to write additional sensor info event data to pipe.", android_name);
-}
-#endif /* CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED */
-
-
 void SensorBase::WriteDataToPipe(int64_t __attribute__((unused))hw_pollrate)
 {
     int err;

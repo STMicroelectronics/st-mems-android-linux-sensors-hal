@@ -48,10 +48,6 @@ Magnetometer::Magnetometer(HWSensorBaseCommonData *data, const char *name,
     sensor_t_data.resolution = GAUSS_TO_UTESLA(data->channels[0].scale);
     sensor_t_data.maxRange = sensor_t_data.resolution * (std::pow(2, data->channels[0].bits_used - 1) - 1);
     sensor_event.data.dataLen = 3;
-
-#if (CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED)
-    supportsSensorAdditionalInfo = true;
-#endif /* CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED */
 }
 
 int Magnetometer::Enable(int handle, bool enable, bool lock_en_mutex)
@@ -143,37 +139,6 @@ void Magnetometer::ProcessData(SensorBaseData *data)
     HWSensorBaseWithPollrate::WriteDataToPipe(data->pollrate_ns);
     HWSensorBaseWithPollrate::ProcessData(data);
 }
-
-#if (CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED)
-size_t Magnetometer::getSensorAdditionalInfoPayLoadFramesArray(additional_info_event_t **array_sensorAdditionalInfoPLFrames)
-{
-    additional_info_event_t Mag_SAI_Placement_event, *p;
-    additional_info_event_t *p_custom_Mag_SAI_Placement_event =  NULL;
-
-    // place for ODM/OEM to fill custom_Mag_SAI_Placement_event
-
-    if (!p_custom_Mag_SAI_Placement_event) {
-        Mag_SAI_Placement_event = defaultSensorPlacement_additional_info_event;
-        ALOGD("%s: using Sensor Additional Info Placement default", GetName());
-    } else {
-        Mag_SAI_Placement_event = *p_custom_Mag_SAI_Placement_event;
-    }
-
-    size_t frames = 1;
-
-    p = (additional_info_event_t *)calloc(frames , sizeof(additional_info_event_t));
-    if (!p) {
-        ALOGE("%s: Failed to allocate memory.", GetName());
-        return (size_t)-ENOMEM;
-    }
-    for (size_t i = 0; i < frames; i++) {
-        memcpy(&p[i], &Mag_SAI_Placement_event, sizeof(additional_info_event_t));
-    }
-
-    *array_sensorAdditionalInfoPLFrames = p;
-    return sizeof(**array_sensorAdditionalInfoPLFrames)/sizeof(*array_sensorAdditionalInfoPLFrames[0]);
-}
-#endif /* CONFIG_ST_HAL_ADDITIONAL_INFO_ENABLED */
 
 } // namespace core
 } // namespace stm
