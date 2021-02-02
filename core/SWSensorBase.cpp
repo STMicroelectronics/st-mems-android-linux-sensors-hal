@@ -25,8 +25,6 @@
 namespace stm {
 namespace core {
 
-#define SW_SENSOR_BASE_DEELAY_PROCESSING_DATA            (500000000LL)
-
 static IConsole &console { IConsole::getInstance() };
 
 SWSensorBase::SWSensorBase(const char *name, int handle, STMSensorType sensor_type,
@@ -378,12 +376,6 @@ int SWSensorBaseWithPollrate::SetDelay(int handle, int64_t period_ns, int64_t ti
 
         if ((period_ns < (((int64_t)FREQUENCY_TO_US(sensor_t_data.maxRateHz)) * 1000)) && (period_ns > 0)) {
             period_ns = FREQUENCY_TO_US(sensor_t_data.maxRateHz) * 1000;
-        }
-
-        if (timeout < SW_SENSOR_BASE_DEELAY_PROCESSING_DATA) {
-            timeout = 0;
-        } else {
-            timeout -= SW_SENSOR_BASE_DEELAY_PROCESSING_DATA;
         }
     }
 
