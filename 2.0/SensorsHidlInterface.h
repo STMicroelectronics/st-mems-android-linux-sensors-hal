@@ -32,6 +32,7 @@
 
 #include "DirectChannel.h"
 #include "SensorsDataProxyManager.h"
+#include "AdditionalInfoManager.h"
 
 namespace android {
 namespace hardware {

@@ -42,6 +42,7 @@ SensorsHidlInterface::SensorsHidlInterface(void)
                        console(IConsole::getInstance()),
                        lastDirectChannelHandle(0)
 {
+    addInfoMng = std::make_unique<AdditionalInfoManager>(sensorsCore.getSensorsList());
 }
 
 SensorsHidlInterface::~SensorsHidlInterface(void)
@@ -65,6 +66,9 @@ Return<void> SensorsHidlInterface::getSensorsList(getSensorsList_cb _hidl_cb)
 
     for (size_t i = 0; i < count; i++) {
         if (convertFromSTMSensor(list.at(i), &sensorsList[n])) {
+            if (addInfoMng->isSupported(sensorsList[n].sensorHandle)) {
+                sensorsList[n].flags |= V1_0::SensorFlagBits::ADDITIONAL_INFO;
+            }
             sensorFlags[sensorsList[n].sensorHandle] = sensorsList[n].flags;
             n++;
         }
@@ -443,6 +447,11 @@ SensorsHidlInterface::onNewSensorsData(const std::vector<ISTMSensorsCallbackData
 
         if (sdata.getSensorType() == stm::core::SensorType::META_DATA) {
             eventsList.push_back(event);
+
+            auto addInfoEvents = addInfoMng->getPayload(sdata.getSensorHandle(), event.timestamp);
+            for (auto &el : addInfoEvents) {
+                eventsList.push_back(el);
+            }
         } else {
             const stm::core::STMSensor *sensor = getSTMSensor(sdata.getSensorHandle());
             if (sensor == nullptr) continue;
