@@ -42,7 +42,7 @@ STMSensor::STMSensor(const std::string &name,
             power(power),
             minRateHz(minRateHz),
             maxRateHz(maxRateHz),
-            onChange(false),
+            onChange(minRateHz < 1e-9 ? true : false),
             fifoRsvdCount(fifoRsvdCount),
             fifoMaxCount(fifoMaxCount),
             wakeUp(wakeUp)
