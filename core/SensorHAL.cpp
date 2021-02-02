@@ -487,6 +487,8 @@ static int loadIIODevices(std::vector<STSensorHAL_iio_devices_data> &iioDeviceDa
             goto st_hal_load_free_iio_channels;
         }
 
+        device_iio_utils::set_clock_type(data.iio_sysfs_path.c_str(), "boottime");
+
         if ((sensor->android_sensor_type != StepDetectorSensorType) &&
             (sensor->android_sensor_type != StepCounterSensorType) &&
             (sensor->android_sensor_type != SignMotionSensorType) &&
