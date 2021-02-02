@@ -29,6 +29,8 @@ SWLinearAccel::SWLinearAccel(const char *name, int handle)
                                LinearAccelSensorType,
                                true, false, true, false)
 {
+    sensor_t_data.maxRange = ST_HAL_GRAVITY_MAX_ON_EARTH;
+
     dependencies_type_list.push_back(AccelMagnGyroFusion9XSensorType);
     id_sensor_trigger = SENSOR_DEPENDENCY_ID_0;
     sensor_event.data.dataLen = SENSOR_DATA_3AXIS;
