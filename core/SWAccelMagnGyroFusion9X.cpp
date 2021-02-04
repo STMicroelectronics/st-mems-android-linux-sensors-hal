@@ -52,7 +52,7 @@ int SWAccelMagnGyroFusion9X::CustomInit()
 #ifdef CONFIG_INEMOENGINE_PRO
     iNemoEngine_API_Initialization(NULL, NULL);
 #else /* CONFIG_INEMOENGINE_PRO */
-    //InvalidThisClass();
+    InvalidThisClass();
 #endif /* CONFIG_INEMOENGINE_PRO */
 
     return 0;
