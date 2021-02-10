@@ -65,6 +65,10 @@ cc_library_static {
     ],
     local_include_dirs: [
         "include",
+        "libs/accel-calibration",
+        "libs/gyro-calibration",
+        "libs/magn-calibration",
+        "libs/sensors-fusion"
     ],
     shared_libs: [
         "libcutils",
@@ -80,5 +84,9 @@ cc_library_static {
         "-Wall",
         "-Wextra",
         "-Wpedantic",
+        "-DHAL_ENABLE_ACCEL_CALIBRATION=1",
+        "-DHAL_ENABLE_GYRO_CALIBRATION=1",
+        "-DHAL_ENABLE_MAGN_CALIBRATION=1",
+        "-DHAL_ENABLE_SENSORS_FUSION=1",
     ]
 }

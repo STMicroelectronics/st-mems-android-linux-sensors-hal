@@ -19,6 +19,8 @@
 
 #include "SWSensorBase.h"
 
+#include <STMSensorsFusion9Axis.h>
+
 namespace stm {
 namespace core {
 
@@ -33,6 +35,9 @@ public:
     virtual int Enable(int handle, bool enable, bool lock_en_mutex);
     virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout, bool lock_en_mutex);
     virtual void ProcessData(SensorBaseData *data);
+
+private:
+    STMSensorsFusion9Axis& sensorsFusion;
 };
 
 } // namespace core

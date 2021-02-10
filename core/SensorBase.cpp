@@ -249,6 +249,7 @@ int SensorBase::Enable(int handle, bool enable, bool lock_en_mutex)
         if (enable) {
             SetBitEnableMask(handle);
             flush_stack.resetBuffer();
+            lastDecimatedPollrate = 0;
         } else {
             err = SetDelay(handle, 0, INT64_MAX, false);
             if (err < 0) {

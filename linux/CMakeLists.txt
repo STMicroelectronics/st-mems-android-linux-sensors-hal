@@ -25,7 +25,11 @@ project(${PROJECT_NAME} VERSION ${PROJECT_VERSION}
         DESCRIPTION ${PROJECT_DESCRIPTION}
         LANGUAGES CXX C ASM)
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../core/ stmicroelectronics-sensors-core)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../core libstm-sensors-core)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../core/libs/accel-calibration libstm-accel-calibration)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../core/libs/gyro-calibration libstm-gyro-calibration)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../core/libs/magn-calibration libstm-magn-calibration)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../core/libs/sensors-fusion libstm-sensors-fusion)
 
 add_compile_options(-Wall -Wextra -pedantic)
 
@@ -39,8 +43,13 @@ target_include_directories(${PROJECT_TARGET} PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR})
 
 find_package(Threads)
-target_link_libraries(${PROJECT_TARGET} Threads::Threads)
+target_link_libraries(${PROJECT_TARGET} PUBLIC Threads::Threads)
 
-target_link_libraries(${PROJECT_TARGET} stmicroelectronics-sensors-core-linux)
+target_link_libraries(${PROJECT_TARGET} PRIVATE stmicroelectronics-sensors-core-linux)
+target_link_libraries(${PROJECT_TARGET} PRIVATE stm-accel-calibration)
+target_link_libraries(${PROJECT_TARGET} PRIVATE stm-gyro-calibration)
+target_link_libraries(${PROJECT_TARGET} PRIVATE stm-magn-calibration)
+target_link_libraries(${PROJECT_TARGET} PRIVATE stm-sensors-fusion)
+
 target_compile_features(${PROJECT_TARGET} PUBLIC cxx_std_14)
 set_target_properties(${PROJECT_TARGET} PROPERTIES CXX_EXTENSIONS OFF)

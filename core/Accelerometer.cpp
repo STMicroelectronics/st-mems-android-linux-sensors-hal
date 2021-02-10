@@ -22,15 +22,6 @@
 
 #include "Accelerometer.h"
 
-#ifdef CONFIG_ST_HAL_ACCEL_CALIB_ENABLED
-#define CALIBRATION_FREQUENCY                 25
-#define CALIBRATION_PERIOD_MS                 (1000.0f / CALIBRATION_FREQUENCY)
-
-extern "C" {
-    #include "STAccCalibration_API.h"
-}
-#endif /* CONFIG_ST_HAL_ACCEL_CALIB_ENABLED */
-
 namespace stm {
 namespace core {
 
@@ -42,62 +33,88 @@ Accelerometer::Accelerometer(HWSensorBaseCommonData *data,
                              float power_consumption, bool wakeup)
     : HWSensorBaseWithPollrate(data, name, sfa, handle,
                                AccelSensorType,
-                               hw_fifo_len, power_consumption)
+                               hw_fifo_len, power_consumption),
+      accelCalibration(STMAccelCalibration::getInstance())
 {
-    (void)wakeup;
+    (void) wakeup;
 
     sensor_t_data.resolution = data->channels[0].scale;
     sensor_t_data.maxRange = sensor_t_data.resolution * (std::pow(2, data->channels[0].bits_used - 1) - 1);
     sensor_event.data.dataLen = 3;
 }
 
-int Accelerometer::Enable(int handle, bool enable, bool lock_en_mutex)
+int Accelerometer::CustomInit()
 {
-#ifdef CONFIG_ST_HAL_ACCEL_CALIB_ENABLED
-    int err;
+    std::string libVersionMsg { "accel calibration library: " };
+    int err = 0;
 
-    if (lock_en_mutex) {
-        pthread_mutex_lock(&enable_mutex);
+    if (HAL_ENABLE_ACCEL_CALIBRATION != 0) {
+        libVersionMsg += accelCalibration.getLibVersion();
+
+        accelCalibration.resetBiasMatrix(currentBias);
+        err = accelCalibration.init(sensor_t_data.maxRange);
+    } else {
+        libVersionMsg += std::string("not enabled!");
     }
 
-    err = HWSensorBaseWithPollrate::Enable(handle, enable, false);
-    if (err < 0) {
+    console.info(libVersionMsg);
+
+    return err;
+}
+
+int Accelerometer::Enable(int handle, bool enable, bool lock_en_mutex)
+{
+    if (HAL_ENABLE_ACCEL_CALIBRATION != 0) {
+        bool old_status;
+        int err;
+
+        if (lock_en_mutex) {
+            pthread_mutex_lock(&enable_mutex);
+        }
+
+        old_status = GetStatus(false);
+
+        err = HWSensorBaseWithPollrate::Enable(handle, enable, false);
+        if (err < 0) {
+            if (lock_en_mutex) {
+                pthread_mutex_unlock(&enable_mutex);
+            }
+
+            return err;
+        }
+
+        if (GetStatus(false) != old_status) {
+            accelCalibration.reset(currentBias);
+        }
+
         if (lock_en_mutex) {
             pthread_mutex_unlock(&enable_mutex);
         }
 
-        return err;
+        return 0;
     }
 
-    if (enable) {
-        ST_AccCalibration_API_Init(CALIBRATION_PERIOD_MS);
-    } else {
-        ST_AccCalibration_API_DeInit(CALIBRATION_PERIOD_MS);
-    }
-
-    if (lock_en_mutex) {
-        pthread_mutex_unlock(&enable_mutex);
-    }
-
-    return 0;
-#else /* CONFIG_ST_HAL_ACCEL_CALIB_ENABLED */
     return HWSensorBaseWithPollrate::Enable(handle, enable, lock_en_mutex);
-#endif /* CONFIG_ST_HAL_ACCEL_CALIB_ENABLED */
 }
 
 void Accelerometer::ProcessData(SensorBaseData *data)
 {
     float tmp_raw_data[SENSOR_DATA_3AXIS];
-#ifdef CONFIG_ST_HAL_ACCEL_CALIB_ENABLED
-    STAccCalibration_Input acc_cal_input;
-    STAccCalibration_Output acc_cal_output;
-#endif /* CONFIG_ST_HAL_ACCEL_CALIB_ENABLED */
 
     memcpy(tmp_raw_data, data->raw, SENSOR_DATA_3AXIS * sizeof(float));
 
-    data->raw[0] = SENSOR_X_DATA(tmp_raw_data[0], tmp_raw_data[1], tmp_raw_data[2], CONFIG_ST_HAL_ACCEL_ROT_MATRIX);
-    data->raw[1] = SENSOR_Y_DATA(tmp_raw_data[0], tmp_raw_data[1], tmp_raw_data[2], CONFIG_ST_HAL_ACCEL_ROT_MATRIX);
-    data->raw[2] = SENSOR_Z_DATA(tmp_raw_data[0], tmp_raw_data[1], tmp_raw_data[2], CONFIG_ST_HAL_ACCEL_ROT_MATRIX);
+    data->raw[0] = SENSOR_X_DATA(tmp_raw_data[0],
+                                 tmp_raw_data[1],
+                                 tmp_raw_data[2],
+                                 CONFIG_ST_HAL_ACCEL_ROT_MATRIX);
+    data->raw[1] = SENSOR_Y_DATA(tmp_raw_data[0],
+                                 tmp_raw_data[1],
+                                 tmp_raw_data[2],
+                                 CONFIG_ST_HAL_ACCEL_ROT_MATRIX);
+    data->raw[2] = SENSOR_Z_DATA(tmp_raw_data[0],
+                                 tmp_raw_data[1],
+                                 tmp_raw_data[2],
+                                 CONFIG_ST_HAL_ACCEL_ROT_MATRIX);
 
 #ifdef CONFIG_ST_HAL_FACTORY_CALIBRATION
     data->raw[0] = (data->raw[0] - factory_offset[0]) * factory_scale[0];
@@ -108,28 +125,33 @@ void Accelerometer::ProcessData(SensorBaseData *data)
     data->accuracy = SENSOR_STATUS_UNRELIABLE;
 #endif /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
 
-#ifdef CONFIG_ST_HAL_ACCEL_CALIB_ENABLED
-    acc_cal_input.timestamp = data->timestamp;
-    acc_cal_input.acc_raw[0] = data->raw[0];
-    acc_cal_input.acc_raw[1] = data->raw[1];
-    acc_cal_input.acc_raw[2] = data->raw[2];
+    if (HAL_ENABLE_ACCEL_CALIBRATION != 0) {
+        std::array<float, 3> accelData;
+        Matrix<3, 4, float> bias;
 
-    ST_AccCalibration_API_Run(&acc_cal_output, &acc_cal_input);
+        memcpy(accelData.data(), data->raw, 3 * sizeof(float));
 
-    data->processed[0] = acc_cal_output.acc_cal[0];
-    data->processed[1] = acc_cal_output.acc_cal[1];
-    data->processed[2] = acc_cal_output.acc_cal[2];
-    data->offset[0] = acc_cal_output.offset[0];
-    data->offset[1] = acc_cal_output.offset[1];
-    data->offset[2] = acc_cal_output.offset[2];
-    data->accuracy = acc_cal_output.accuracy;
-#else /* CONFIG_ST_HAL_ACCEL_CALIB_ENABLED */
-    data->processed[0] = data->raw[0];
-    data->processed[1] = data->raw[1];
-    data->processed[2] = data->raw[2];
+        if (bias_last_pollrate != data->pollrate_ns) {
+            bias_last_pollrate = data->pollrate_ns;
+            accelCalibration.setFrequency(NS_TO_FREQUENCY(data->pollrate_ns));
+        }
 
-    data->accuracy = SENSOR_STATUS_UNRELIABLE;
-#endif /* CONFIG_ST_HAL_ACCEL_CALIB_ENABLED */
+        accelCalibration.run(accelData, data->timestamp);
+        accelCalibration.getBias(bias);
+
+        data->offset[0] = bias[0][3];
+        data->offset[1] = bias[1][3];
+        data->offset[2] = bias[2][3];
+
+        data->accuracy = SENSOR_STATUS_ACCURACY_HIGH;
+    } else {
+        data->accuracy = SENSOR_STATUS_UNRELIABLE;
+        memset(data->offset, 0, 3 * sizeof(float));
+    }
+
+    data->processed[0] = data->raw[0] - data->offset[0];
+    data->processed[1] = data->raw[1] - data->offset[1];
+    data->processed[2] = data->raw[2] - data->offset[2];
 
     sensor_event.data.data2[0] = data->processed[0];
     sensor_event.data.data2[1] = data->processed[1];

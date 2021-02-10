@@ -48,8 +48,6 @@ protected:
     SensorBaseData *sensors_tmp_data;
     IUtils &utils { IUtils::getInstance() };
 
-    int64_t lastDecimatedPollrate = 0;
-
     virtual bool ValidDataToPush(int64_t timestamp) override;
 
 public:

@@ -36,6 +36,10 @@ cc_binary {
     ],
     static_libs: [
         "stmicroelectronics-sensors-core",
+        "libstm-accel-calibration",
+        "libstm-gyro-calibration",
+        "libstm-magn-calibration",
+        "libstm-sensors-fusion"
     ],
     shared_libs: [
         "android.hardware.sensors@2.0",

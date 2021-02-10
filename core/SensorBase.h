@@ -129,6 +129,7 @@ protected:
     volatile int64_t sensor_my_disable;
     uint8_t decimator;
     uint8_t samples_counter;
+    int64_t lastDecimatedPollrate = 0;
 
     push_data_t push_data;
     dependencies_t dependencies;
@@ -137,6 +138,7 @@ protected:
 
     FlushBufferStack flush_stack;
 
+    IConsole &console { IConsole::getInstance() };
     sensors_event_t sensor_event;
     struct sensor_t sensor_t_data;
 

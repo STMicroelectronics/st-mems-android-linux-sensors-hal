@@ -21,19 +21,14 @@
 
 #include "SWAccelGyroFusion6X.h"
 
-#ifdef CONFIG_INEMOENGINE_PRO
-extern "C" {
-    #include "iNemoEngineProAPI.h"
-}
-#endif /* CONFIG_INEMOENGINE_PRO */
-
 namespace stm {
 namespace core {
 
 SWAccelGyroFusion6X::SWAccelGyroFusion6X(const char *name, int handle)
     : SWSensorBaseWithPollrate(name, handle,
                                AccelGyroFusion6XSensorType,
-                               false, false, true, false)
+                               false, false, true, false),
+      sensorsFusion(STMSensorsFusion6Axis::getInstance())
 {
     sensor_t_data.minRateHz = CONFIG_ST_HAL_MIN_FUSION_POLLRATE;
 
@@ -47,13 +42,21 @@ SWAccelGyroFusion6X::SWAccelGyroFusion6X(const char *name, int handle)
 
 int SWAccelGyroFusion6X::CustomInit()
 {
-#ifdef CONFIG_INEMOENGINE_PRO
-    iNemoEngine_API_Initialization(NULL, NULL);
-#else /* CONFIG_INEMOENGINE_PRO */
-    InvalidThisClass();
-#endif /* CONFIG_INEMOENGINE_PRO */
+    std::string libVersionMsg { "sensors fusion (6X) library: " };
+    int err = 0;
 
-    return 0;
+    if (HAL_ENABLE_SENSORS_FUSION != 0) {
+        libVersionMsg += sensorsFusion.getLibVersion();
+
+        err = sensorsFusion.init();
+    } else {
+        InvalidThisClass();
+        libVersionMsg += std::string("not enabled!");
+    }
+
+    console.info(libVersionMsg);
+
+    return err;
 }
 
 int SWAccelGyroFusion6X::Enable(int handle, bool enable, bool lock_en_mutex)
@@ -80,14 +83,15 @@ int SWAccelGyroFusion6X::Enable(int handle, bool enable, bool lock_en_mutex)
 
     if ((enable && !old_status) || (!enable && !old_status_no_handle)) {
         if (enable) {
+            if (HAL_ENABLE_SENSORS_FUSION != 0) {
+                sensorsFusion.reset(NULL);
+            }
+
+            sensor_event.timestamp = 0;
             sensor_global_enable = utils.getTime();
         } else {
             sensor_global_disable = utils.getTime();
         }
-
-#ifdef CONFIG_INEMOENGINE_PRO
-        iNemoEngine_API_enable6X(enable);
-#endif /* CONFIG_INEMOENGINE_PRO */
     }
 
     if (lock_en_mutex) {
@@ -125,84 +129,83 @@ int SWAccelGyroFusion6X::SetDelay(int handle, int64_t period_ns, int64_t timeout
     return 0;
 }
 
-#ifdef CONFIG_INEMOENGINE_PRO
 void SWAccelGyroFusion6X::ProcessData(SensorBaseData *data)
 {
-    unsigned int i;
-    SensorBaseData accel_data;
-    int err, nomaxdata = 10;
-    iNemoSensorsData sdata;
+    if (HAL_ENABLE_SENSORS_FUSION != 0) {
+        unsigned int i;
+        SensorBaseData accel_data;
+        int err, nomaxdata = 10;
 
-    do {
-        err = GetLatestValidDataFromDependency(SENSOR_DEPENDENCY_ID_0, &accel_data, data->timestamp);
-        if (err < 0) {
-            usleep(10);
-            nomaxdata--;
-            continue;
-        }
-    } while ((nomaxdata >= 0) && (err < 0));
+        do {
+            err = GetLatestValidDataFromDependency(SENSOR_DEPENDENCY_ID_0, &accel_data, data->timestamp);
+            if (err < 0) {
+                std::this_thread::sleep_for(std::chrono::microseconds(10));
+                nomaxdata--;
+                continue;
+            }
+        } while ((nomaxdata >= 0) && (err < 0));
 
-    if (nomaxdata > 0) {
-            memcpy(sdata.accel, accel_data.raw, sizeof(sdata.accel));
-            memcpy(sdata.gyro, data->processed, sizeof(sdata.gyro));
+        if (nomaxdata > 0) {
+            std::array<float, 3> accelData;
+            std::array<float, 3> gyroData;
 
-            iNemoEngine_API_Run(data->timestamp - sensor_event.timestamp, &sdata);
-    }
+            memcpy(accelData.data(), accel_data.raw, 3 * sizeof(float));
+            memcpy(gyroData.data(), data->processed, 3 * sizeof(float));
 
-    sensor_event.timestamp = data->timestamp;
-    outdata.timestamp = data->timestamp;
-    outdata.flush_event_handle = data->flush_event_handle;
-    outdata.accuracy = data->accuracy;
-    outdata.pollrate_ns = data->pollrate_ns;
-
-    for (i = 0; i < push_data.num; i++) {
-        if (!push_data.sb[i]->ValidDataToPush(outdata.timestamp)) {
-            continue;
+            sensorsFusion.run(accelData, gyroData, data->timestamp);
         }
 
-        switch (push_data.sb[i]->GetType()) {
-        case STMSensorType::ROTATION_VECTOR:
-            err = iNemoEngine_API_Get_6X_Quaternion(outdata.processed);
-            if (err < 0)
+        sensor_event.timestamp = data->timestamp;
+        outdata.timestamp = data->timestamp;
+        outdata.flushEventHandles = data->flushEventHandles;
+        outdata.flushEventsNum = data->flushEventsNum;
+        outdata.accuracy = data->accuracy;
+        outdata.pollrate_ns = data->pollrate_ns;
+
+        for (i = 0; i < push_data.num; i++) {
+            if (!push_data.sb[i]->ValidDataToPush(outdata.timestamp)) {
                 continue;
+            }
 
-            break;
+            switch ((SensorType)push_data.sb[i]->GetType()) {
+            case SensorType::GAME_ROTATION_VECTOR:
+                std::array<float, 4> quaternion;
 
-        case STMSensorType::GRAVITY:
-            err = iNemoEngine_API_Get_Gravity(outdata.processed);
-            if (err < 0)
-                continue;
+                err = sensorsFusion.getQuaternion(quaternion);
+                if (err < 0)
+                    continue;
 
-            break;
+                memcpy(outdata.processed, quaternion.data(), 4 * sizeof(float));
+                break;
 
-        case STMSensorType::LINEAR_ACCELERATION:
-            err = iNemoEngine_API_Get_Linear_Acceleration(outdata.processed);
-            if (err < 0)
-                continue;
+            case SensorType::GRAVITY:
+                std::array<float, 3> gravity;
 
-            break;
+                err = sensorsFusion.getGravity(gravity);
+                if (err < 0)
+                    continue;
 
-        default:
-            return;
+                memcpy(outdata.processed, gravity.data(), 3 * sizeof(float));
+                break;
+
+            case SensorType::LINEAR_ACCELERATION:
+                std::array<float, 3> linearAccel;
+
+                err = sensorsFusion.getLinearAccel(linearAccel);
+                if (err < 0)
+                    continue;
+
+                memcpy(outdata.processed, linearAccel.data(), 3 * sizeof(float));
+                break;
+
+            default:
+                return;
+            }
+
+            push_data.sb[i]->ReceiveDataFromDependency(sensor_t_data.handle, &outdata);
         }
-
-        push_data.sb[i]->ReceiveDataFromDependency(sensor_t_data.handle, &outdata);
     }
 }
-#else /* CONFIG_INEMOENGINE_PRO */
-void SWAccelGyroFusion6X::ProcessData(SensorBaseData *data)
-{
-    outdata.timestamp = data->timestamp;
-    outdata.flushEventHandles = data->flushEventHandles;
-    outdata.flushEventsNum = data->flushEventsNum;
-    outdata.accuracy = data->accuracy;
-    outdata.pollrate_ns = data->pollrate_ns;
-
-    for (auto i = 0U; i < push_data.num; i++) {
-        push_data.sb[i]->ReceiveDataFromDependency(sensor_t_data.handle, &outdata);
-    }
-}
-#endif /* CONFIG_INEMOENGINE_PRO */
 
 } // namespace core
 } // namespace stm

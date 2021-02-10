@@ -19,6 +19,8 @@
 
 #include "HWSensorBase.h"
 
+#include <STMGyroCalibration.h>
+
 namespace stm {
 namespace core {
 
@@ -31,15 +33,15 @@ public:
               struct device_iio_sampling_freqs *sfa, int handle,
               unsigned int hw_fifo_len, float power_consumption, bool wakeup);
 
-#ifdef CONFIG_ST_HAL_GYRO_GBIAS_ESTIMATION_ENABLED
     int64_t gbias_last_pollrate;
-#endif /* CONFIG_ST_HAL_GYRO_GBIAS_ESTIMATION_ENABLED */
 
     virtual int CustomInit();
     virtual int Enable(int handle, bool enable, bool lock_en_mutex);
-    virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout,
-                         bool lock_en_mutex);
     virtual void ProcessData(SensorBaseData *data);
+
+private:
+    Matrix<3, 4, float> currentBias;
+    STMGyroCalibration& gyroCalibration;
 };
 
 } // namespace core

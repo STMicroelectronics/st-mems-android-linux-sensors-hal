@@ -325,13 +325,15 @@ void SWSensorBase::ThreadDataTask()
                 do {
                     flush_handle = flush_stack.readLastElement(&timestamp_flush);
                     if ((flush_handle >= 0) && (timestamp_flush <= sensors_tmp_data[i].timestamp)) {
-                        sensors_tmp_data[i].flushEventHandles[sensors_tmp_data[i].flushEventsNum++] = flush_handle;
+                        if (sensors_tmp_data[i].flushEventsNum < (int)sensors_tmp_data[i].flushEventHandles.size()) {
+                            sensors_tmp_data[i].flushEventHandles[sensors_tmp_data[i].flushEventsNum++] = flush_handle;
+                        }
                         flush_stack.removeLastElement();
                         retry = true;
                     } else {
                         retry = false;
                     }
-                } while (retry  && sensors_tmp_data[i].flushEventsNum <= (int)sensors_tmp_data[i].flushEventHandles.size());
+                } while (retry);
 
                 this->ProcessData(&sensors_tmp_data[i]);
             }

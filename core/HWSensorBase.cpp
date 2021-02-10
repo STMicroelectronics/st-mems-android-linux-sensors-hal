@@ -429,10 +429,8 @@ int HWSensorBase::SetDelay(int __attribute__((unused))handle,
                            int64_t __attribute__((unused))period_ns,
                            int64_t timeout, bool lock_en_mutex)
 {
-    int err;
     unsigned int buf_len;
-    const std::string message = ": changed pollrate to timeout=" +
-        std::to_string((uint64_t)NS_TO_MS((uint64_t)timeout)) + "ms";
+    int err;
 
     if (timeout < INT64_MAX) {
         if ((sensor_t_data.fifoMaxEventCount == 0) && (timeout > 0)) {
@@ -457,8 +455,6 @@ int HWSensorBase::SetDelay(int __attribute__((unused))handle,
             goto mutex_unlock;
         }
     }
-
-    console.debug(GetName() + message);
 
     if (lock_en_mutex) {
         pthread_mutex_unlock(&enable_mutex);
@@ -705,13 +701,15 @@ void HWSensorBase::ThreadDataTask()
                 do {
                     flush_handle = flush_stack.readLastElement(&timestamp_flush);
                     if ((flush_handle >= 0) && (timestamp_flush <= sensor_data.timestamp)) {
-                        sensor_data.flushEventHandles[sensor_data.flushEventsNum++] = flush_handle;
+                        if (sensor_data.flushEventsNum < (int)sensor_data.flushEventHandles.size()) {
+                            sensor_data.flushEventHandles[sensor_data.flushEventsNum++] = flush_handle;
+                        }
                         flush_stack.removeLastElement();
                         tryAgain = true;
                     } else {
                         tryAgain = false;
                     }
-                } while (tryAgain && sensor_data.flushEventsNum <= (int)sensor_data.flushEventHandles.size());
+                } while (tryAgain);
 
                 ProcessData(&sensor_data);
             }
@@ -999,7 +997,7 @@ int HWSensorBaseWithPollrate::FlushData(int handle, bool lock_en_mutex)
 
     return 0;
 
- unlock_mutex:
+unlock_mutex:
     if (lock_en_mutex) {
         pthread_mutex_unlock(&enable_mutex);
     }

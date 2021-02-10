@@ -17,6 +17,7 @@
 ifneq ($(TARGET_SIMULATOR),true)
 
 LOCAL_PATH := $(call my-dir)
+LOCAL_PATH_BAK := $(call my-dir)
 
 include $(CLEAR_VARS)
 
@@ -31,11 +32,19 @@ LOCAL_PRELINK_MODULE := false
 LOCAL_MODULE_RELATIVE_PATH := hw
 
 LOCAL_C_INCLUDES := \
-    $(LOCAL_PATH)/include
+    $(LOCAL_PATH)/include \
+    $(LOCAL_PATH)/libs/accel-calibration \
+    $(LOCAL_PATH)/libs/gyro-calibration \
+    $(LOCAL_PATH)/libs/magn-calibration \
+    $(LOCAL_PATH)/libs/sensors-fusion
 
 LOCAL_CFLAGS += \
     -Wall \
-    -Wextra
+    -Wextra \
+    -DHAL_ENABLE_ACCEL_CALIBRATION=1 \
+    -DHAL_ENABLE_GYRO_CALIBRATION=1 \
+    -DHAL_ENABLE_MAGN_CALIBRATION=1 \
+    -DHAL_ENABLE_SENSORS_FUSION=1
 
 ifeq ($(DEBUG),y)
 LOCAL_CFLAGS += -g -O0
@@ -104,5 +113,13 @@ LOCAL_HEADER_LIBRARIES := \
     libhardware_headers
 
 include $(BUILD_STATIC_LIBRARY)
+
+include $(LOCAL_PATH)/libs/accel-calibration/Android.mk
+LOCAL_PATH := $(LOCAL_PATH_BAK)
+include $(LOCAL_PATH)/libs/gyro-calibration/Android.mk
+LOCAL_PATH := $(LOCAL_PATH_BAK)
+include $(LOCAL_PATH)/libs/magn-calibration/Android.mk
+LOCAL_PATH := $(LOCAL_PATH_BAK)
+include $(LOCAL_PATH)/libs/sensors-fusion/Android.mk
 
 endif # !TARGET_SIMULATOR

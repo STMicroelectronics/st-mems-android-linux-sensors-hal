@@ -18,7 +18,13 @@ cmake_minimum_required(VERSION 3.0.2)
 
 add_compile_options(-Wall -Wextra -pedantic -static)
 
+add_compile_options(-DHAL_ENABLE_ACCEL_CALIBRATION=1
+                    -DHAL_ENABLE_GYRO_CALIBRATION=1
+                    -DHAL_ENABLE_MAGN_CALIBRATION=1
+                    -DHAL_ENABLE_SENSORS_FUSION=1)
+
 add_library(stmicroelectronics-sensors-core-linux
+            STATIC
             ISTMSensorsHAL.cpp
             STMSensorsHAL.cpp
             STMSensorsList.cpp
@@ -69,4 +75,8 @@ target_include_directories(stmicroelectronics-sensors-core-linux PUBLIC
                            ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 target_include_directories(stmicroelectronics-sensors-core-linux PRIVATE
-                           ${CMAKE_CURRENT_SOURCE_DIR})
+                           ${CMAKE_CURRENT_SOURCE_DIR}
+                           ${CMAKE_CURRENT_SOURCE_DIR}/libs/accel-calibration
+                           ${CMAKE_CURRENT_SOURCE_DIR}/libs/gyro-calibration
+                           ${CMAKE_CURRENT_SOURCE_DIR}/libs/magn-calibration
+                           ${CMAKE_CURRENT_SOURCE_DIR}/libs/sensors-fusion)

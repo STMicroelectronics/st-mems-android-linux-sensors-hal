@@ -30,7 +30,11 @@ LOCAL_SHARED_LIBRARIES := \
     libc
 
 LOCAL_STATIC_LIBRARIES := \
-    stmicroelectronics-sensors-core-legacy
+    stmicroelectronics-sensors-core-legacy \
+    libstm-accel-calibration-legacy \
+    libstm-gyro-calibration-legacy \
+    libstm-magn-calibration-legacy \
+    libstm-sensors-fusion-legacy
 
 LOCAL_HEADER_LIBRARIES := \
     libhardware_headers

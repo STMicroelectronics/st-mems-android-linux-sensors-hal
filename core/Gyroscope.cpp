@@ -22,12 +22,6 @@
 
 #include "Gyroscope.h"
 
-#ifdef CONFIG_ST_HAL_GYRO_GBIAS_ESTIMATION_ENABLED
-extern "C" {
-    #include "iNemoEngineAPI_gbias_estimation.h"
-}
-#endif /* CONFIG_ST_HAL_GYRO_GBIAS_ESTIMATION_ENABLED */
-
 namespace stm {
 namespace core {
 
@@ -35,112 +29,105 @@ Gyroscope::Gyroscope(HWSensorBaseCommonData *data, const char *name,
                      struct device_iio_sampling_freqs *sfa, int handle,
                      unsigned int hw_fifo_len, float power_consumption, bool wakeup)
     : HWSensorBaseWithPollrate(data, name, sfa, handle,
-                               GyroSensorType, hw_fifo_len, power_consumption)
+                               GyroSensorType, hw_fifo_len, power_consumption),
+      gyroCalibration(STMGyroCalibration::getInstance())
 {
-    (void)wakeup;
+    (void) wakeup;
 
     sensor_t_data.resolution = data->channels[0].scale;
     sensor_t_data.maxRange = sensor_t_data.resolution * (std::pow(2, data->channels[0].bits_used - 1) - 1);
     sensor_event.data.dataLen = 3;
 
-#ifdef CONFIG_ST_HAL_GYRO_GBIAS_ESTIMATION_ENABLED
-    dependencies_type_list.push_back(AccelSensorType);
-#endif /* CONFIG_ST_HAL_GYRO_GBIAS_ESTIMATION_ENABLED */
+    if (HAL_ENABLE_GYRO_CALIBRATION != 0) {
+        dependencies_type_list.push_back(AccelSensorType);
+    }
 }
 
 int Gyroscope::CustomInit()
 {
-#ifdef CONFIG_ST_HAL_GYRO_GBIAS_ESTIMATION_ENABLED
+    std::string libVersionMsg { "gyro calibration library: " };
+    int err = 0;
+
+    if (HAL_ENABLE_GYRO_CALIBRATION != 0) {
+        libVersionMsg += gyroCalibration.getLibVersion();
+
 #ifdef CONFIG_ST_HAL_FACTORY_CALIBRATION
-    iNemoEngine_API_gbias_Initialization(factory_calibration_updated);
+        iNemoEngine_API_gbias_Initialization(factory_calibration_updated);
 
-    if (factory_calibration_updated) {
-        factory_calibration_updated = false;
-    }
-#else /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
-    iNemoEngine_API_gbias_Initialization(false);
+        if (factory_calibration_updated) {
+            factory_calibration_updated = false;
+        }
+#else  /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
+        gyroCalibration.resetBiasMatrix(currentBias);
+
+        // TODO fix the values used as parameters
+        err = gyroCalibration.init(0.0f,
+                                   0.0f,
+                                   0.0f,
+                                   sensor_t_data.maxRange);
 #endif /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
-#endif /* CONFIG_ST_HAL_GYRO_GBIAS_ESTIMATION_ENABLED */
+    } else {
+        libVersionMsg += std::string("not enabled!");
+    }
 
-    return 0;
+    console.info(libVersionMsg);
+
+    return err;
 }
 
 int Gyroscope::Enable(int handle, bool enable, bool lock_en_mutex)
 {
-#ifdef CONFIG_ST_HAL_GYRO_GBIAS_ESTIMATION_ENABLED
-    int err;
-    bool old_status;
+    if (HAL_ENABLE_GYRO_CALIBRATION != 0) {
+        bool old_status;
+        int err;
 
-    if (lock_en_mutex) {
-        pthread_mutex_lock(&enable_mutex);
-    }
+        if (lock_en_mutex) {
+            pthread_mutex_lock(&enable_mutex);
+        }
 
-    old_status = GetStatus(false);
+        old_status = GetStatus(false);
 
-    err = HWSensorBaseWithPollrate::Enable(handle, enable, false);
-    if (err < 0) {
+        err = HWSensorBaseWithPollrate::Enable(handle, enable, false);
+        if (err < 0) {
+            if (lock_en_mutex) {
+                pthread_mutex_unlock(&enable_mutex);
+            }
+
+            return err;
+        }
+
+        if (GetStatus(false) != old_status) {
+            gyroCalibration.reset(currentBias);
+        }
+
         if (lock_en_mutex) {
             pthread_mutex_unlock(&enable_mutex);
         }
 
-        return err;
+        return 0;
     }
 
-    if (GetStatus(false) != old_status) {
-        iNemoEngine_API_gbias_enable(enable);
-    }
-
-    if (lock_en_mutex) {
-        pthread_mutex_unlock(&enable_mutex);
-    }
-
-    return 0;
-#else /* CONFIG_ST_HAL_GYRO_GBIAS_ESTIMATION_ENABLED */
     return HWSensorBaseWithPollrate::Enable(handle, enable, lock_en_mutex);
-#endif /* CONFIG_ST_HAL_GYRO_GBIAS_ESTIMATION_ENABLED */
-}
-
-int Gyroscope::SetDelay(int handle, int64_t period_ns, int64_t timeout, bool lock_en_mutex)
-{
-#ifdef CONFIG_ST_HAL_GYRO_GBIAS_ESTIMATION_ENABLED
-    int err;
-
-    if (lock_en_mutex) {
-        pthread_mutex_lock(&enable_mutex);
-    }
-
-    err = HWSensorBaseWithPollrate::SetDelay(handle, period_ns, timeout, false);
-    if (err < 0) {
-        if (lock_en_mutex) {
-            pthread_mutex_unlock(&enable_mutex);
-        }
-
-        return err;
-    }
-
-    if (lock_en_mutex) {
-        pthread_mutex_unlock(&enable_mutex);
-    }
-
-    return 0;
-#else /* CONFIG_ST_HAL_GYRO_GBIAS_ESTIMATION_ENABLED */
-    return HWSensorBaseWithPollrate::SetDelay(handle, period_ns, timeout, lock_en_mutex);
-#endif /* CONFIG_ST_HAL_GYRO_GBIAS_ESTIMATION_ENABLED */
 }
 
 void Gyroscope::ProcessData(SensorBaseData *data)
 {
     float tmp_raw_data[SENSOR_DATA_3AXIS];
-#ifdef CONFIG_ST_HAL_GYRO_GBIAS_ESTIMATION_ENABLED
-    int err, nomaxdata = 10;
-    SensorBaseData accel_data;
-#endif /* CONFIG_ST_HAL_GYRO_GBIAS_ESTIMATION_ENABLED */
 
     memcpy(tmp_raw_data, data->raw, SENSOR_DATA_3AXIS * sizeof(float));
 
-    data->raw[0] = SENSOR_X_DATA(tmp_raw_data[0], tmp_raw_data[1], tmp_raw_data[2], CONFIG_ST_HAL_GYRO_ROT_MATRIX);
-    data->raw[1] = SENSOR_Y_DATA(tmp_raw_data[0], tmp_raw_data[1], tmp_raw_data[2], CONFIG_ST_HAL_GYRO_ROT_MATRIX);
-    data->raw[2] = SENSOR_Z_DATA(tmp_raw_data[0], tmp_raw_data[1], tmp_raw_data[2], CONFIG_ST_HAL_GYRO_ROT_MATRIX);
+    data->raw[0] = SENSOR_X_DATA(tmp_raw_data[0],
+                                 tmp_raw_data[1],
+                                 tmp_raw_data[2],
+                                 CONFIG_ST_HAL_GYRO_ROT_MATRIX);
+    data->raw[1] = SENSOR_Y_DATA(tmp_raw_data[0],
+                                 tmp_raw_data[1],
+                                 tmp_raw_data[2],
+                                 CONFIG_ST_HAL_GYRO_ROT_MATRIX);
+    data->raw[2] = SENSOR_Z_DATA(tmp_raw_data[0],
+                                 tmp_raw_data[1],
+                                 tmp_raw_data[2],
+                                 CONFIG_ST_HAL_GYRO_ROT_MATRIX);
 
 #ifdef CONFIG_ST_HAL_FACTORY_CALIBRATION
     data->raw[0] = (data->raw[0] - factory_offset[0]) * factory_scale[0];
@@ -148,31 +135,42 @@ void Gyroscope::ProcessData(SensorBaseData *data)
     data->raw[2] = (data->raw[2] - factory_offset[2]) * factory_scale[2];
 #endif /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
 
-#ifdef CONFIG_ST_HAL_GYRO_GBIAS_ESTIMATION_ENABLED
-    do {
-        err = GetLatestValidDataFromDependency(SENSOR_DEPENDENCY_ID_0, &accel_data, data->timestamp);
-        if (err < 0) {
-            nomaxdata--;
-            usleep(10);
-            continue;
-        }
-    } while ((nomaxdata >= 0) && (err < 0));
+    if (HAL_ENABLE_GYRO_CALIBRATION != 0) {
+        SensorBaseData accel_data;
+        int err, nomaxdata = 10;
 
-    if (nomaxdata > 0) {
-        if (gbias_last_pollrate != data->pollrate_ns) {
-            gbias_last_pollrate = data->pollrate_ns;
-            iNemoEngine_API_gbias_set_frequency(NS_TO_FREQUENCY(data->pollrate_ns));
+        do {
+            err = GetLatestValidDataFromDependency(SENSOR_DEPENDENCY_ID_0, &accel_data, data->timestamp);
+            if (err < 0) {
+                nomaxdata--;
+                std::this_thread::sleep_for(std::chrono::microseconds(10));
+                continue;
+            }
+        } while ((nomaxdata >= 0) && (err < 0));
+
+        if (nomaxdata > 0) {
+            if (gbias_last_pollrate != data->pollrate_ns) {
+                gbias_last_pollrate = data->pollrate_ns;
+                gyroCalibration.setFrequency(NS_TO_FREQUENCY(data->pollrate_ns));
+            }
+
+            std::array<float, 3> accelData({ accel_data.raw[0], accel_data.raw[0], accel_data.raw[0] });
+            std::array<float, 3> gyroData({ data->raw[0], data->raw[0], data->raw[0] });
+            gyroCalibration.run(accelData, gyroData, data->timestamp);
         }
 
-        iNemoEngine_API_gbias_Run(accel_data.raw, data->raw);
+        Matrix<3, 4, float> bias;
+        gyroCalibration.getBias(bias);
+
+        data->offset[0] = bias[0][3];
+        data->offset[1] = bias[1][3];
+        data->offset[2] = bias[2][3];
+
+        data->accuracy = SENSOR_STATUS_ACCURACY_HIGH;
+    } else {
+        data->accuracy = SENSOR_STATUS_UNRELIABLE;
+        memset(data->offset, 0, 3 * sizeof(float));
     }
-
-    iNemoEngine_API_Get_gbias(data->offset);
-
-    data->accuracy = SENSOR_STATUS_ACCURACY_HIGH;
-#else /* CONFIG_ST_HAL_GYRO_GBIAS_ESTIMATION_ENABLED */
-    data->accuracy = SENSOR_STATUS_UNRELIABLE;
-#endif /* CONFIG_ST_HAL_GYRO_GBIAS_ESTIMATION_ENABLED */
 
     data->processed[0] = data->raw[0] - data->offset[0];
     data->processed[1] = data->raw[1] - data->offset[1];
