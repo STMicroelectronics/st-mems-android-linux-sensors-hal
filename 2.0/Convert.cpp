@@ -185,8 +185,12 @@ static bool isSpecial(const V1_0::SensorType &sensorType)
     return false;
 }
 
-static int64_t convertFromHzToUs(float hz)
+static int32_t convertFromHzToUs(float hz)
 {
+    if (hz < 1e-9) {
+        return 0;
+    }
+
     return 1e6 / hz;
 }
 
