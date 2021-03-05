@@ -100,6 +100,12 @@ Event AdditionalInfoManager::makeSensorPlacementFrame(int sensorHandle, int seri
     sensorEvent.u.additional.type = ::android::hardware::sensors::V1_0::AdditionalInfoType::AINFO_SENSOR_PLACEMENT;
     sensorEvent.u.additional.u.data_float = placements[sensorHandle].getPayload().data();
 
+    constexpr size_t OutDataLen = sizeof(sensorEvent.u.additional.u.data_float) / sizeof(float);
+
+    for (size_t i = placements[sensorHandle].getPayload().size(); i < OutDataLen; ++i) {
+        sensorEvent.u.additional.u.data_float[i] = 0.0f;
+    }
+
     return sensorEvent;
 }
 

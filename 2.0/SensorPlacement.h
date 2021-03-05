@@ -18,7 +18,9 @@
 #pragma once
 
 #include <array>
+#include <string>
 
+#include <IConsole.h>
 #include <SensorType.h>
 
 struct SensorPlacement {
@@ -35,4 +37,11 @@ private:
      * Sensor placement payload (4x3 matrix)
      */
     std::array<float, 12> data;
+
+    /**
+     * Print console
+     */
+    stm::core::IConsole &console = stm::core::IConsole::getInstance();
+
+    bool parsePropValue(std::string value, std::array<float, 12> &placement) const;
 };
