@@ -36,11 +36,11 @@ int64_t Utils::getTime(void) const
 {
     struct timespec ts;
 
-    if (clock_gettime(CLOCK_REALTIME, &ts)) {
-      return 0;
+    if (clock_gettime(CLOCK_BOOTTIME, &ts)) {
+      return -1;
     }
 
-    return (ts.tv_sec * 1000000000) + ts.tv_nsec;
+    return (ts.tv_sec * 1e9) + ts.tv_nsec;
 }
 
 IUtils& IUtils::getInstance(void)
