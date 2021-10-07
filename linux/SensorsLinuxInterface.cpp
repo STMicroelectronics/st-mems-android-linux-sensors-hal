@@ -72,3 +72,31 @@ SensorsLinuxInterface::onNewSensorsData(const std::vector<ISTMSensorsCallbackDat
 {
     (void) sensorsData;
 }
+
+/**
+ * onSaveDataRequest: receive data to store,
+ *                    reference: ISTMSensorsCallbackData class
+ */
+int SensorsLinuxInterface::onSaveDataRequest(const std::string& resourceID,
+                                             const void *data, ssize_t len)
+{
+    (void) resourceID;
+    (void) data;
+    (void) len;
+
+    return 0;
+}
+
+/**
+ * onLoadDataRequest: load data from disk,
+ *                    reference: ISTMSensorsCallbackData class
+ */
+int SensorsLinuxInterface::onLoadDataRequest(const std::string& resourceID,
+                                             void *data, ssize_t len)
+{
+    (void) resourceID;
+    (void) data;
+    (void) len;
+
+    return 0;
+}

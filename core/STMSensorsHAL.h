@@ -66,6 +66,24 @@ private:
         {
             (void) sensorsData;
         }
+
+        int onSaveDataRequest(const std::string& resourceID, const void *data, ssize_t len) override
+        {
+            (void) resourceID;
+            (void) data;
+            (void) len;
+
+            return -EIO;
+        }
+
+        int onLoadDataRequest(const std::string& resourceID, void *data, ssize_t len) override
+        {
+            (void) resourceID;
+            (void) data;
+            (void) len;
+
+            return -EIO;
+        }
     };
 
     /**

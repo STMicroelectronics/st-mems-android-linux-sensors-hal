@@ -244,6 +244,34 @@ void SensorsLegacyInterface::onNewSensorsData(const std::vector<ISTMSensorsCallb
 }
 
 /**
+ * onSaveDataRequest: receive data to store,
+ *                    reference: ISTMSensorsCallbackData class
+ */
+int SensorsLegacyInterface::onSaveDataRequest(const std::string& resourceID,
+                                              const void *data, ssize_t len)
+{
+    (void) resourceID;
+    (void) data;
+    (void) len;
+
+    return -EIO;
+}
+
+/**
+ * onLoadDataRequest: load data from disk,
+ *                    reference: ISTMSensorsCallbackData class
+ */
+int SensorsLegacyInterface::onLoadDataRequest(const std::string& resourceID,
+                                              void *data, ssize_t len)
+{
+    (void) resourceID;
+    (void) data;
+    (void) len;
+
+    return -EIO;
+}
+
+/**
  * initializePipe: initialize pipe used to send data to framework thread
  *
  * Return value: 0 on success, else a negative error code.

@@ -93,6 +93,10 @@ public:
 
     void onNewSensorsData(const std::vector<ISTMSensorsCallbackData> &sensorsData) override;
 
+    int onSaveDataRequest(const std::string& resourceID, const void *data, ssize_t len) override;
+
+    int onLoadDataRequest(const std::string& resourceID, void *data, ssize_t len) override;
+
     void postEvents(const std::vector<Event> &events, bool wakeup);
 
 private:

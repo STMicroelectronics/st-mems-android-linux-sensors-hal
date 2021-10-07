@@ -18,6 +18,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 #include <ISTMSensorsCallbackData.h>
 
@@ -33,6 +34,26 @@ public:
      * @sensorsData: object reference containing all the data.
      */
     virtual void onNewSensorsData(const std::vector<ISTMSensorsCallbackData> &sensorsData) = 0;
+
+    /**
+     * onSaveDataRequest: called whenever a resource needs to be written to disk
+     * @resourceID: identifier of the resource.
+     * @data: data pointer.
+     * @len: data buffer size.
+     *
+     * Return value: number of bytes written on success, else a negative error code.
+     */
+    virtual int onSaveDataRequest(const std::string& resourceID, const void *data, ssize_t len) = 0;
+
+    /**
+     * onLoadDataRequest: called whenever a resource needs to be loaded from disk
+     * @resourceID: identifier of the resource.
+     * @data: data pointer.
+     * @len: data buffer size.
+     *
+     * Return value: number of bytes read on success, else a negative error code.
+     */
+    virtual int onLoadDataRequest(const std::string& resourceID, void *data, ssize_t len) = 0;
 };
 
 } // namespace core

@@ -484,6 +484,42 @@ SensorsHidlInterface::onNewSensorsData(const std::vector<ISTMSensorsCallbackData
 }
 
 /**
+ * onSaveDataRequest: store persistent data to disk
+ * @resourceID: identifier of the resource.
+ * @data: data pointer.
+ * @len: data buffer size.
+ *
+ * Return value: number of bytes written on success, else a negative error code.
+ */
+int SensorsHidlInterface::onSaveDataRequest(const std::string& resourceID,
+                                            const void *data, ssize_t len)
+{
+    (void) resourceID;
+    (void) data;
+    (void) len;
+
+    return -EIO;
+}
+
+/**
+ * onLoadDataRequest: load previously stored data from disk
+ * @resourceID: identifier of the resource.
+ * @data: data pointer.
+ * @len: data buffer size.
+ *
+ * Return value: number of bytes read on success, else a negative error code.
+ */
+int SensorsHidlInterface::onLoadDataRequest(const std::string& resourceID,
+                                            void *data, ssize_t len)
+{
+    (void) resourceID;
+    (void) data;
+    (void) len;
+
+    return -EIO;
+}
+
+/**
  * postEvents: write sensors events to queue
  * @events: sensor events
  * @wakeup: true if it's a wakeup sensor
