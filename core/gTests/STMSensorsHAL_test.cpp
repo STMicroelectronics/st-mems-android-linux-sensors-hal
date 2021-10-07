@@ -38,7 +38,7 @@ class STMSensorsCallback : public ISTMSensorsCallback {
 class STMSensorsHALTest : public ::testing::Test {
 public:
     const STMSensorsCallback sensorsCallback;
-    STMSensorsHAL hal;
+    STMSensorsHAL &hal = STMSensorsHAL::getInstance();
 
 protected:
     void SetUp() override {

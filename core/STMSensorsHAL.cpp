@@ -26,6 +26,13 @@
 namespace stm {
 namespace core {
 
+STMSensorsHAL& STMSensorsHAL::getInstance(void)
+{
+    static STMSensorsHAL instance;
+
+    return instance;
+}
+
 STMSensorsHAL::STMSensorsHAL(void)
               : sensorsCallback(&emptySTMSensorCallback),
                 console(IConsole::getInstance()),

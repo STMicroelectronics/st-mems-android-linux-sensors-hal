@@ -23,9 +23,7 @@ namespace core {
 
 ISTMSensorsHAL& ISTMSensorsHAL::getInstance(void)
 {
-    static STMSensorsHAL instance;
-
-    return instance;
+    return STMSensorsHAL::getInstance();
 }
 
 } // namespace core

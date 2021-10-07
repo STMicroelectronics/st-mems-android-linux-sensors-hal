@@ -28,7 +28,7 @@ namespace core {
 
 class STMSensorsHAL : public ISTMSensorsHAL {
 public:
-    STMSensorsHAL(void);
+    static STMSensorsHAL& getInstance(void);
     ~STMSensorsHAL(void);
 
     void initialize(const ISTMSensorsCallback &sensorsCallback) final;
@@ -44,6 +44,8 @@ public:
     int flushData(uint32_t handle) final;
 
 private:
+    STMSensorsHAL(void);
+
     /**
      * Sensors list
      */
