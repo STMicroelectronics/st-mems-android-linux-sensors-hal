@@ -38,7 +38,7 @@ int STMMagnCalibration::init(float magnRange)
     return 0;
 }
 
-int STMMagnCalibration::reset(const Matrix<3, 4, float> &initialBias)
+int STMMagnCalibration::reset(const Matrix<4, 3, float> &initialBias)
 {
     outBias = initialBias;
     lastTimestamp = 1;
@@ -67,7 +67,7 @@ int STMMagnCalibration::run(const std::array<float, 3> &magnData,
     return 0;
 }
 
-int STMMagnCalibration::getBias(Matrix<3, 4, float> &bias) const
+int STMMagnCalibration::getBias(Matrix<4, 3, float> &bias) const
 {
     bias = outBias;
 
@@ -81,7 +81,7 @@ const std::string& STMMagnCalibration::getLibVersion(void) const
     return libVersion;
 }
 
-void STMMagnCalibration::resetBiasMatrix(Matrix<3, 4, float> &bias)
+void STMMagnCalibration::resetBiasMatrix(Matrix<4, 3, float> &bias)
 {
     for (auto i = 0; i < bias.numRows(); ++i) {
         for (auto j = 0; j < bias.numColumns(); ++j) {

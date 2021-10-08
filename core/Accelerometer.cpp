@@ -127,7 +127,7 @@ void Accelerometer::ProcessData(SensorBaseData *data)
 
     if (HAL_ENABLE_ACCEL_CALIBRATION != 0) {
         std::array<float, 3> accelData;
-        Matrix<3, 4, float> bias;
+        Matrix<4, 3, float> bias;
 
         memcpy(accelData.data(), data->raw, 3 * sizeof(float));
 
@@ -139,9 +139,9 @@ void Accelerometer::ProcessData(SensorBaseData *data)
         accelCalibration.run(accelData, data->timestamp);
         accelCalibration.getBias(bias);
 
-        data->offset[0] = bias[0][3];
-        data->offset[1] = bias[1][3];
-        data->offset[2] = bias[2][3];
+        data->offset[0] = bias[3][0];
+        data->offset[1] = bias[3][1];
+        data->offset[2] = bias[3][2];
 
         data->accuracy = SENSOR_STATUS_ACCURACY_HIGH;
     } else {

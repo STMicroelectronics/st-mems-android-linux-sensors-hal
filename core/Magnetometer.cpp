@@ -126,7 +126,7 @@ void Magnetometer::ProcessData(SensorBaseData *data)
 
     if (HAL_ENABLE_MAGN_CALIBRATION != 0) {
         std::array<float, 3> magnData;
-        Matrix<3, 4, float> bias;
+        Matrix<4, 3, float> bias;
 
         memcpy(magnData.data(), data->raw, 3 * sizeof(float));
 
@@ -138,9 +138,9 @@ void Magnetometer::ProcessData(SensorBaseData *data)
         magnCalibration.run(magnData, data->timestamp);
         magnCalibration.getBias(bias);
 
-        data->offset[0] = bias[0][3];
-        data->offset[1] = bias[1][3];
-        data->offset[2] = bias[2][3];
+        data->offset[0] = bias[3][0];
+        data->offset[1] = bias[3][1];
+        data->offset[2] = bias[3][2];
 
         data->accuracy = SENSOR_STATUS_ACCURACY_HIGH;
     } else {

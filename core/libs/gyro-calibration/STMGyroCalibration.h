@@ -35,7 +35,7 @@ struct STMGyroCalibration {
              float accelRange,
              float gyroRange);
 
-    int reset(const Matrix<3, 4, float> &initialBias);
+    int reset(const Matrix<4, 3, float> &initialBias);
 
     int setFrequency(int frequencyHz);
 
@@ -43,18 +43,18 @@ struct STMGyroCalibration {
             const std::array<float, 3> &gyroData,
             int64_t timestamp);
 
-    int getBias(Matrix<3, 4, float> &bias) const;
+    int getBias(Matrix<4, 3, float> &bias) const;
 
     const std::string& getLibVersion(void) const;
 
-    static void resetBiasMatrix(Matrix<3, 4, float> &bias);
+    static void resetBiasMatrix(Matrix<4, 3, float> &bias);
 
     static int getMinFrequencyHz(void);
 
     static int getMaxFrequencyHz(void);
 
 private:
-    Matrix<3, 4, float> outBias;
+    Matrix<4, 3, float> outBias;
     int64_t lastTimestamp;
 
     STMGyroCalibration(void);

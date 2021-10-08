@@ -44,7 +44,7 @@ int STMGyroCalibration::init(float accelThreshold,
     return 0;
 }
 
-int STMGyroCalibration::reset(const Matrix<3, 4, float> &initialBias)
+int STMGyroCalibration::reset(const Matrix<4, 3, float> &initialBias)
 {
     outBias = initialBias;
     lastTimestamp = 1;
@@ -75,7 +75,7 @@ int STMGyroCalibration::run(const std::array<float, 3> &accelData,
     return 0;
 }
 
-int STMGyroCalibration::getBias(Matrix<3, 4, float> &bias) const
+int STMGyroCalibration::getBias(Matrix<4, 3, float> &bias) const
 {
     bias = outBias;
 
@@ -89,7 +89,7 @@ const std::string& STMGyroCalibration::getLibVersion(void) const
     return libVersion;
 }
 
-void STMGyroCalibration::resetBiasMatrix(Matrix<3, 4, float> &bias)
+void STMGyroCalibration::resetBiasMatrix(Matrix<4, 3, float> &bias)
 {
     for (auto i = 0; i < bias.numRows(); ++i) {
         for (auto j = 0; j < bias.numColumns(); ++j) {

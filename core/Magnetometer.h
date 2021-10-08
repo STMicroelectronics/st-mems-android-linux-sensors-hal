@@ -40,7 +40,7 @@ public:
     virtual void ProcessData(SensorBaseData *data);
 
 private:
-    Matrix<3, 4, float> currentBias;
+    Matrix<4, 3, float> currentBias;
     STMMagnCalibration& magnCalibration;
 };
 

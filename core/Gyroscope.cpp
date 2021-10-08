@@ -159,12 +159,12 @@ void Gyroscope::ProcessData(SensorBaseData *data)
             gyroCalibration.run(accelData, gyroData, data->timestamp);
         }
 
-        Matrix<3, 4, float> bias;
+        Matrix<4, 3, float> bias;
         gyroCalibration.getBias(bias);
 
-        data->offset[0] = bias[0][3];
-        data->offset[1] = bias[1][3];
-        data->offset[2] = bias[2][3];
+        data->offset[0] = bias[3][0];
+        data->offset[1] = bias[3][1];
+        data->offset[2] = bias[3][2];
 
         data->accuracy = SENSOR_STATUS_ACCURACY_HIGH;
     } else {

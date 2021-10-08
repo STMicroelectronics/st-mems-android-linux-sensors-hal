@@ -38,7 +38,7 @@ int STMAccelCalibration::init(float accelRange)
     return 0;
 }
 
-int STMAccelCalibration::reset(const Matrix<3, 4, float> &initialBias)
+int STMAccelCalibration::reset(const Matrix<4, 3, float> &initialBias)
 {
     outBias = initialBias;
     lastTimestamp = 1;
@@ -68,7 +68,7 @@ int STMAccelCalibration::run(const std::array<float, 3> &accelData,
     return 0;
 }
 
-int STMAccelCalibration::getBias(Matrix<3, 4, float> &bias) const
+int STMAccelCalibration::getBias(Matrix<4, 3, float> &bias) const
 {
     bias = outBias;
 
@@ -82,7 +82,7 @@ const std::string& STMAccelCalibration::getLibVersion(void) const
     return libVersion;
 }
 
-void STMAccelCalibration::resetBiasMatrix(Matrix<3, 4, float> &bias)
+void STMAccelCalibration::resetBiasMatrix(Matrix<4, 3, float> &bias)
 {
     for (auto i = 0; i < bias.numRows(); ++i) {
         for (auto j = 0; j < bias.numColumns(); ++j) {
