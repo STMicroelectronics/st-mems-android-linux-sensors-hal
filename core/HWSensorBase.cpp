@@ -686,7 +686,7 @@ void HWSensorBase::ThreadDataTask()
                 pthread_mutex_unlock(&sample_in_processing_mutex);
 
                 timestamp_odr_switch = odr_switch.readLastElement(&new_pollrate);
-                if (sensor_data.timestamp > timestamp_odr_switch) {
+                if ((timestamp_odr_switch >= 0) && (sensor_data.timestamp > timestamp_odr_switch)) {
                     sensor_data.pollrate_ns = new_pollrate;
                     old_pollrate = new_pollrate;
                     odr_switch.removeLastElement();
