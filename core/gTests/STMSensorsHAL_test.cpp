@@ -55,10 +55,11 @@ class STMSensorsCallback : public ISTMSensorsCallback {
 
 class STMSensorsHALTest : public ::testing::Test {
 public:
-    const STMSensorsCallback sensorsCallback;
-    STMSensorsHAL &hal = STMSensorsHAL::getInstance();
+    ISTMSensorsHAL &hal = ISTMSensorsHAL::getInstance();
 
 protected:
+    const STMSensorsCallback sensorsCallback;
+
     void SetUp() override {
         hal.initialize(sensorsCallback);
     }
@@ -100,7 +101,7 @@ int64_t Utils::getTime(void) const
 {
     struct timespec ts;
 
-    if (clock_gettime(CLOCK_REALTIME, &ts)) {
+    if (clock_gettime(CLOCK_BOOTTIME, &ts)) {
       return 0;
     }
 
