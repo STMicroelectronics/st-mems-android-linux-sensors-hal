@@ -59,20 +59,13 @@ public:
         void invalidate() { valid = false; };
     };
 
-    class iterator : public std::iterator<std::output_iterator_tag, Node> {
-    public:
-        explicit iterator(Graph<T> &graph, int index): ptr(graph), index(index) {}
-        Node& operator*() const { return ptr.adjList[index]; };
-        iterator& operator++() { index++; return *this; };
-        bool operator!=(const iterator &rhs) const { return index != rhs.index; };
+    auto begin() { return adjList.begin(); }
 
-    private:
-        Graph<T> &ptr;
-        int index;
-    };
+    auto end() { return adjList.end(); }
 
-    iterator begin() { return iterator(*this, 0); }
-    iterator end() { return iterator(*this, adjList.size()); }
+    auto cbegin() const { return adjList.cbegin(); }
+
+    auto cend() const { return adjList.cend(); }
 
 private:
     int ids;
