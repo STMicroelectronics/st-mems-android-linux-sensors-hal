@@ -56,6 +56,7 @@
 #include "DeviceOrientation.h"
 #include "utils.h"
 #include "SensorsSupported.h"
+#include "sensors_legacy.h"
 
 namespace stm {
 namespace core {
@@ -818,10 +819,13 @@ int st_hal_open_sensors(void **pdata, STMSensorsList &sensorsList)
     if (deviceFoundNum < 0) {
         console.error("Failed to read IIO sensors");
         free(*pdata);
+        *pdata = nullptr;
         return deviceFoundNum;
     }
     if (iioDataList.size() == 0) {
         console.error("No IIO sensors found!");
+        free(*pdata);
+        *pdata = nullptr;
         return 0;
     }
 
@@ -941,6 +945,19 @@ int st_hal_open_sensors(void **pdata, STMSensorsList &sensorsList)
     console.debug(std::to_string(sensorsList.getList().size()) + " sensors available and ready");
 
     return 0;
+}
+
+void st_hal_dev_set_callbacks(void *data, const ISTMSensorsCallback &sensorsCallback)
+{
+    STSensorHAL_data *hal_data = (STSensorHAL_data *)data;
+
+    for (auto &node : hal_data->graph) {
+        node.payload->setCallbacks(sensorsCallback);
+    }
+
+    for (auto &node : hal_data->graph) {
+        node.payload->libsInit();
+    }
 }
 
 /**

@@ -33,15 +33,18 @@ public:
               struct device_iio_sampling_freqs *sfa, int handle,
               unsigned int hw_fifo_len, float power_consumption, bool wakeup);
 
-    int64_t gbias_last_pollrate;
+    int64_t bias_last_pollrate;
 
-    virtual int CustomInit();
+    virtual int libsInit(void) override;
     virtual int Enable(int handle, bool enable, bool lock_en_mutex);
     virtual void ProcessData(SensorBaseData *data);
 
 private:
-    Matrix<4, 3, float> currentBias;
     STMGyroCalibration& gyroCalibration;
+
+    void saveBiasValues(void) const;
+
+    void loadBiasValues(void);
 };
 
 } // namespace core

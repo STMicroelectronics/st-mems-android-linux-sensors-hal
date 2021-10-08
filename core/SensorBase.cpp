@@ -30,7 +30,8 @@ namespace core {
 static IConsole &console { IConsole::getInstance() };
 
 SensorBase::SensorBase(const char *name, int handle, const STMSensorType &type)
-    : sensor_t_data(type)
+    : sensor_t_data(type),
+      sensorsCallback(nullptr)
 {
     int i, err, pipe_fd[2];
 
@@ -725,6 +726,11 @@ bool SensorBase::hasEventChannels()
 bool SensorBase::hasDataChannels()
 {
     return false;
+}
+
+void SensorBase::setCallbacks(const ISTMSensorsCallback &sensorsCallback)
+{
+    this->sensorsCallback = (ISTMSensorsCallback *)&sensorsCallback;
 }
 
 } // namespace core

@@ -34,6 +34,9 @@ public:
     SWAccelGyroFusion6X(const char *name, int handle);
 
     virtual int CustomInit();
+
+    virtual int libsInit(void) override;
+
     virtual int Enable(int handle, bool enable, bool lock_en_mutex);
     virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout, bool lock_en_mutex);
     virtual void ProcessData(SensorBaseData *data);

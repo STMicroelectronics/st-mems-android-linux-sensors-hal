@@ -42,6 +42,15 @@ SWAccelGyroFusion6X::SWAccelGyroFusion6X(const char *name, int handle)
 
 int SWAccelGyroFusion6X::CustomInit()
 {
+    if (HAL_ENABLE_SENSORS_FUSION == 0) {
+        InvalidThisClass();
+    }
+
+    return 0;
+}
+
+int SWAccelGyroFusion6X::libsInit(void)
+{
     std::string libVersionMsg { "sensors fusion (6X) library: " };
     int err = 0;
 
@@ -50,7 +59,6 @@ int SWAccelGyroFusion6X::CustomInit()
 
         err = sensorsFusion.init();
     } else {
-        InvalidThisClass();
         libVersionMsg += std::string("not enabled!");
     }
 

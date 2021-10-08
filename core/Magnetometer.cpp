@@ -36,6 +36,7 @@ Magnetometer::Magnetometer(HWSensorBaseCommonData *data, const char *name,
     : HWSensorBaseWithPollrate(data, name, sfa, handle,
                                MagnSensorType,
                                hw_fifo_len, power_consumption),
+      bias_last_pollrate(0),
       magnCalibration(STMMagnCalibration::getInstance())
 {
     (void) wakeup;
@@ -45,21 +46,22 @@ Magnetometer::Magnetometer(HWSensorBaseCommonData *data, const char *name,
     sensor_event.data.dataLen = 3;
 }
 
-int Magnetometer::CustomInit()
+int Magnetometer::libsInit(void)
 {
     std::string libVersionMsg { "magn calibration library: " };
     int err = 0;
 
     if (HAL_ENABLE_MAGN_CALIBRATION != 0) {
         libVersionMsg += magnCalibration.getLibVersion();
+        console.info(libVersionMsg);
 
-        magnCalibration.resetBiasMatrix(currentBias);
         err = magnCalibration.init(sensor_t_data.maxRange);
+
+        loadBiasValues();
     } else {
         libVersionMsg += std::string("not enabled!");
+        console.info(libVersionMsg);
     }
-
-    console.info(libVersionMsg);
 
     return err;
 }
@@ -85,8 +87,9 @@ int Magnetometer::Enable(int handle, bool enable, bool lock_en_mutex)
             return err;
         }
 
-        if (GetStatus(false) != old_status) {
-            magnCalibration.reset(currentBias);
+        bool new_status = GetStatus(false);
+        if (!new_status && (new_status != old_status)) {
+            saveBiasValues();
         }
 
         if (lock_en_mutex) {
@@ -97,6 +100,34 @@ int Magnetometer::Enable(int handle, bool enable, bool lock_en_mutex)
     }
 
     return HWSensorBaseWithPollrate::Enable(handle, enable, lock_en_mutex);
+}
+
+void Magnetometer::saveBiasValues(void) const
+{
+    Matrix<4, 3, float> bias;
+
+    magnCalibration.getBias(bias);
+
+    if (sensorsCallback != nullptr) {
+        if (sensorsCallback->onSaveDataRequest("magn_bias.dat", &bias, sizeof(bias))) {
+            console.error("failed to save magn bias");
+        }
+    }
+}
+
+void Magnetometer::loadBiasValues(void)
+{
+    Matrix<4, 3, float> bias;
+
+    magnCalibration.resetBiasMatrix(bias);
+
+    if (sensorsCallback != nullptr) {
+        if (sensorsCallback->onLoadDataRequest("magn_bias.dat", &bias, sizeof(bias))) {
+            console.error("failed to load magn bias");
+        }
+    }
+
+    magnCalibration.reset(bias);
 }
 
 void Magnetometer::ProcessData(SensorBaseData *data)

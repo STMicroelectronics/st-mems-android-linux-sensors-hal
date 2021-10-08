@@ -34,6 +34,7 @@ Accelerometer::Accelerometer(HWSensorBaseCommonData *data,
     : HWSensorBaseWithPollrate(data, name, sfa, handle,
                                AccelSensorType,
                                hw_fifo_len, power_consumption),
+      bias_last_pollrate(0),
       accelCalibration(STMAccelCalibration::getInstance())
 {
     (void) wakeup;
@@ -43,21 +44,22 @@ Accelerometer::Accelerometer(HWSensorBaseCommonData *data,
     sensor_event.data.dataLen = 3;
 }
 
-int Accelerometer::CustomInit()
+int Accelerometer::libsInit(void)
 {
     std::string libVersionMsg { "accel calibration library: " };
     int err = 0;
 
     if (HAL_ENABLE_ACCEL_CALIBRATION != 0) {
         libVersionMsg += accelCalibration.getLibVersion();
+        console.info(libVersionMsg);
 
-        accelCalibration.resetBiasMatrix(currentBias);
         err = accelCalibration.init(sensor_t_data.maxRange);
+
+        loadBiasValues();
     } else {
         libVersionMsg += std::string("not enabled!");
+        console.info(libVersionMsg);
     }
-
-    console.info(libVersionMsg);
 
     return err;
 }
@@ -83,8 +85,9 @@ int Accelerometer::Enable(int handle, bool enable, bool lock_en_mutex)
             return err;
         }
 
-        if (GetStatus(false) != old_status) {
-            accelCalibration.reset(currentBias);
+        bool new_status = GetStatus(false);
+        if (!new_status && (new_status != old_status)) {
+            saveBiasValues();
         }
 
         if (lock_en_mutex) {
@@ -95,6 +98,34 @@ int Accelerometer::Enable(int handle, bool enable, bool lock_en_mutex)
     }
 
     return HWSensorBaseWithPollrate::Enable(handle, enable, lock_en_mutex);
+}
+
+void Accelerometer::saveBiasValues(void) const
+{
+    Matrix<4, 3, float> bias;
+
+    accelCalibration.getBias(bias);
+
+    if (sensorsCallback != nullptr) {
+        if (sensorsCallback->onSaveDataRequest("accel_bias.dat", &bias, sizeof(bias))) {
+            console.error("failed to save accel bias");
+        }
+    }
+}
+
+void Accelerometer::loadBiasValues(void)
+{
+    Matrix<4, 3, float> bias;
+
+    accelCalibration.resetBiasMatrix(bias);
+
+    if (sensorsCallback != nullptr) {
+        if (sensorsCallback->onLoadDataRequest("accel_bias.dat", &bias, sizeof(bias))) {
+            console.error("failed to load accel bias");
+        }
+    }
+
+    accelCalibration.reset(bias);
 }
 
 void Accelerometer::ProcessData(SensorBaseData *data)

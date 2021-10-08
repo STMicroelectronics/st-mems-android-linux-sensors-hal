@@ -40,7 +40,16 @@ SWAccelMagnGyroFusion9X::SWAccelMagnGyroFusion9X(const char *name, int handle)
     id_sensor_trigger = SENSOR_DEPENDENCY_ID_2;
 }
 
-int SWAccelMagnGyroFusion9X::CustomInit()
+int SWAccelMagnGyroFusion9X::CustomInit(void)
+{
+    if (HAL_ENABLE_SENSORS_FUSION == 0) {
+        InvalidThisClass();
+    }
+
+    return 0;
+}
+
+int SWAccelMagnGyroFusion9X::libsInit(void)
 {
     std::string libVersionMsg { "sensors fusion (9X) library: " };
     int err = 0;
@@ -50,14 +59,13 @@ int SWAccelMagnGyroFusion9X::CustomInit()
 
         err = sensorsFusion.init();
     } else {
-        InvalidThisClass();
         libVersionMsg += std::string("not enabled!");
     }
 
     console.info(libVersionMsg);
 
     return err;
-  }
+}
 
 int SWAccelMagnGyroFusion9X::Enable(int handle, bool enable, bool lock_en_mutex)
 {

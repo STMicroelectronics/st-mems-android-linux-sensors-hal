@@ -39,6 +39,7 @@
 #include <FlushBufferStack.h>
 #include <FlushRequested.h>
 #include <ChangeODRTimestampStack.h>
+#include <ISTMSensorsCallback.h>
 
 #ifdef CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS
 #include <SelfTest.h>
@@ -147,6 +148,8 @@ protected:
     std::unique_ptr<std::thread> dataThread;
     std::unique_ptr<std::thread> eventsThread;
 
+    ISTMSensorsCallback *sensorsCallback;
+
     void InvalidThisClass();
     bool GetStatusExcludeHandle(int handle);
     bool GetStatusOfHandle(int handle);
@@ -172,6 +175,8 @@ public:
     bool IsValidClass();
 
     virtual int CustomInit();
+
+    virtual int libsInit(void) { return 0; };
 
     STMSensorType GetType();
     char* GetName();
@@ -221,6 +226,8 @@ public:
 
     virtual bool hasEventChannels();
     virtual bool hasDataChannels();
+
+    void setCallbacks(const ISTMSensorsCallback &sensorsCallback);
 };
 
 } // namespace core

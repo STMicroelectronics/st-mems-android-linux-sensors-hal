@@ -30,6 +30,7 @@ Gyroscope::Gyroscope(HWSensorBaseCommonData *data, const char *name,
                      unsigned int hw_fifo_len, float power_consumption, bool wakeup)
     : HWSensorBaseWithPollrate(data, name, sfa, handle,
                                GyroSensorType, hw_fifo_len, power_consumption),
+      bias_last_pollrate(0),
       gyroCalibration(STMGyroCalibration::getInstance())
 {
     (void) wakeup;
@@ -43,34 +44,32 @@ Gyroscope::Gyroscope(HWSensorBaseCommonData *data, const char *name,
     }
 }
 
-int Gyroscope::CustomInit()
+int Gyroscope::libsInit(void)
 {
     std::string libVersionMsg { "gyro calibration library: " };
     int err = 0;
 
     if (HAL_ENABLE_GYRO_CALIBRATION != 0) {
         libVersionMsg += gyroCalibration.getLibVersion();
+        console.info(libVersionMsg);
 
 #ifdef CONFIG_ST_HAL_FACTORY_CALIBRATION
-        iNemoEngine_API_gbias_Initialization(factory_calibration_updated);
-
         if (factory_calibration_updated) {
             factory_calibration_updated = false;
         }
-#else  /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
-        gyroCalibration.resetBiasMatrix(currentBias);
+#endif /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
 
         // TODO fix the values used as parameters
-        err = gyroCalibration.init(0.0f,
-                                   0.0f,
-                                   0.0f,
+        err = gyroCalibration.init(1.0f,
+                                   1.0f,
+                                   20.0f,
                                    sensor_t_data.maxRange);
-#endif /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
+
+        loadBiasValues();
     } else {
         libVersionMsg += std::string("not enabled!");
+        console.info(libVersionMsg);
     }
-
-    console.info(libVersionMsg);
 
     return err;
 }
@@ -96,8 +95,9 @@ int Gyroscope::Enable(int handle, bool enable, bool lock_en_mutex)
             return err;
         }
 
-        if (GetStatus(false) != old_status) {
-            gyroCalibration.reset(currentBias);
+        bool new_status = GetStatus(false);
+        if (!new_status && (new_status != old_status)) {
+            saveBiasValues();
         }
 
         if (lock_en_mutex) {
@@ -108,6 +108,34 @@ int Gyroscope::Enable(int handle, bool enable, bool lock_en_mutex)
     }
 
     return HWSensorBaseWithPollrate::Enable(handle, enable, lock_en_mutex);
+}
+
+void Gyroscope::saveBiasValues(void) const
+{
+    Matrix<4, 3, float> bias;
+
+    gyroCalibration.getBias(bias);
+
+    if (sensorsCallback != nullptr) {
+        if (sensorsCallback->onSaveDataRequest("gyro_bias.dat", &bias, sizeof(bias))) {
+            console.error("failed to save gyro bias");
+        }
+    }
+}
+
+void Gyroscope::loadBiasValues(void)
+{
+    Matrix<4, 3, float> bias;
+
+    gyroCalibration.resetBiasMatrix(bias);
+
+    if (sensorsCallback != nullptr) {
+        if (sensorsCallback->onLoadDataRequest("gyro_bias.dat", &bias, sizeof(bias))) {
+            console.error("failed to load gyro bias");
+        }
+    }
+
+    gyroCalibration.reset(bias);
 }
 
 void Gyroscope::ProcessData(SensorBaseData *data)
@@ -149,13 +177,13 @@ void Gyroscope::ProcessData(SensorBaseData *data)
         } while ((nomaxdata >= 0) && (err < 0));
 
         if (nomaxdata > 0) {
-            if (gbias_last_pollrate != data->pollrate_ns) {
-                gbias_last_pollrate = data->pollrate_ns;
+            if (bias_last_pollrate != data->pollrate_ns) {
+                bias_last_pollrate = data->pollrate_ns;
                 gyroCalibration.setFrequency(NS_TO_FREQUENCY(data->pollrate_ns));
             }
 
-            std::array<float, 3> accelData({ accel_data.raw[0], accel_data.raw[0], accel_data.raw[0] });
-            std::array<float, 3> gyroData({ data->raw[0], data->raw[0], data->raw[0] });
+            std::array<float, 3> accelData({ accel_data.raw[0], accel_data.raw[1], accel_data.raw[2] });
+            std::array<float, 3> gyroData({ data->raw[0], data->raw[1], data->raw[2] });
             gyroCalibration.run(accelData, gyroData, data->timestamp);
         }
 

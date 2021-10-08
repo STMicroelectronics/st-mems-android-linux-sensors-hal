@@ -35,13 +35,17 @@ public:
 
     int64_t bias_last_pollrate;
 
-    virtual int CustomInit();
+    virtual int libsInit(void) override;
+
     virtual int Enable(int handle, bool enable, bool lock_en_mutex);
     virtual void ProcessData(SensorBaseData *data);
 
 private:
-    Matrix<4, 3, float> currentBias;
     STMMagnCalibration& magnCalibration;
+
+    void saveBiasValues(void) const;
+
+    void loadBiasValues(void);
 };
 
 } // namespace core

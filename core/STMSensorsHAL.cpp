@@ -91,6 +91,10 @@ void STMSensorsHAL::initialize(const ISTMSensorsCallback &sensorsCallback)
         activate(sensor.getHandle(), false);
     }
 
+    if (hal_data) {
+        st_hal_dev_set_callbacks(hal_data, sensorsCallback);
+    }
+
     this->sensorsCallback = (ISTMSensorsCallback *)&sensorsCallback;
 }
 
