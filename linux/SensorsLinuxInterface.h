@@ -39,6 +39,10 @@ public:
 
     int enable(uint32_t handle, bool enable);
 
+    int setRate(uint32_t handle,
+                int64_t samplingPeriodNanoSec,
+                int64_t maxReportLatencyNanoSec);
+
     void onNewSensorsData(const std::vector<ISTMSensorsCallbackData> &sensorsData) override;
 
     int onSaveDataRequest(const std::string& resourceID, const void *data, ssize_t len) override;

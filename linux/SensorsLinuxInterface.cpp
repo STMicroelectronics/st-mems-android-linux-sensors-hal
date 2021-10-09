@@ -53,7 +53,7 @@ const std::vector<STMSensor>& SensorsLinuxInterface::getSensorsList(void) const
 
 /**
  * enable: enable or disable specified sensor
- * @handle: sensor handle ID (retrieved from sensors list)
+ * @handle: sensor handle ID (retrieved from sensors list).
  * @enable: enable or disable flag.
  *
  * Return value: 0 on success, else a negative error code.
@@ -61,6 +61,21 @@ const std::vector<STMSensor>& SensorsLinuxInterface::getSensorsList(void) const
 int SensorsLinuxInterface::enable(uint32_t handle, bool enable)
 {
     return sensorsCore.activate(handle, enable);
+}
+
+/**
+ * setRate: set sensor sampling period and batch time
+ * @handle: sensor handle ID (retrieved from sensors list).
+ * @samplingPeriodNanoSec: sensor sampling period in nsec.
+ * @maxReportLatencyNanoSec: sensor batch time in nsec.
+ *
+ * Return value: 0 on success, else a negative error code.
+ */
+int SensorsLinuxInterface::setRate(uint32_t handle,
+                                  int64_t samplingPeriodNanoSec,
+                                  int64_t maxReportLatencyNanoSec)
+{
+    return sensorsCore.setRate(handle, samplingPeriodNanoSec, maxReportLatencyNanoSec);
 }
 
 /**
