@@ -66,11 +66,6 @@ protected:
     FlushRequested flush_requested;
     HWSensorBaseCommonData common_data;
     ChangeODRTimestampStack odr_switch;
-#ifdef CONFIG_ST_HAL_FACTORY_CALIBRATION
-    bool factory_calibration_updated;
-    float factory_offset[3];
-    float factory_scale[3];
-#endif /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
 #ifdef CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS
     struct selftest_data selftest;
 #endif /* CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS */
@@ -99,8 +94,6 @@ public:
 
     virtual int AddSensorDependency(SensorBase *p);
     virtual void RemoveSensorDependency(SensorBase *p);
-
-    int ApplyFactoryCalibrationData(char *filename, time_t *last_modification);
 
     virtual void ProcessData(SensorBaseData *data);
     virtual void ProcessEvent(struct device_iio_events *event_data);

@@ -233,15 +233,6 @@ HWSensorBase::HWSensorBase(HWSensorBaseCommonData *data, const char *name,
     sensor_t_data.power = power_consumption;
     sensor_t_data.fifoMaxEventCount = hw_fifo_len;
 
-#ifdef CONFIG_ST_HAL_FACTORY_CALIBRATION
-    memset(factory_offset, 0, 3 * sizeof(float));
-
-    factory_scale[0] = 1.0f;
-    factory_scale[1] = 1.0f;
-    factory_scale[2] = 1.0f;
-    factory_calibration_updated = false;
-#endif /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
-
 #ifdef CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS
     selftest.available = 0;
 #endif /* CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS */
@@ -492,58 +483,6 @@ void HWSensorBase::RemoveSensorDependency(SensorBase *p)
 {
     DeAllocateBufferForDependencyData(GetDependencyIDFromHandle(p->GetHandle()));
     SensorBase::RemoveSensorDependency(p);
-}
-
-int HWSensorBase::ApplyFactoryCalibrationData(char *filename, time_t *last_modification)
-{
-#ifdef CONFIG_ST_HAL_FACTORY_CALIBRATION
-    int err;
-    struct stat file_stat;
-    FILE *calibration_file;
-    double calibration_timediff;
-
-    err = stat(filename, &file_stat);
-    if (err < 0) {
-        return err;
-    }
-
-    calibration_timediff = difftime(file_stat.st_mtime, *last_modification);
-    if (calibration_timediff > 0) {
-        factory_calibration_updated = true;
-        *last_modification = file_stat.st_mtime;
-    }
-
-    calibration_file = fopen(filename, "r");
-    if (!calibration_file) {
-        return -errno;
-    }
-
-    err = fscanf(calibration_file, "%f,%f,%f\n",
-                 &factory_offset[0],
-                 &factory_offset[1],
-                 &factory_offset[2]);
-    if (err < 0) {
-        fclose(calibration_file);
-        return err;
-    }
-
-    err = fscanf(calibration_file, "%f,%f,%f\n",
-                 &factory_scale[0],
-                 &factory_scale[1],
-                 &factory_scale[2]);
-    if (err < 0) {
-        ALOGW("\"%s\": Failed to read factory scale values, it will be used default values.", GetName());
-    }
-
-    fclose(calibration_file);
-
-    return 0;
-#else /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
-    (void)filename;
-    (void)last_modification;
-
-    return 0;
-#endif /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
 }
 
 void HWSensorBase::ProcessEvent(struct device_iio_events *event_data)

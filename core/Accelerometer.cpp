@@ -147,14 +147,7 @@ void Accelerometer::ProcessData(SensorBaseData *data)
                                  tmp_raw_data[2],
                                  CONFIG_ST_HAL_ACCEL_ROT_MATRIX);
 
-#ifdef CONFIG_ST_HAL_FACTORY_CALIBRATION
-    data->raw[0] = (data->raw[0] - factory_offset[0]) * factory_scale[0];
-    data->raw[1] = (data->raw[1] - factory_offset[1]) * factory_scale[1];
-    data->raw[2] = (data->raw[2] - factory_offset[2]) * factory_scale[2];
-    data->accuracy = SENSOR_STATUS_ACCURACY_HIGH;
-#else /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
     data->accuracy = SENSOR_STATUS_UNRELIABLE;
-#endif /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
 
     if (HAL_ENABLE_ACCEL_CALIBRATION != 0) {
         std::array<float, 3> accelData;

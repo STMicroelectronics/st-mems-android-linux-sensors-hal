@@ -25,13 +25,9 @@
 
 #define ST_HAL_DATA_PATH				"/data/STSensorHAL"
 #define ST_HAL_PRIVATE_DATA_PATH			"/data/STSensorHAL/private_data.dat"
-#define ST_HAL_FACTORY_DATA_PATH			"/data/STSensorHAL/factory_calibration"
 #define ST_HAL_SELFTEST_DATA_PATH			"/data/STSensorHAL/selftest"
 #define ST_HAL_SELFTEST_CMD_DATA_PATH			"/data/STSensorHAL/selftest/cmd"
 #define ST_HAL_SELFTEST_RESULTS_DATA_PATH		"/data/STSensorHAL/selftest/results"
-#define ST_HAL_FACTORY_ACCEL_DATA_FILENAME		CONCATENATE_STRING(ST_HAL_FACTORY_DATA_PATH, "/accel.txt")
-#define ST_HAL_FACTORY_MAGN_DATA_FILENAME		CONCATENATE_STRING(ST_HAL_FACTORY_DATA_PATH, "/magn.txt")
-#define ST_HAL_FACTORY_GYRO_DATA_FILENAME		CONCATENATE_STRING(ST_HAL_FACTORY_DATA_PATH, "/gyro.txt")
 
 #define ST_HAL_IIO_MAX_DEVICES				(50)
 

@@ -53,12 +53,6 @@ int Gyroscope::libsInit(void)
         libVersionMsg += gyroCalibration.getLibVersion();
         console.info(libVersionMsg);
 
-#ifdef CONFIG_ST_HAL_FACTORY_CALIBRATION
-        if (factory_calibration_updated) {
-            factory_calibration_updated = false;
-        }
-#endif /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
-
         // TODO fix the values used as parameters
         err = gyroCalibration.init(1.0f,
                                    1.0f,
@@ -156,12 +150,6 @@ void Gyroscope::ProcessData(SensorBaseData *data)
                                  tmp_raw_data[1],
                                  tmp_raw_data[2],
                                  CONFIG_ST_HAL_GYRO_ROT_MATRIX);
-
-#ifdef CONFIG_ST_HAL_FACTORY_CALIBRATION
-    data->raw[0] = (data->raw[0] - factory_offset[0]) * factory_scale[0];
-    data->raw[1] = (data->raw[1] - factory_offset[1]) * factory_scale[1];
-    data->raw[2] = (data->raw[2] - factory_offset[2]) * factory_scale[2];
-#endif /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
 
     if (HAL_ENABLE_GYRO_CALIBRATION != 0) {
         SensorBaseData accel_data;

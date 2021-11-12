@@ -181,21 +181,6 @@ struct STSensorHAL_iio_devices_data {
 // 	ST_sensors_supported_t(CONCATENATE_STRING(ST_SENSORS_LIST_47, TEMP_NAME_SUFFIX_IIO), STMSensorType::AMBIENT_TEMPERATURE, DEVICE_IIO_TEMP,"LPS27HHW Temperature Sensor", 0.0f),
 // };
 
-#ifdef CONFIG_ST_HAL_FACTORY_CALIBRATION
-#define ST_HAL_PRIVATE_DATA_CALIBRATION_LM_ACCEL_ID		(0)
-#define ST_HAL_PRIVATE_DATA_CALIBRATION_LM_MAGN_ID		(1)
-#define ST_HAL_PRIVATE_DATA_CALIBRATION_LM_GYRO_ID		(2)
-#define ST_HAL_PRIVATE_DATA_CALIBRATION_LM_MAX_ID		(3)
-
-/*
- * st_hal_private_data: private data structure
- * @calibration_last_modification: time_t infomations about last calibration modification.
- */
-struct st_hal_private_data {
-	time_t calibration_last_modification[ST_HAL_PRIVATE_DATA_CALIBRATION_LM_MAX_ID];
-};
-#endif /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
-
 static int st_hal_set_operation_mode(unsigned int mode);
 
 /*
@@ -250,16 +235,10 @@ static SensorBase* st_hal_create_virtual_class_sensor(const STMSensorType &senso
  *
  * Return value: sensor class pointer on success, NULL pointer on fail.
  */
-static SensorBase* st_hal_create_class_sensor(STSensorHAL_iio_devices_data *data, int sensorId, void *custom_data)
+static SensorBase* st_hal_create_class_sensor(STSensorHAL_iio_devices_data *data, int sensorId)
 {
     struct HWSensorBaseCommonData class_data;
     SensorBase *sb = nullptr;
-#ifdef CONFIG_ST_HAL_FACTORY_CALIBRATION
-    int err;
-    struct st_hal_private_data *priv_data = (struct st_hal_private_data *)custom_data;
-#else /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
-    (void)custom_data;
-#endif /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
 
     if ((strlen(data->iio_sysfs_path.c_str()) + 1 > HW_SENSOR_BASE_IIO_SYSFS_PATH_MAX) ||
         (strlen(data->deviceName.c_str()) + 1 > HW_SENSOR_BASE_IIO_DEVICE_NAME_MAX) ||
@@ -279,40 +258,14 @@ static SensorBase* st_hal_create_class_sensor(STSensorHAL_iio_devices_data *data
         sb = new Accelerometer(&class_data, data->androidName.c_str(), &data->sfa,
                                sensorId, data->hw_fifo_len,
                                data->power_consumption, data->wake_up_sensor);
-#ifdef CONFIG_ST_HAL_FACTORY_CALIBRATION
-        if (sb->IsValidClass()) {
-            err = ((HWSensorBase *)sb)->ApplyFactoryCalibrationData((char *)ST_HAL_FACTORY_ACCEL_DATA_FILENAME,
-                                                                    &priv_data->calibration_last_modification[ST_HAL_PRIVATE_DATA_CALIBRATION_LM_ACCEL_ID]);
-            if (err < 0)
-                ALOGE("\"%s\": Failed to read factory calibration values.", data->android_name);
-        }
-#endif /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
     } else if (data->sensor_type == MagnSensorType) {
         sb = new Magnetometer(&class_data, data->androidName.c_str(), &data->sfa,
                               sensorId, data->hw_fifo_len,
                               data->power_consumption, data->wake_up_sensor);
-
-#ifdef CONFIG_ST_HAL_FACTORY_CALIBRATION
-        if (sb->IsValidClass()) {
-            err = ((HWSensorBase *)sb)->ApplyFactoryCalibrationData((char *)ST_HAL_FACTORY_MAGN_DATA_FILENAME,
-                                                                    &priv_data->calibration_last_modification[ST_HAL_PRIVATE_DATA_CALIBRATION_LM_MAGN_ID]);
-            if (err < 0)
-                ALOGE("\"%s\": Failed to read factory calibration values.", data->android_name);
-        }
-#endif /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
     } else if (data->sensor_type == GyroSensorType) {
         sb = new Gyroscope(&class_data, data->androidName.c_str(), &data->sfa,
                            sensorId, data->hw_fifo_len,
                            data->power_consumption, data->wake_up_sensor);
-
-#ifdef CONFIG_ST_HAL_FACTORY_CALIBRATION
-        if (sb->IsValidClass()) {
-            err = ((HWSensorBase *)sb)->ApplyFactoryCalibrationData((char *)ST_HAL_FACTORY_GYRO_DATA_FILENAME,
-                                                                    &priv_data->calibration_last_modification[ST_HAL_PRIVATE_DATA_CALIBRATION_LM_GYRO_ID]);
-            if (err < 0)
-                ALOGE("\"%s\": Failed to read factory calibration values.", data->android_name);
-        }
-#endif /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
     } else if (data->sensor_type == StepDetectorSensorType) {
         sb = new StepDetector(&class_data, data->androidName.c_str(),
                               sensorId, data->hw_fifo_len,
@@ -721,69 +674,6 @@ __attribute__((unused)) static int st_hal_dev_close(struct hw_device_t *dev)
     return 0;
 }
 
-#ifdef CONFIG_ST_HAL_FACTORY_CALIBRATION
-/**
- * st_hal_read_private_data() - Read STSensorHAL private data
- * @priv_data: private data structure.
- *
- * Return value: 0 on success, negative number on fail.
- */
-static int st_hal_read_private_data(struct st_hal_private_data *priv_data)
-{
-	int err;
-	FILE *private_file;
-
-	private_file = fopen(ST_HAL_PRIVATE_DATA_PATH, "r");
-	if (!private_file)
-		return -errno;
-
-	err = fread(priv_data, sizeof(struct st_hal_private_data), 1, private_file);
-	if (err <= 0) {
-		fclose(private_file);
-		return -errno;
-	}
-
-	fclose(private_file);
-
-	return 0;
-}
-
-/**
- * st_hal_write_private_data() - Write STSensorHAL private data
- * @priv_data: private data structure.
- *
- * Return value: 0 on success, negative number on fail.
- */
-static int st_hal_write_private_data(struct st_hal_private_data *priv_data)
-{
-	int err;
-	FILE *private_file;
-
-	private_file = fopen(ST_HAL_PRIVATE_DATA_PATH, "w");
-	if (!private_file)
-		return -errno;
-
-	err = fwrite(priv_data, sizeof(struct st_hal_private_data), 1, private_file);
-	if (err <= 0) {
-		fclose(private_file);
-		return -errno;
-	}
-
-	fclose(private_file);
-
-	return 0;
-}
-
-/**
- * st_hal_set_default_private_data() - Set default STSensorHAL private data
- * @priv_data: private data structure.
- */
-static void st_hal_set_default_private_data(struct st_hal_private_data *priv_data)
-{
-	memset(priv_data->calibration_last_modification, 0, ARRAY_SIZE(priv_data->calibration_last_modification) * sizeof(time_t));
-}
-#endif /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
-
 /**
  * open_sensors() - Open sensor device
  * see Android documentation.
@@ -793,9 +683,6 @@ static void st_hal_set_default_private_data(struct st_hal_private_data *priv_dat
 int st_hal_open_sensors(void **pdata, STMSensorsList &sensorsList)
 {
     std::vector<STSensorHAL_iio_devices_data> iioDataList;
-#ifdef CONFIG_ST_HAL_FACTORY_CALIBRATION
-    struct st_hal_private_data private_data;
-#endif /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
     unsigned int internalSensorId = 4;
 
     *pdata = new STSensorHAL_data();
@@ -804,16 +691,6 @@ int st_hal_open_sensors(void **pdata, STMSensorsList &sensorsList)
     }
 
     STSensorHAL_data *hal_data = (STSensorHAL_data *)*pdata;
-
-    mkdir(ST_HAL_DATA_PATH, S_IRWXU);
-
-#ifdef CONFIG_ST_HAL_FACTORY_CALIBRATION
-    err = st_hal_read_private_data(&private_data);
-    if (err < 0) {
-        ALOGE("Failed to read private data. First boot?");
-        st_hal_set_default_private_data(&private_data);
-    }
-#endif /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
 
     int deviceFoundNum = loadIIODevices(iioDataList);
     if (deviceFoundNum < 0) {
@@ -830,15 +707,8 @@ int st_hal_open_sensors(void **pdata, STMSensorsList &sensorsList)
     }
 
     for (auto &iioDeviceData : iioDataList) {
-#ifdef CONFIG_ST_HAL_FACTORY_CALIBRATION
         SensorBase *sensor = st_hal_create_class_sensor(&iioDeviceData,
-                                                        classes_available + 1,
-                                                        &private_data);
-#else /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
-        SensorBase *sensor = st_hal_create_class_sensor(&iioDeviceData,
-                                                        internalSensorId,
-                                                        NULL);
-#endif /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
+                                                        internalSensorId);
         if (sensor == nullptr) {
             console.error(iioDeviceData.deviceName + ": failed to create HW sensor class.");
             continue;
@@ -847,13 +717,6 @@ int st_hal_open_sensors(void **pdata, STMSensorsList &sensorsList)
         hal_data->graph.addNode(sensor);
         internalSensorId++;
     }
-
-#ifdef CONFIG_ST_HAL_FACTORY_CALIBRATION
-    err = st_hal_write_private_data(&private_data);
-    if (err < 0) {
-        ALOGE("Failed to write private data.");
-    }
-#endif /* CONFIG_ST_HAL_FACTORY_CALIBRATION */
 
     for (auto &virtualSensor : sensorsSWSupportedList) {
         SensorBase *sensor = st_hal_create_virtual_class_sensor(virtualSensor.type, internalSensorId);
