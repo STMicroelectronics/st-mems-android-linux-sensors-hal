@@ -1,0 +1,44 @@
+#+TITLE: stm-sensors-hal-iio Android HIDL 2.0
+#+SUBTITLE: notes
+#+AUTHOR: Denis Ciocca
+
+* Introduction
+
+This is the documentation page for the Android HIDL 2.0 components of the sensors-hal iio.
+
+* Build instructions
+
+1> clone this repository into desired folder (i.e. hardware/st/sensors-hal):
+
+#+begin_src shell
+git clone https://github.com/STMicroelectronics/st-mems-android-linux-sensors-hal.git hardware/st/sensors-hal
+#+end_src
+
+** Android 11 and above
+
+2> modify the device makefile (i.e. device/<vendor>/<board>/device.mk) by adding these lines:
+
+#+begin_src makefile
+# Build stm-sensors-hal in full treble mode
+PRODUCT_PACKAGES += \
+	android.hardware.sensors@2.0-service.stmicroelectronics
+
+# Copy sensors config file(s)
+PRODUCT_COPY_FILES += \
+	frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml \
+	frameworks/native/data/etc/android.hardware.sensor.ambient_temperature.xml:system/etc/permissions/android.hardware.sensor.ambient_temperature.xml \
+	frameworks/native/data/etc/android.hardware.sensor.compass.xml:system/etc/permissions/android.hardware.sensor.compass.xml \
+	frameworks/native/data/etc/android.hardware.sensor.gyroscope.xml:system/etc/permissions/android.hardware.sensor.gyroscope.xml \
+	frameworks/native/data/etc/android.hardware.sensor.hifi_sensors.xml:system/etc/permissions/android.hardware.sensor.hifi_sensors.xml \
+	frameworks/native/data/etc/android.hardware.sensor.relative_humidity.xml:system/etc/permissions/android.hardware.sensor.relative_humidity.xml \
+	frameworks/native/data/etc/android.hardware.sensor.stepcounter.xml:system/etc/permissions/android.hardware.sensor.stepcounter.xml \
+	frameworks/native/data/etc/android.hardware.sensor.stepdetector.xml:system/etc/permissions/android.hardware.sensor.stepdetector.xml
+#+end_src
+
+3> modify the sepolicy file_contexts file (i.e. device/<vendor>/<board>/sepolicy/file_contexts) by adding these lines:
+
+#+begin_src
+/vendor/bin/hw/android\.hardware\.sensors@2\.0-service\.stmicroelectronics  u:object_r:hal_sensors_default_exec:s0
+#+end_src
+
+4> build aosp as described into [[https://source.android.com/setup/build/building][official documentation]].

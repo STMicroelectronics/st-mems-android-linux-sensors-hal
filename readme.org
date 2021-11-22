@@ -1,0 +1,38 @@
+#+TITLE: stm-sensors-hal-iio documentation
+#+SUBTITLE: notes
+#+AUTHOR: Denis Ciocca
+
+* Introduction
+
+This repository hosts the STMicroelectronics HAL (Hardware Abstraction Layer) for mems sensors running in Android or Linux systems based on the STMicroelectronics github hosted [[https://github.com/STMicroelectronics/STMems_Linux_IIO_drivers][IIO drivers]].
+
+This HAL implementation is leaning on the [[https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/Documentation/iio][Linux IIO framework]] to gather data from sensor device drivers.
+
+You can find a list of sensors supported directly into the source code [[file:core/SensorsSupported.cpp][here]].
+
+* Architecture
+
+Four different components can be identified:
+
+- core :: This is the main component of the HAL. All the adapter components are interacting with the core in order to send commands and receive sensors data and events.
+- android hidl 2.0 (Android 11 and above) :: Android [[https://source.android.com/devices/architecture/hidl-cpp][HIDL]] 2.0 adapter (full treble).
+- android legacy (Android 10 and inferior) :: Android [[https://source.android.com/devices/architecture/hal][legacy]] (pre full treble) adapter.
+- linux :: Linux implementation adapter.
+
+* Android
+
+HAL is compiled using different makefiles in order to support the two different modes. Fortunately this is transparent at the end for the build system, correct declaration is needed in order to choose the version to build and install.
+
+In Android legacy mode (pre full treble) the HAL is build as dynamic library (.so) and the Android framework or HIDL 1.0 service load the library at runtime. 
+In Android HIDL 2.0 (full treble) mode, HAL is build as an executable and a service is created to run within it.
+
+You can find the related documentation for Android here:
+
+- [[file:2.0/readme.org][HIDL 2.0]]
+- [[file:legacy/readme.org][Legacy]]
+
+* Linux
+
+In Linux, HAL is build as an executable using cmake. Current version does list the sensors found and exit, user needs to implement the final application.
+
+[[file:linux/readme.org][Here]] you can find the related documentation.

@@ -2,28 +2,52 @@
 #+SUBTITLE: notes
 #+AUTHOR: Denis Ciocca
 
-* debug build
-#+begin_src sh
-cmake -DCMAKE_BUILD_TYPE=Debug ./
+* Introduction
+
+This is the documentation page for the Linux components of the sensors-hal iio.
+
+* Build instructions
+
+1> clone this repository into desired folder:
+
+#+begin_src shell
+git clone https://github.com/STMicroelectronics/st-mems-android-linux-sensors-hal.git
 #+end_src
 
-* export compile commands
-#+begin_src sh
-cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ./
+** release build
+
+#+begin_src shell
+cmake -DCMAKE_BUILD_TYPE=Release ${PROJECT_SOURCE_PATH}
 #+end_src
 
-* cross-compile
+** debug build
+
+#+begin_src shell
+cmake -DCMAKE_BUILD_TYPE=Debug ${PROJECT_SOURCE_PATH}
+#+end_src
+
+** export compile commands
+
+#+begin_src shell
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ${PROJECT_SOURCE_PATH}
+#+end_src
+
+** cross-compile
+
 - arm64
-#+begin_src sh
-cmake -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-arm64.cmake ./
+
+#+begin_src shell
+cmake -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-arm64.cmake ${PROJECT_SOURCE_PATH}
 #+end_src
 
 - arm32
-#+begin_src sh
-cmake -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-arm32.cmake ./
+
+#+begin_src shell
+cmake -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-arm32.cmake ${PROJECT_SOURCE_PATH}
 #+end_src
 
-* ninja build
-#+begin_src sh
-cmake -GNinja ./
+** ninja build
+
+#+begin_src shell
+cmake -GNinja ${PROJECT_SOURCE_PATH}
 #+end_src
