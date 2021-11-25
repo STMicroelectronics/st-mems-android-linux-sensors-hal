@@ -51,9 +51,13 @@ struct SensorsSupported {
     static SensorsSupported StepDetector(const std::string &d_name, const std::string &a_name, float power);
     static SensorsSupported StepCounter(const std::string &d_name, const std::string &a_name, float power);
     static SensorsSupported SignMotion(const std::string &d_name, const std::string &a_name, float power);
+    static SensorsSupported Pressure(const std::string &d_name, const std::string &a_name, float power);
+    static SensorsSupported AmbientTemperature(const std::string &d_name, const std::string &a_name, float power);
+    static SensorsSupported InternalTemperature(const std::string &d_name, const std::string &a_name, float power);
+    static SensorsSupported RelativeHumidity(const std::string &d_name, const std::string &a_name, float power);
 };
 
-extern const std::array<struct SensorsSupported, 103> sensorsSupportedList;
+extern const std::array<struct SensorsSupported, 135> sensorsSupportedList;
 
 struct SWSensorsSupported {
     SWSensorsSupported(STMSensorType type) : type(type) {}
