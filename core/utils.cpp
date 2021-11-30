@@ -16,6 +16,7 @@
  */
 
 #include <iostream>
+#include <cfloat>
 #include <errno.h>
 #include <limits.h>
 #include <stdio.h>
@@ -124,7 +125,7 @@ int device_iio_utils::sysfs_write_float(char *file, float val)
         return -errno;
     }
 
-    fprintf(fp, "%f", val);
+    fprintf(fp, "%.*f", DBL_DIG - 1, val);
     fclose(fp);
 
     return 0;
