@@ -14,9 +14,62 @@ This is the documentation page for the Android legacy components of the sensors-
 git clone https://github.com/STMicroelectronics/st-mems-android-linux-sensors-hal.git hardware/st/sensors-hal
 #+end_src
 
+2> modify the uevent rules file (i.e. device/<vendor>/<board>/ueventd.rc) by adding these lines:
+
+#+begin_src conf
+#common iio char devices
+/dev/iio:device* 0666 system system
+
+#sensors common
+/sys/bus/iio/devices/iio:device* buffer/enable 0666 system system
+/sys/bus/iio/devices/iio:device* buffer/length 0666 system system
+/sys/bus/iio/devices/iio:device* sampling_frequency 0666 system system
+/sys/bus/iio/devices/iio:device* hwfifo_flush 0666 system system
+/sys/bus/iio/devices/iio:device* hwfifo_enabled 0666 system system
+/sys/bus/iio/devices/iio:device* hwfifo_watermark 0666 system system
+/sys/bus/iio/devices/iio:device* injection_mode 0666 system system
+/sys/bus/iio/devices/iio:device* current_timestamp_clock 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_timestamp_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_count_en 0666 system system
+
+#accelerometer sensor
+/sys/bus/iio/devices/iio:device* in_accel_x_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_accel_y_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_accel_z_scale 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_accel_x_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_accel_y_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_accel_z_en 0666 system system
+
+#gyroscope sensor
+/sys/bus/iio/devices/iio:device* in_anglvel_x_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_anglvel_y_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_anglvel_z_scale 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_anglvel_x_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_anglvel_y_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_anglvel_z_en 0666 system system
+
+#magnetometer sensor
+/sys/bus/iio/devices/iio:device* in_magn_x_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_magn_y_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_magn_z_scale 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_magn_x_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_magn_y_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_magn_z_en 0666 system system
+
+#step counter sensor
+/sys/bus/iio/devices/iio:device* scan_elements/in_step_counter_en 0666 system system
+/sys/bus/iio/devices/iio:device* max_delivery_rate 0666 system system
+
+#temperature sensor
+/sys/bus/iio/devices/iio:device* scan_elements/in_temp_en 0666 system system
+
+#gesture sensor
+/sys/bus/iio/devices/iio:device* scan_elements/in_gesture_en 0666 system system
+#+end_src
+
 ** Android 10
 
-2> modify the device makefile (i.e. device/<vendor>/<board>/device.mk) by adding these lines:
+3> modify the device makefile (i.e. device/<vendor>/<board>/device.mk) by adding these lines:
 
 #+begin_src makefile
 # Build stm-sensors-hal in legacy mode
@@ -37,9 +90,9 @@ PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.sensor.stepdetector.xml:system/etc/permissions/android.hardware.sensor.stepdetector.xml
 #+end_src
 
-3> create new manifest.xml file that describe hal service (i.e. device/<vendor>/<board>/stm-sensors-hal/manifest.xml) with this content:
+4> create new manifest.xml file that describe hal service (i.e. device/<vendor>/<board>/stm-sensors-hal/manifest.xml) with this content:
 
-#+begin_src
+#+begin_src conf
 <manifest version="1.0" type="device">
 	<hal format="hidl">
 		<name>android.hardware.sensors</name>
@@ -53,17 +106,17 @@ PRODUCT_COPY_FILES += \
 </manifest>
 #+end_src
 
-4> modify the device board config (i.e. device/<vendor>/<board>/BoardConfig.mk) by adding these lines:
+5> modify the device board config (i.e. device/<vendor>/<board>/BoardConfig.mk) by adding these lines:
 
 #+begin_src makefile
 DEVICE_MANIFEST_FILE += device/<vendor>/<board>/stm-sensors-hal/manifest.xml
 #+end_src
 
-5> build aosp as described into [[https://source.android.com/setup/build/building][official documentation]].
+6> build aosp as described into [[https://source.android.com/setup/build/building][official documentation]].
 
 ** Android 9 and inferior
 
-2> modify the device makefile (i.e. device/<vendor>/<board>/device.mk) by adding these lines:
+3> modify the device makefile (i.e. device/<vendor>/<board>/device.mk) by adding these lines:
 
 #+begin_src makefile
 # Build stm-sensors-hal in legacy mode
@@ -82,4 +135,4 @@ PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.sensor.stepdetector.xml:system/etc/permissions/android.hardware.sensor.stepdetector.xml
 #+end_src
 
-3> build aosp as described into [[https://source.android.com/setup/build/building][official documentation]].
+4> build aosp as described into [[https://source.android.com/setup/build/building][official documentation]].

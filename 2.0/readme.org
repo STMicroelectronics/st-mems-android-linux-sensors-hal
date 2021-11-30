@@ -37,8 +37,61 @@ PRODUCT_COPY_FILES += \
 
 3> modify the sepolicy file_contexts file (i.e. device/<vendor>/<board>/sepolicy/file_contexts) by adding these lines:
 
-#+begin_src
+#+begin_src conf
 /vendor/bin/hw/android\.hardware\.sensors@2\.0-service\.stmicroelectronics  u:object_r:hal_sensors_default_exec:s0
 #+end_src
 
-4> build aosp as described into [[https://source.android.com/setup/build/building][official documentation]].
+4> modify the uevent rules file (i.e. device/<vendor>/<board>/ueventd.rc) by adding these lines:
+
+#+begin_src conf
+#common iio char devices
+/dev/iio:device* 0666 system system
+
+#sensors common
+/sys/bus/iio/devices/iio:device* buffer/enable 0666 system system
+/sys/bus/iio/devices/iio:device* buffer/length 0666 system system
+/sys/bus/iio/devices/iio:device* sampling_frequency 0666 system system
+/sys/bus/iio/devices/iio:device* hwfifo_flush 0666 system system
+/sys/bus/iio/devices/iio:device* hwfifo_enabled 0666 system system
+/sys/bus/iio/devices/iio:device* hwfifo_watermark 0666 system system
+/sys/bus/iio/devices/iio:device* injection_mode 0666 system system
+/sys/bus/iio/devices/iio:device* current_timestamp_clock 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_timestamp_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_count_en 0666 system system
+
+#accelerometer sensor
+/sys/bus/iio/devices/iio:device* in_accel_x_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_accel_y_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_accel_z_scale 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_accel_x_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_accel_y_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_accel_z_en 0666 system system
+
+#gyroscope sensor
+/sys/bus/iio/devices/iio:device* in_anglvel_x_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_anglvel_y_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_anglvel_z_scale 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_anglvel_x_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_anglvel_y_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_anglvel_z_en 0666 system system
+
+#magnetometer sensor
+/sys/bus/iio/devices/iio:device* in_magn_x_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_magn_y_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_magn_z_scale 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_magn_x_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_magn_y_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_magn_z_en 0666 system system
+
+#step counter sensor
+/sys/bus/iio/devices/iio:device* scan_elements/in_step_counter_en 0666 system system
+/sys/bus/iio/devices/iio:device* max_delivery_rate 0666 system system
+
+#temperature sensor
+/sys/bus/iio/devices/iio:device* scan_elements/in_temp_en 0666 system system
+
+#gesture sensor
+/sys/bus/iio/devices/iio:device* scan_elements/in_gesture_en 0666 system system
+#+end_src
+
+5> build aosp as described into [[https://source.android.com/setup/build/building][official documentation]].
