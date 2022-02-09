@@ -74,6 +74,11 @@ class Console : public IConsole {
         (void) message;
     }
 
+    void warning(const std::string &message) const override
+    {
+        (void) message;
+    }
+
     void error(const std::string &message) const override
     {
         (void) message;

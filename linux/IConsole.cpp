@@ -32,6 +32,8 @@ public:
 
     void info(const std::string &message) const override;
 
+    void warning(const std::string &message) const override;
+
     void error(const std::string &message) const override;
 
     void debug(const std::string &message) const override;
@@ -42,6 +44,11 @@ void Console::info(const std::string &message) const
     std::string messageToPrint = message + "\n";
 
     std::cout << messageToPrint;
+}
+
+void Console::warning(const std::string &message) const
+{
+    info(message);
 }
 
 void Console::error(const std::string &message) const

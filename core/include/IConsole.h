@@ -45,6 +45,12 @@ public:
     virtual void info(const std::string &message) const = 0;
 
     /**
+     * warning: print warning message
+     * @message: message string to be printed
+     */
+    virtual void warning(const std::string &message) const = 0;
+
+    /**
      * error: print error message
      * @message: message string to be printed
      */

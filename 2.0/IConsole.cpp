@@ -35,6 +35,8 @@ public:
 
     void info(const std::string &message) const override;
 
+    void warning(const std::string &message) const override;
+
     void error(const std::string &message) const override;
 
     void debug(const std::string &message) const override;
@@ -45,6 +47,13 @@ void Console::info(const std::string &message) const
     std::string messageToPrint = message + "\n";
 
     ALOGI("%s", messageToPrint.c_str());
+}
+
+void Console::warning(const std::string &message) const
+{
+    std::string messageToPrint = message + "\n";
+
+    ALOGW("%s", messageToPrint.c_str());
 }
 
 void Console::error(const std::string &message) const
