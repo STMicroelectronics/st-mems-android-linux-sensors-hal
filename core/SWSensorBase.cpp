@@ -146,6 +146,7 @@ int SWSensorBase::AddSensorDependency(SensorBase *p)
 
     if (dependency_delay) {
         if (dependency_ID == id_sensor_trigger) {
+            triggerHandle = p->GetHandle();
             sensor_t_data.maxRateHz = dependecy_data.maxRateHz;
 
             if ((sensor_t_data.minRateHz == 0) || (sensor_t_data.minRateHz > dependecy_data.minRateHz)) {
@@ -172,7 +173,7 @@ void SWSensorBase::RemoveSensorDependency(SensorBase *p)
     SensorBase::RemoveSensorDependency(p);
 }
 
-int SWSensorBase::FlushData(int handle, bool lock_en_mutex)
+int SWSensorBase::flushRequest(int handle, bool lock_en_mutex)
 {
     int err;
     unsigned int i;
@@ -182,15 +183,11 @@ int SWSensorBase::FlushData(int handle, bool lock_en_mutex)
     }
 
     if (GetStatus(false)) {
-        if (GetMinTimeout(false) > 0) {
-            for (i = 0; i < dependencies.num; i++) {
-                err = dependencies.sb[i]->FlushData(handle, true);
-                if (err < 0) {
-                    goto unlock_mutex;
-                }
+        for (i = 0; i < dependencies.num; i++) {
+            err = dependencies.sb[i]->flushRequest(handle, true);
+            if (err < 0) {
+                goto unlock_mutex;
             }
-        } else {
-            ProcessFlushData(handle, 0);
         }
     } else {
         goto unlock_mutex;
@@ -237,19 +234,19 @@ void SWSensorBase::ProcessFlushData(int handle, int64_t timestamp)
             push_data.sb[i]->ProcessFlushData(handle, timestamp);
         }
     } else {
-        if (ValidDataToPush(timestamp)) {
+        if (handle == sensor_t_data.handle) {
             if (timestamp > sample_in_processing_timestamp) {
                 err = flush_stack.writeElement(handle, timestamp);
                 if (err < 0) {
                     console.error(std::string(GetName()) + ": Failed to write Flush event into stack.");
                 }
             } else {
-                if (handle == sensor_t_data.handle) {
-                    WriteFlushEventToPipe();
-                } else {
-                    for (i = 0; i < push_data.num; i++) {
-                        push_data.sb[i]->ProcessFlushData(handle, timestamp);
-                    }
+                WriteFlushEventToPipe();
+            }
+        } else {
+            for (i = 0; i < push_data.num; i++) {
+                if (sensor_t_data.handle == push_data.sb[i]->getHandleOfMyTrigger()) {
+                    push_data.sb[i]->ProcessFlushData(handle, timestamp);
                 }
             }
         }
@@ -341,6 +338,11 @@ void SWSensorBase::ThreadDataTask()
     }
 }
 
+int SWSensorBase::getHandleOfMyTrigger(void) const
+{
+    return triggerHandle;
+}
+
 SWSensorBaseWithPollrate::SWSensorBaseWithPollrate(const char *name, int handle, STMSensorType sensor_type,
                                                    bool use_dependency_resolution,
                                                    bool use_dependency_range, bool use_dependency_delay,
@@ -425,7 +427,7 @@ mutex_unlock:
     return err;
 }
 
-int SWSensorBaseWithPollrate::FlushData(int handle, bool lock_en_mutex)
+int SWSensorBaseWithPollrate::flushRequest(int handle, bool lock_en_mutex)
 {
     int err;
     unsigned int i;
@@ -435,15 +437,11 @@ int SWSensorBaseWithPollrate::FlushData(int handle, bool lock_en_mutex)
     }
 
     if (GetStatus(false)) {
-        if (GetMinTimeout(false) > 0) {
-            for (i = 0; i < dependencies.num; i++) {
-                err = dependencies.sb[i]->FlushData(handle, true);
-                if (err < 0) {
-                    goto unlock_mutex;
-                }
+        for (i = 0; i < dependencies.num; i++) {
+            err = dependencies.sb[i]->flushRequest(handle, true);
+            if (err < 0) {
+                goto unlock_mutex;
             }
-        } else {
-            ProcessFlushData(handle, utils.getTime());
         }
     } else {
         goto unlock_mutex;

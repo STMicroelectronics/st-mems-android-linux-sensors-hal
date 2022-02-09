@@ -34,7 +34,6 @@ cc_library_static {
         "CircularBuffer.cpp",
         "DeviceOrientation.cpp",
         "FlushBufferStack.cpp",
-        "FlushRequested.cpp",
         "Gesture.cpp",
         "Gyroscope.cpp",
         "HWSensorBase.cpp",

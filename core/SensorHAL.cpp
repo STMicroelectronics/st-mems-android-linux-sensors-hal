@@ -498,7 +498,7 @@ int st_hal_dev_flush(void *data, uint32_t handle)
 
     for (auto &node : hal_data->graph) {
         if (nodeId->second == node.id) {
-            return node.payload->FlushData(node.payload->GetHandle(), true);
+            return node.payload->flushRequest(node.payload->GetHandle(), true);
         }
     }
 

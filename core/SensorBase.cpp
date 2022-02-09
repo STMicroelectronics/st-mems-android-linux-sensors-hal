@@ -529,18 +529,6 @@ struct sensor_t SensorBase::GetSensor_tData(void)
    return data;
 }
 
-int SensorBase::FlushData(int __attribute__((unused))handle,
-                          bool __attribute__((unused))lock_en_mute)
-{
-    return 0;
-}
-
-void SensorBase::ProcessFlushData(int __attribute__((unused))handle,
-                                  int64_t __attribute__((unused))timestamp)
-{
-    return;
-}
-
 void SensorBase::WriteOdrChangeEventToPipe(int64_t timestamp, int64_t pollrate)
 {
     sensors_event_t odr_change_event_data;
@@ -731,6 +719,11 @@ bool SensorBase::hasDataChannels()
 void SensorBase::setCallbacks(const ISTMSensorsCallback &sensorsCallback)
 {
     this->sensorsCallback = (ISTMSensorsCallback *)&sensorsCallback;
+}
+
+int SensorBase::getHandleOfMyTrigger(void) const
+{
+    return -1;
 }
 
 } // namespace core

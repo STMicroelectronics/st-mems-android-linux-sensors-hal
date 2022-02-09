@@ -66,7 +66,6 @@ LOCAL_SRC_FILES := \
     CircularBuffer.cpp \
     DeviceOrientation.cpp \
     FlushBufferStack.cpp \
-    FlushRequested.cpp \
     Gesture.cpp \
     Gyroscope.cpp \
     HWSensorBase.cpp \

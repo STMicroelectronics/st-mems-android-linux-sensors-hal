@@ -37,7 +37,6 @@
 #include "common_data.h"
 #include <CircularBuffer.h>
 #include <FlushBufferStack.h>
-#include <FlushRequested.h>
 #include <ChangeODRTimestampStack.h>
 #include <ISTMSensorsCallback.h>
 
@@ -204,8 +203,8 @@ public:
 
     virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout, bool lock_en_mutex);
 
-    virtual int FlushData(int handle, bool lock_en_mute);
-    virtual void ProcessFlushData(int handle, int64_t timestamp);
+    virtual int flushRequest(int handle, bool lock_en_mutex) = 0;
+    virtual void ProcessFlushData(int handle, int64_t timestamp) = 0;
 
     void WriteOdrChangeEventToPipe(int64_t timestamp, int64_t pollrate);
     void WriteFlushEventToPipe();
@@ -228,6 +227,8 @@ public:
     virtual bool hasDataChannels();
 
     void setCallbacks(const ISTMSensorsCallback &sensorsCallback);
+
+    virtual int getHandleOfMyTrigger(void) const;
 };
 
 } // namespace core

@@ -502,7 +502,7 @@ void HWSensorBase::ProcessData(SensorBaseData *data)
     SensorBase::ProcessData(data);
 }
 
-int HWSensorBase::FlushData(int handle, bool lock_en_mutex)
+int HWSensorBase::flushRequest(int handle, bool lock_en_mutex)
 {
     int err;
     unsigned int i;
@@ -512,18 +512,19 @@ int HWSensorBase::FlushData(int handle, bool lock_en_mutex)
     }
 
     if (GetStatus(false)) {
-        err = flush_requested.writeElement(handle);
-        if (err < 0) {
-            goto unlock_mutex;
+        {
+            std::lock_guard<std::mutex> lock(flushRequesteLock);
+            flushRequested.push(handle);
         }
 
-        if ((GetMinTimeout(false) > 0) && (GetMinTimeout(false) < INT64_MAX)) {
-            for (i = 0; i < dependencies.num; i++) {
-                dependencies.sb[i]->FlushData(sensor_t_data.handle, true);
-            }
+        for (i = 0; i < dependencies.num; i++) {
+            dependencies.sb[i]->flushRequest(sensor_t_data.handle, true);
+        }
 
+        if (sensor_t_data.fifoMaxEventCount) {
             err = device_iio_utils::hw_fifo_flush(common_data.device_iio_sysfs_path);
             if (err < 0) {
+                // TODO should remove the flush requests just added
                 console.error(GetName() + std::string(": Failed to flush hw fifo."));
                 goto unlock_mutex;
             }
@@ -553,23 +554,28 @@ void HWSensorBase::ProcessFlushData(int __attribute__((unused))handle, int64_t t
     unsigned int i;
     int err, flush_handle;
 
-    flush_handle = flush_requested.readElement();
-    if (flush_handle < 0) {
+    std::lock_guard<std::mutex> lock(flushRequesteLock);
+    if (flushRequested.empty()) {
+        console.debug(GetName() + std::string(": no flush requests were made"));
         return;
     }
+    flush_handle = flushRequested.front();
+    flushRequested.pop();
 
     pthread_mutex_lock(&sample_in_processing_mutex);
 
-    if (timestamp > sample_in_processing_timestamp) {
-        err = flush_stack.writeElement(flush_handle, timestamp);
-        if (err < 0) {
-            console.error(GetName() + std::string(": Failed to write Flush event into stack."));
+    if (flush_handle == sensor_t_data.handle) {
+        if (timestamp > sample_in_processing_timestamp) {
+            err = flush_stack.writeElement(flush_handle, timestamp);
+            if (err < 0) {
+                console.error(GetName() + std::string(": Failed to write Flush event into stack."));
+            }
+        } else {
+            WriteFlushEventToPipe();
         }
     } else {
-        if (flush_handle == sensor_t_data.handle) {
-            WriteFlushEventToPipe();
-        } else {
-            for (i = 0; i < push_data.num; i++) {
+        for (i = 0; i < push_data.num; i++) {
+            if (sensor_t_data.handle == push_data.sb[i]->getHandleOfMyTrigger()) {
                 push_data.sb[i]->ProcessFlushData(flush_handle, timestamp);
             }
         }
@@ -898,7 +904,7 @@ int HWSensorBaseWithPollrate::SetDelay(int handle, int64_t period_ns,
     return err;
 }
 
-int HWSensorBaseWithPollrate::FlushData(int handle, bool lock_en_mutex)
+int HWSensorBaseWithPollrate::flushRequest(int handle, bool lock_en_mutex)
 {
     int err;
     unsigned int i;
@@ -908,23 +914,24 @@ int HWSensorBaseWithPollrate::FlushData(int handle, bool lock_en_mutex)
     }
 
     if (GetStatus(false)) {
-        err = flush_requested.writeElement(handle);
-        if (err < 0) {
-            goto unlock_mutex;
+        {
+            std::lock_guard<std::mutex> lock(flushRequesteLock);
+            flushRequested.push(handle);
         }
 
-        if ((GetMinTimeout(false) > 0) && (GetMinTimeout(false) < INT64_MAX)) {
-            for (i = 0; i < dependencies.num; i++) {
-                dependencies.sb[i]->FlushData(sensor_t_data.handle, true);
-            }
+        for (i = 0; i < dependencies.num; i++) {
+            dependencies.sb[i]->flushRequest(sensor_t_data.handle, true);
+        }
 
+        if (sensor_t_data.fifoMaxEventCount) {
             err = device_iio_utils::hw_fifo_flush(common_data.device_iio_sysfs_path);
             if (err < 0) {
+                // TODO should remove the flush requests just added
                 console.error(GetName() + std::string(": Failed to flush hw fifo."));
                 goto unlock_mutex;
             }
         } else {
-            ProcessFlushData(sensor_t_data.handle, utils.getTime());
+            ProcessFlushData(sensor_t_data.handle, 0);
         }
     } else {
         goto unlock_mutex;

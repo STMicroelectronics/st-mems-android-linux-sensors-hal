@@ -40,6 +40,7 @@ protected:
     bool dependency_range;
     bool dependency_delay;
     bool dependency_name;
+    int triggerHandle;
 
     DependencyID id_sensor_trigger;
     int trigger_write_pipe_fd, trigger_read_pipe_fd;
@@ -63,12 +64,14 @@ SWSensorBase(const char *name, int handle, STMSensorType sensor_type,
 
     virtual void ReceiveDataFromDependency(int handle, SensorBaseData *data);
 
-    virtual int FlushData(int handle, bool lock_en_mutex);
+    virtual int flushRequest(int handle, bool lock_en_mutex) override;
     virtual void ProcessFlushData(int handle, int64_t timestamp);
 
     virtual void ThreadDataTask();
 
     bool hasDataChannels() { return true; }
+
+    int getHandleOfMyTrigger(void) const override;
 };
 
 
@@ -83,7 +86,7 @@ public:
     virtual ~SWSensorBaseWithPollrate();
 
     virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout, bool lock_en_mutex);
-    virtual int FlushData(int handle, bool lock_en_mutex);
+    virtual int flushRequest(int handle, bool lock_en_mutex) override;
     virtual void WriteDataToPipe(int64_t hw_pollrate);
 };
 

@@ -17,7 +17,9 @@
 
 #pragma once
 
+#include <queue>
 #include <poll.h>
+#include <mutex>
 
 #include "SensorBase.h"
 #include <IUtils.h>
@@ -63,7 +65,8 @@ class HWSensorBase : public SensorBase {
 protected:
     ssize_t scan_size;
     struct pollfd pollfd_iio[2];
-    FlushRequested flush_requested;
+    std::queue<int> flushRequested;
+    std::mutex flushRequesteLock;
     HWSensorBaseCommonData common_data;
     ChangeODRTimestampStack odr_switch;
 #ifdef CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS
@@ -97,8 +100,8 @@ public:
 
     virtual void ProcessData(SensorBaseData *data);
     virtual void ProcessEvent(struct device_iio_events *event_data);
-    virtual int FlushData(int handle, bool lock_en_mute);
-    virtual void ProcessFlushData(int handle, int64_t timestamp);
+    virtual int flushRequest(int handle, bool lock_en_mute) override;
+    virtual void ProcessFlushData(int handle, int64_t timestamp) override;
     virtual void ThreadDataTask();
     virtual void ThreadEventsTask();
 
@@ -125,7 +128,7 @@ public:
 
     virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout,
                          bool lock_en_mute);
-    virtual int FlushData(int handle, bool lock_en_mute);
+    virtual int flushRequest(int handle, bool lock_en_mute) override;
     virtual void WriteDataToPipe(int64_t hw_pollrate);
 };
 

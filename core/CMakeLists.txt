@@ -39,7 +39,6 @@ add_library(stmicroelectronics-sensors-core-linux
             CircularBuffer.cpp
             DeviceOrientation.cpp
             FlushBufferStack.cpp
-            FlushRequested.cpp
             Gesture.cpp
             Gyroscope.cpp
             HWSensorBase.cpp
