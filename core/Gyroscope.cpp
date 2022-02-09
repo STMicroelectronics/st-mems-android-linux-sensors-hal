@@ -112,7 +112,7 @@ void Gyroscope::saveBiasValues(void) const
 
     if (sensorsCallback != nullptr) {
         if (sensorsCallback->onSaveDataRequest("gyro_bias.dat", &bias, sizeof(bias))) {
-            console.error("failed to save gyro bias");
+            console.warning("failed to save gyro bias");
         }
     }
 }
@@ -125,7 +125,7 @@ void Gyroscope::loadBiasValues(void)
 
     if (sensorsCallback != nullptr) {
         if (sensorsCallback->onLoadDataRequest("gyro_bias.dat", &bias, sizeof(bias))) {
-            console.error("failed to load gyro bias");
+            console.warning("failed to load gyro bias");
         }
     }
 

@@ -108,7 +108,7 @@ void Accelerometer::saveBiasValues(void) const
 
     if (sensorsCallback != nullptr) {
         if (sensorsCallback->onSaveDataRequest("accel_bias.dat", &bias, sizeof(bias))) {
-            console.error("failed to save accel bias");
+            console.warning("failed to save accel bias");
         }
     }
 }
@@ -121,7 +121,7 @@ void Accelerometer::loadBiasValues(void)
 
     if (sensorsCallback != nullptr) {
         if (sensorsCallback->onLoadDataRequest("accel_bias.dat", &bias, sizeof(bias))) {
-            console.error("failed to load accel bias");
+            console.warning("failed to load accel bias");
         }
     }
 
