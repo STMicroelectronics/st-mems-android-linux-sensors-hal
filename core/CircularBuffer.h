@@ -30,10 +30,12 @@ typedef struct SensorBaseData {
     float offset[4];
     float processed[5];
     int64_t timestamp;
+    int64_t hwTimestamp;
     int8_t accuracy;
     std::array<int, 10> flushEventHandles;
     int flushEventsNum;
     int64_t pollrate_ns;
+    bool hasHwTimestamp = false;
 } SensorBaseData;
 
 /*

@@ -16,6 +16,7 @@
  */
 
 #include <iostream>
+#include <regex>
 #include <cfloat>
 #include <errno.h>
 #include <limits.h>
@@ -807,6 +808,28 @@ int device_iio_utils::get_scale(const char *device_dir, float *value,
     return ret < 0 ? -ENOMEM : sysfs_read_float(tmp_filaname, value);
 }
 
+static bool isTimestampChannel(const char *name)
+{
+    std::regex e("(.*)(timestamp)(.*)");
+
+    if (std::regex_match(name, e)) {
+        return true;
+    }
+
+    return false;
+}
+
+static bool isHwTimestampChannel(const char *name)
+{
+    std::regex e("(.*)(count)(.*)");
+
+    if (std::regex_match(name, e)) {
+        return true;
+    }
+
+    return false;
+}
+
 int device_iio_utils::get_type(struct device_iio_info_channel *channel,
                                const char *device_dir, const char *name,
                                const char *pre_name)
@@ -833,6 +856,14 @@ int device_iio_utils::get_type(struct device_iio_info_channel *channel,
 
     if (strlen(pre_name) + strlen("_type") + 1 > DEVICE_IIO_MAX_FILENAME_LEN) {
         return -1;
+    }
+
+    if (isTimestampChannel(name)) {
+        channel->type = IIOChannelType::TIMESTAMP;
+    } else if (isHwTimestampChannel(name)) {
+        channel->type = IIOChannelType::HW_TIMESTAMP;
+    } else {
+        channel->type = IIOChannelType::UNKNOWN;
     }
 
     sprintf(dir, "%s/scan_elements", device_dir);

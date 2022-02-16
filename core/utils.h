@@ -88,13 +88,19 @@ struct device_iio_sampling_freqs {
     unsigned int length;
 };
 
+enum class IIOChannelType {
+    TIMESTAMP,
+    HW_TIMESTAMP,
+    UNKNOWN
+};
+
 struct device_iio_info_channel {
     char *name;
     char *type_name;
     unsigned int index;
     unsigned int enabled;
-    float scale;
-    float offset;
+    float scale = 1;
+    float offset = 0;
     unsigned int bytes;
     unsigned int bits_used;
     unsigned int shift;
@@ -102,6 +108,7 @@ struct device_iio_info_channel {
     unsigned int be;
     unsigned int sign;
     unsigned int location;
+    IIOChannelType type;
 };
 
 struct device_iio_type_name {

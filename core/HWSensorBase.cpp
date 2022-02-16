@@ -157,6 +157,7 @@ static int ProcessScanData(uint8_t *data, struct device_iio_info_channel *channe
 
             val >>= channels[k].shift;
             val &= channels[k].mask;
+
             if (channels[k].sign) {
                 sensor_out_data->raw[k] = ((float)(int32_t)val + channels[k].offset) * channels[k].scale;
             } else {
@@ -171,14 +172,15 @@ static int ProcessScanData(uint8_t *data, struct device_iio_info_channel *channe
                     val = (val & channels[k].mask) | ~channels[k].mask;
                 }
 
-                if ((channels[k].scale == 1.0f) && (channels[k].offset == 0.0f)) {
+                if (channels[k].type == IIOChannelType::TIMESTAMP) {
                     sensor_out_data->timestamp = val;
+                } else if (channels[k].type == IIOChannelType::HW_TIMESTAMP) {
+                    sensor_out_data->hwTimestamp = val;
+                    sensor_out_data->hasHwTimestamp = true;
                 } else {
-                    sensor_out_data->raw[k] = (((float)val + channels[k].offset) * channels[k].scale);
+                    IConsole &console = IConsole::getInstance();
+                    console.warning("cannot process 64bit channel");
                 }
-            } else {
-                uint64_t val = *(uint64_t *)(data + channels[k].location);
-                sensor_out_data->raw[k] = val;
             }
 
             break;
