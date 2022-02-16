@@ -902,7 +902,7 @@ int device_iio_utils::get_type(struct device_iio_info_channel *channel,
             if (channel->bits_used == 64) {
                 channel->mask = ~0;
             }  else {
-                channel->mask = (1 << channel->bits_used) - 1;
+                channel->mask = (1LL << channel->bits_used) - 1;
             }
 
             fclose(sysfsfp);
