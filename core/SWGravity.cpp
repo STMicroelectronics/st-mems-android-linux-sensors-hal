@@ -31,7 +31,7 @@ SWGravity::SWGravity(const char *name, int handle)
 {
     sensor_t_data.maxRange = ST_HAL_GRAVITY_MAX_ON_EARTH;
 
-    dependencies_type_list.push_back(AccelMagnGyroFusion9XSensorType);
+    dependencies_type_list.push_back(AccelGyroFusion6XSensorType);
     id_sensor_trigger = SENSOR_DEPENDENCY_ID_0;
     sensor_event.data.dataLen = SENSOR_DATA_3AXIS;
 }
