@@ -34,7 +34,8 @@ LOCAL_STATIC_LIBRARIES := \
     libstm-accel-calibration-legacy \
     libstm-gyro-calibration-legacy \
     libstm-magn-calibration-legacy \
-    libstm-sensors-fusion-legacy
+    libstm-sensors-fusion-legacy \
+    libstm-timesync-legacy
 
 LOCAL_HEADER_LIBRARIES := \
     libhardware_headers

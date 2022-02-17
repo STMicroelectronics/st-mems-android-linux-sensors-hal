@@ -69,6 +69,7 @@ typedef enum {
  */
 #define DEVICE_IIO_EV_DIR_FIFO_DATA             0x05
 #define DEVICE_IIO_EV_TYPE_FIFO_FLUSH           0x06
+#define DEVICE_IIO_EV_TYPE_TIME_SYNC            0x07
 
 #define DISABLE_CHANNEL                         0
 #define ENABLE_CHANNEL                          1
@@ -79,7 +80,7 @@ struct device_iio_events {
 };
 
 struct device_iio_scales {
-    float scales[DEVICE_IIO_SCALE_AVAILABLE];
+    float scales[DEVICE_IIO_SCALE_AVAILABLE] = {1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f};
     unsigned int length;
 };
 

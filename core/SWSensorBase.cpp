@@ -314,14 +314,23 @@ void SWSensorBase::ThreadDataTask()
 
             for (i = 0; i < err / sizeof(SensorBaseData); i++) {
                 pthread_mutex_lock(&sample_in_processing_mutex);
-                sample_in_processing_timestamp = sensors_tmp_data[i].timestamp;
+                if (sensors_tmp_data[i].hasHwTimestamp) {
+                    sample_in_processing_timestamp = sensors_tmp_data[i].hwTimestamp;
+                } else {
+                    sample_in_processing_timestamp = sensors_tmp_data[i].timestamp;
+                }
                 pthread_mutex_unlock(&sample_in_processing_mutex);
 
                 bool retry = false;
 
                 do {
                     flush_handle = flush_stack.readLastElement(&timestamp_flush);
-                    if ((flush_handle >= 0) && (timestamp_flush <= sensors_tmp_data[i].timestamp)) {
+                    int64_t timestampToCompare = sensors_tmp_data[i].timestamp;
+                    if (sensors_tmp_data[i].hasHwTimestamp) {
+                        timestampToCompare = sensors_tmp_data[i].hwTimestamp;
+                    }
+
+                    if ((flush_handle >= 0) && (timestamp_flush <= timestampToCompare)) {
                         if (sensors_tmp_data[i].flushEventsNum < (int)sensors_tmp_data[i].flushEventHandles.size()) {
                             sensors_tmp_data[i].flushEventHandles[sensors_tmp_data[i].flushEventsNum++] = flush_handle;
                         }

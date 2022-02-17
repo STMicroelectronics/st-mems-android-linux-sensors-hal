@@ -36,7 +36,8 @@ LOCAL_C_INCLUDES := \
     $(LOCAL_PATH)/libs/accel-calibration \
     $(LOCAL_PATH)/libs/gyro-calibration \
     $(LOCAL_PATH)/libs/magn-calibration \
-    $(LOCAL_PATH)/libs/sensors-fusion
+    $(LOCAL_PATH)/libs/sensors-fusion \
+    $(LOCAL_PATH)/libs/timesync
 
 LOCAL_CFLAGS += \
     -Wall \
@@ -44,7 +45,8 @@ LOCAL_CFLAGS += \
     -DHAL_ENABLE_ACCEL_CALIBRATION=1 \
     -DHAL_ENABLE_GYRO_CALIBRATION=1 \
     -DHAL_ENABLE_MAGN_CALIBRATION=1 \
-    -DHAL_ENABLE_SENSORS_FUSION=1
+    -DHAL_ENABLE_SENSORS_FUSION=1 \
+    -DHAL_ENABLE_TIMESYNC=0
 
 ifeq ($(DEBUG),y)
 LOCAL_CFLAGS += -g -O0
@@ -120,5 +122,7 @@ LOCAL_PATH := $(LOCAL_PATH_BAK)
 include $(LOCAL_PATH)/libs/magn-calibration/Android.mk
 LOCAL_PATH := $(LOCAL_PATH_BAK)
 include $(LOCAL_PATH)/libs/sensors-fusion/Android.mk
+LOCAL_PATH := $(LOCAL_PATH_BAK)
+include $(LOCAL_PATH)/libs/timesync/Android.mk
 
 endif # !TARGET_SIMULATOR

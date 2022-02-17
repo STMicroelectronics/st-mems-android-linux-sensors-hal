@@ -230,6 +230,12 @@ HWSensorBase::HWSensorBase(HWSensorBaseCommonData *data, const char *name,
     int err;
     char *buffer_path;
 
+    if (HAL_ENABLE_TIMESYNC != 0) {
+        timesync.init(32);
+    }
+    lastLSB.timestamp = 0;
+    lastMSB.timestamp = 0;
+
     memcpy(&common_data, data, sizeof(common_data));
 
     sensor_t_data.power = power_consumption;
@@ -388,6 +394,10 @@ int HWSensorBase::Enable(int handle, bool enable, bool lock_en_mutex)
         }
 
         if (enable) {
+            if (HAL_ENABLE_TIMESYNC != 0) {
+                std::lock_guard<std::mutex> lock(timesyncLock);
+                timesync.reset();
+            }
             sensor_global_enable = timestampEnable;
         } else {
             sensor_global_disable = utils.getTime();
@@ -494,8 +504,35 @@ void HWSensorBase::ProcessEvent(struct device_iio_events *event_data)
     event_type = ((event_data->event_id >> 56) & 0xFF);
     event_dir = ((event_data->event_id >> 48) & 0x7F);
 
-    if ((event_type == DEVICE_IIO_EV_TYPE_FIFO_FLUSH)  || (event_dir == DEVICE_IIO_EV_DIR_FIFO_DATA)) {
+    if ((event_type == DEVICE_IIO_EV_TYPE_FIFO_FLUSH) ||
+        (event_dir == DEVICE_IIO_EV_DIR_FIFO_DATA)) {
         ProcessFlushData(sensor_t_data.handle, event_data->event_timestamp);
+    } else if (event_type == DEVICE_IIO_EV_TYPE_TIME_SYNC) {
+        if (HAL_ENABLE_TIMESYNC != 0) {
+            processSyncEvent(event_data);
+        } else {
+            console.warning("received timesync event but feature not enabled!");
+        }
+    }
+}
+
+void HWSensorBase::processSyncEvent(struct device_iio_events *event_data)
+{
+    uint8_t event_dir = ((event_data->event_id >> 48) & 0x7F);
+
+    if (event_dir == 0) {
+        lastLSB.timestamp = event_data->event_timestamp;
+        lastLSB.val = le32toh(event_data->event_id & 0xFFFFFFFF);
+    } else {
+        lastMSB.timestamp = event_data->event_timestamp;
+        lastMSB.val = le32toh(event_data->event_id & 0xFFFFFFFF);
+    }
+
+    if (lastLSB.timestamp == lastMSB.timestamp) {
+        int64_t hwTimestamp = ((uint64_t)lastMSB.val << 32) | (uint64_t)lastLSB.val;
+
+        std::lock_guard<std::mutex> lock(timesyncLock);
+        timesync.add(event_data->event_timestamp, hwTimestamp);
     }
 }
 
@@ -553,7 +590,6 @@ unlock_mutex:
 
 void HWSensorBase::ProcessFlushData(int __attribute__((unused))handle, int64_t timestamp)
 {
-    unsigned int i;
     int err, flush_handle;
 
     std::lock_guard<std::mutex> lock(flushRequesteLock);
@@ -576,7 +612,7 @@ void HWSensorBase::ProcessFlushData(int __attribute__((unused))handle, int64_t t
             WriteFlushEventToPipe();
         }
     } else {
-        for (i = 0; i < push_data.num; i++) {
+        for (auto i = 0U; i < push_data.num; i++) {
             if (sensor_t_data.handle == push_data.sb[i]->getHandleOfMyTrigger()) {
                 push_data.sb[i]->ProcessFlushData(flush_handle, timestamp);
             }
@@ -628,9 +664,20 @@ void HWSensorBase::ThreadDataTask()
                     continue;
                 }
 
-                pthread_mutex_lock(&sample_in_processing_mutex);
-                sample_in_processing_timestamp = sensor_data.timestamp;
-                pthread_mutex_unlock(&sample_in_processing_mutex);
+                if ((HAL_ENABLE_TIMESYNC != 0) && (sensor_data.hasHwTimestamp)) {
+                    std::lock_guard<std::mutex> lock(timesyncLock);
+                    if (!timesync.estimate(sensor_data.hwTimestamp, sensor_data.timestamp)) {
+                        sensor_data.timestamp = 0;
+                    }
+
+                    pthread_mutex_lock(&sample_in_processing_mutex);
+                    sample_in_processing_timestamp = sensor_data.hwTimestamp;
+                    pthread_mutex_unlock(&sample_in_processing_mutex);
+                } else {
+                    pthread_mutex_lock(&sample_in_processing_mutex);
+                    sample_in_processing_timestamp = sensor_data.timestamp;
+                    pthread_mutex_unlock(&sample_in_processing_mutex);
+                }
 
                 timestamp_odr_switch = odr_switch.readLastElement(&new_pollrate);
                 if ((timestamp_odr_switch >= 0) && (sensor_data.timestamp > timestamp_odr_switch)) {
@@ -642,12 +689,15 @@ void HWSensorBase::ThreadDataTask()
                 }
 
                 sensor_data.flushEventsNum = 0;
-
                 bool tryAgain = false;
 
                 do {
                     flush_handle = flush_stack.readLastElement(&timestamp_flush);
-                    if ((flush_handle >= 0) && (timestamp_flush <= sensor_data.timestamp)) {
+                    int64_t timestampToCompare = sensor_data.timestamp;
+                    if ((HAL_ENABLE_TIMESYNC != 0) && sensor_data.hasHwTimestamp) {
+                        timestampToCompare = sensor_data.hwTimestamp;
+                    }
+                    if ((flush_handle >= 0) && (timestamp_flush <= timestampToCompare)) {
                         if (sensor_data.flushEventsNum < (int)sensor_data.flushEventHandles.size()) {
                             sensor_data.flushEventHandles[sensor_data.flushEventsNum++] = flush_handle;
                         }
@@ -658,7 +708,21 @@ void HWSensorBase::ThreadDataTask()
                     }
                 } while (tryAgain);
 
-                ProcessData(&sensor_data);
+                if (sensor_data.timestamp) {
+                    ProcessData(&sensor_data);
+                } else {
+                    for (int i = 0; i < sensor_data.flushEventsNum; ++i) {
+                        if (sensor_data.flushEventHandles[i] == sensor_t_data.handle) {
+                                WriteFlushEventToPipe();
+                        } else {
+                            for (auto j = 0U; j < push_data.num; j++) {
+                                if (sensor_t_data.handle == push_data.sb[j]->getHandleOfMyTrigger()) {
+                                    push_data.sb[j]->ProcessFlushData(sensor_data.flushEventHandles[i], 0);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

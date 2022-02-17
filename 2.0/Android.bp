@@ -39,7 +39,8 @@ cc_binary {
         "libstm-accel-calibration",
         "libstm-gyro-calibration",
         "libstm-magn-calibration",
-        "libstm-sensors-fusion"
+        "libstm-sensors-fusion",
+        "libstm-timesync"
     ],
     shared_libs: [
         "android.hardware.sensors@2.0",

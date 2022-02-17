@@ -67,7 +67,8 @@ cc_library_static {
         "libs/accel-calibration",
         "libs/gyro-calibration",
         "libs/magn-calibration",
-        "libs/sensors-fusion"
+        "libs/sensors-fusion",
+        "libs/timesync"
     ],
     shared_libs: [
         "libcutils",
@@ -87,5 +88,6 @@ cc_library_static {
         "-DHAL_ENABLE_GYRO_CALIBRATION=1",
         "-DHAL_ENABLE_MAGN_CALIBRATION=1",
         "-DHAL_ENABLE_SENSORS_FUSION=1",
+        "-DHAL_ENABLE_TIMESYNC=0",
     ]
 }

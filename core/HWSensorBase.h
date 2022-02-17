@@ -24,6 +24,7 @@
 #include "SensorBase.h"
 #include <IUtils.h>
 #include <IConsole.h>
+#include <STMTimesync.h>
 
 extern "C" {
     #include "utils.h"
@@ -79,6 +80,14 @@ protected:
 
     IUtils &utils { IUtils::getInstance() };
 
+    std::mutex timesyncLock;
+    STMTimesync timesync;
+
+    struct syncEventHolder {
+        uint32_t val;
+        int64_t timestamp;
+    } lastMSB, lastLSB;
+
 public:
     HWSensorBase(HWSensorBaseCommonData *data,
                  const char *name,
@@ -102,6 +111,7 @@ public:
     virtual void ProcessEvent(struct device_iio_events *event_data);
     virtual int flushRequest(int handle, bool lock_en_mute) override;
     virtual void ProcessFlushData(int handle, int64_t timestamp) override;
+    void processSyncEvent(struct device_iio_events *event_data);
     virtual void ThreadDataTask();
     virtual void ThreadEventsTask();
 

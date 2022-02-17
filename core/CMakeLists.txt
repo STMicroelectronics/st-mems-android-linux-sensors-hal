@@ -21,7 +21,8 @@ add_compile_options(-Wall -Wextra -pedantic -static)
 add_compile_options(-DHAL_ENABLE_ACCEL_CALIBRATION=1
                     -DHAL_ENABLE_GYRO_CALIBRATION=1
                     -DHAL_ENABLE_MAGN_CALIBRATION=1
-                    -DHAL_ENABLE_SENSORS_FUSION=1)
+                    -DHAL_ENABLE_SENSORS_FUSION=1
+                    -DHAL_ENABLE_TIMESYNC=0)
 
 add_library(stmicroelectronics-sensors-core-linux
             STATIC
@@ -78,4 +79,5 @@ target_include_directories(stmicroelectronics-sensors-core-linux PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR}/libs/accel-calibration
                            ${CMAKE_CURRENT_SOURCE_DIR}/libs/gyro-calibration
                            ${CMAKE_CURRENT_SOURCE_DIR}/libs/magn-calibration
-                           ${CMAKE_CURRENT_SOURCE_DIR}/libs/sensors-fusion)
+                           ${CMAKE_CURRENT_SOURCE_DIR}/libs/sensors-fusion
+                           ${CMAKE_CURRENT_SOURCE_DIR}/libs/timesync)

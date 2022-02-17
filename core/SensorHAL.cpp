@@ -776,6 +776,19 @@ int st_hal_open_sensors(void **pdata, STMSensorsList &sensorsList)
     return 0;
 }
 
+static void st_hal_print_timesync_version()
+{
+    std::string libVersionMsg { "timesync library: " };
+
+    if (HAL_ENABLE_TIMESYNC != 0) {
+        libVersionMsg += STMTimesync::getLibVersion();
+        console.info(libVersionMsg);
+    } else {
+        libVersionMsg += std::string("not enabled!");
+        console.info(libVersionMsg);
+    }
+}
+
 void st_hal_dev_set_callbacks(void *data, const ISTMSensorsCallback &sensorsCallback)
 {
     STSensorHAL_data *hal_data = (STSensorHAL_data *)data;
@@ -787,6 +800,8 @@ void st_hal_dev_set_callbacks(void *data, const ISTMSensorsCallback &sensorsCall
     for (auto &node : hal_data->graph) {
         node.payload->libsInit();
     }
+
+    st_hal_print_timesync_version();
 }
 
 /**
