@@ -668,6 +668,11 @@ void HWSensorBase::ThreadDataTask()
                     std::lock_guard<std::mutex> lock(timesyncLock);
                     if (!timesync.estimate(sensor_data.hwTimestamp, sensor_data.timestamp)) {
                         sensor_data.timestamp = 0;
+                    } else {
+                        int64_t now = utils.getTime();
+                        if (sensor_data.timestamp > utils.getTime()) {
+                            sensor_data.timestamp = now;
+                        }
                     }
 
                     pthread_mutex_lock(&sample_in_processing_mutex);
