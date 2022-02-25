@@ -22,6 +22,7 @@
 #include <IConsole.h>
 #include "Convert.h"
 #include "SensorsHidlInterface.h"
+#include "AndroidPropertiesLoader.h"
 
 namespace android {
 namespace hardware {
@@ -40,7 +41,8 @@ SensorsHidlInterface::SensorsHidlInterface(void)
                        mEventQueueFlag(nullptr),
                        sensorsCore(ISTMSensorsHAL::getInstance()),
                        console(IConsole::getInstance()),
-                       lastDirectChannelHandle(0)
+                       lastDirectChannelHandle(0),
+                       propertiesManager(PropertiesManager::getInstance())
 {
     addInfoMng = std::make_unique<AdditionalInfoManager>(sensorsCore.getSensorsList());
 }
@@ -155,6 +157,9 @@ SensorsHidlInterface::initialize(const MQDescriptorSync<Event>& eventQueueDescri
     frameworkRequestPollrateNs.clear();
     frameworkRequestLatencyNs.clear();
     sensorCurrentPollrateNs.clear();
+
+    AndroidPropertiesLoader propertiesLoader;
+    propertiesManager.load(propertiesLoader);
 
     sensorsCore.initialize(*dynamic_cast<ISTMSensorsCallback *>(this));
 

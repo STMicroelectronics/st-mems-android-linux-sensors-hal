@@ -39,6 +39,8 @@ Accelerometer::Accelerometer(HWSensorBaseCommonData *data,
 {
     (void) wakeup;
 
+    rotMatrix = propertiesManager.getRotationMatrix(AccelSensorType);
+
     sensor_t_data.resolution = data->channels[0].scale;
     sensor_t_data.maxRange = sensor_t_data.resolution * (std::pow(2, data->channels[0].bits_used - 1) - 1);
     sensor_event.data.dataLen = 3;
@@ -130,22 +132,11 @@ void Accelerometer::loadBiasValues(void)
 
 void Accelerometer::ProcessData(SensorBaseData *data)
 {
-    float tmp_raw_data[SENSOR_DATA_3AXIS];
+    std::array<float, 3> accelTmp;
 
-    memcpy(tmp_raw_data, data->raw, SENSOR_DATA_3AXIS * sizeof(float));
-
-    data->raw[0] = SENSOR_X_DATA(tmp_raw_data[0],
-                                 tmp_raw_data[1],
-                                 tmp_raw_data[2],
-                                 CONFIG_ST_HAL_ACCEL_ROT_MATRIX);
-    data->raw[1] = SENSOR_Y_DATA(tmp_raw_data[0],
-                                 tmp_raw_data[1],
-                                 tmp_raw_data[2],
-                                 CONFIG_ST_HAL_ACCEL_ROT_MATRIX);
-    data->raw[2] = SENSOR_Z_DATA(tmp_raw_data[0],
-                                 tmp_raw_data[1],
-                                 tmp_raw_data[2],
-                                 CONFIG_ST_HAL_ACCEL_ROT_MATRIX);
+    memcpy(accelTmp.data(), data->raw, SENSOR_DATA_3AXIS * sizeof(float));
+    accelTmp = rotMatrix * accelTmp;
+    memcpy(data->raw, accelTmp.data(), SENSOR_DATA_3AXIS * sizeof(float));
 
     data->accuracy = SENSOR_STATUS_UNRELIABLE;
 

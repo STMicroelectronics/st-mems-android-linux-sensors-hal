@@ -18,6 +18,8 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
+#include <unordered_map>
 
 namespace stm {
 namespace core {
@@ -63,6 +65,13 @@ enum class SensorType : uint16_t {
     LOW_LATENCY_OFFBODY_DETECT,     /* dimensionless */
     ACCELEROMETER_UNCALIBRATED,     /* m/s^2 */
     ODR_SWITCH_INFO,                /* dimensionless */
+};
+
+const std::unordered_map<SensorType, std::string> sensorTypeToString = {
+    { SensorType::ACCELEROMETER, "accelerometer"},
+    { SensorType::GYROSCOPE, "gyroscope"},
+    { SensorType::MAGNETOMETER, "magnetometer"},
+    { SensorType::PRESSURE, "pressure"},
 };
 
 } // namespace core

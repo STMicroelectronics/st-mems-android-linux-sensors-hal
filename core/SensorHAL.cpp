@@ -29,6 +29,7 @@
 
 #include <IConsole.h>
 #include "SensorsGraph.h"
+#include <PropertiesManager.h>
 
 #include "SensorHAL.h"
 #include "Accelerometer.h"
@@ -328,14 +329,14 @@ static int st_hal_set_fullscale(const char *iio_sysfs_path,
     double max_number;
     int i, max_value;
 
+    PropertiesManager& properties = PropertiesManager::getInstance();
+    max_value = properties.getMaxRangeOfMeasurements(sensor_type);
+
     if (sensor_type == AccelSensorType) {
-        max_value = CONFIG_ST_HAL_ACCEL_RANGE;
         iio_sensor_type = DEVICE_IIO_ACC;
     } else if (sensor_type == MagnSensorType) {
-        max_value = CONFIG_ST_HAL_MAGN_RANGE;
         iio_sensor_type = DEVICE_IIO_MAGN;
     } else if (sensor_type == GyroSensorType) {
-        max_value = CONFIG_ST_HAL_GYRO_RANGE;
         iio_sensor_type = DEVICE_IIO_GYRO;
     } else if (sensor_type == AmbTemperatureSensorType) {
         /* temperature sensors generally do not support change full scale */

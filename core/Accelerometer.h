@@ -46,6 +46,8 @@ private:
     void saveBiasValues(void) const;
 
     void loadBiasValues(void);
+
+    Matrix<3, 3, float> rotMatrix;
 };
 
 } // namespace core

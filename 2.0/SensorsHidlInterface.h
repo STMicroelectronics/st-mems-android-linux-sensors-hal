@@ -27,6 +27,7 @@
 #include <atomic>
 #include <thread>
 
+#include <PropertiesManager.h>
 #include <ISTMSensorsHAL.h>
 #include <IUtils.h>
 
@@ -56,6 +57,7 @@ using stm::core::ISTMSensorsCallback;
 using stm::core::ISTMSensorsCallbackData;
 using stm::core::ISTMSensorsHAL;
 using stm::core::IConsole;
+using stm::core::PropertiesManager;
 
 struct SensorsHidlInterface : public ISensors, public ISTMSensorsCallback {
 public:
@@ -218,6 +220,8 @@ private:
      * map: sensorHandle -> current sensor configured stream pollrate
      */
     std::unordered_map<int32_t, int64_t> sensorCurrentPollrateNs;
+
+    PropertiesManager& propertiesManager;
 
     void deleteEventFlag(void);
 

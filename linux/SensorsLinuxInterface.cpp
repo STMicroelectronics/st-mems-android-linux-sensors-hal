@@ -21,11 +21,13 @@
 #include <cstring>
 
 #include "SensorsLinuxInterface.h"
+#include "LinuxPropertiesLoader.h"
 #include <IConsole.h>
 
 SensorsLinuxInterface::SensorsLinuxInterface(void)
                       : sensorsCore(ISTMSensorsHAL::getInstance()),
-                        console(IConsole::getInstance())
+                        console(IConsole::getInstance()),
+                        propertiesManager(PropertiesManager::getInstance())
 {
 }
 
@@ -36,6 +38,10 @@ SensorsLinuxInterface::SensorsLinuxInterface(void)
  */
 int SensorsLinuxInterface::initialize(void)
 {
+    LinuxPropertiesLoader linuxPropertiesLoader;
+
+    propertiesManager.load(linuxPropertiesLoader);
+
     sensorsCore.initialize(*dynamic_cast<ISTMSensorsCallback *>(this));
 
     return 0;

@@ -18,6 +18,7 @@
 #pragma once
 
 #include <array>
+#include <string>
 
 template <ssize_t rows, ssize_t columns, typename T>
 class Matrix {
@@ -41,6 +42,68 @@ public:
 
     int numColumns(void) const {
         return columns;
+    }
+
+    Matrix<rows, columns, T> & operator*(const Matrix<columns, rows, T>& rhl) {
+        Matrix<rows, columns, T> result;
+
+        for (auto row = 0; row < rows; ++row) {
+            for (auto col = 0; col < columns; ++col) {
+                result[row][col] = 0;
+
+                for (auto i = 0; i < columns; ++i) {
+                    result[row][col] += data[row][i] * rhl[i][col];
+                }
+            }
+        }
+
+        *this = std::move(result);
+
+        return *this;
+    }
+
+    std::array<T, columns> operator*(const std::array<T, columns>& rhl) {
+        std::array<T, columns> result;
+
+        for (auto row = 0; row < rows; ++row) {
+            result[row] = 0;
+
+            for (auto i = 0; i < columns; ++i) {
+                result[row] += data[row][i] * rhl[i];
+            }
+        }
+
+        return result;
+    }
+
+    operator std::string() {
+        std::string text;
+
+        for (auto i = 0; i < numRows(); ++i) {
+            for (auto j = 0; j < numColumns(); ++j) {
+                text.append(std::to_string(data[i][j]));
+                if (j < numColumns() - 1) {
+                    text.append(",");
+                }
+            }
+            if (i < numRows() - 1) {
+                text.append(";");
+            }
+        }
+
+        return text;
+    }
+
+    operator std::array<T, columns * rows>() {
+        std::array<T, columns * rows> output;
+
+        for (auto i = 0; i < numRows(); ++i) {
+            for (auto j = 0; j < numColumns(); ++j) {
+                output[3 * i + j] = data[i][j];
+            }
+        }
+
+        return output;
     }
 
 private:

@@ -25,6 +25,8 @@
 
 #include "HWSensorBase.h"
 
+#include <PropertiesManager.h>
+
 namespace stm {
 namespace core {
 
@@ -833,8 +835,11 @@ HWSensorBaseWithPollrate::HWSensorBaseWithPollrate(HWSensorBaseCommonData *data,
 
     memcpy(&sampling_frequency_available, sfa, sizeof(sampling_frequency_available));
 
+    PropertiesManager& properties = PropertiesManager::getInstance();
+    int maxOdr = properties.getMaxOdr();
+
     for (i = 0; i < sfa->length; i++) {
-        if ((max_sampling_frequency < sfa->freq[i]) && (sfa->freq[i] <= CONFIG_ST_HAL_MAX_SAMPLING_FREQUENCY)) {
+        if ((max_sampling_frequency < sfa->freq[i]) && (sfa->freq[i] <= maxOdr)) {
             max_sampling_frequency = sfa->freq[i];
         }
 

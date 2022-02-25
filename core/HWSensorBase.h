@@ -25,6 +25,7 @@
 #include <IUtils.h>
 #include <IConsole.h>
 #include <STMTimesync.h>
+#include <PropertiesManager.h>
 
 extern "C" {
     #include "utils.h"
@@ -79,6 +80,7 @@ protected:
     int WriteBufferLenght(unsigned int buf_len);
 
     IUtils &utils { IUtils::getInstance() };
+    PropertiesManager& propertiesManager { PropertiesManager::getInstance() };
 
     std::mutex timesyncLock;
     STMTimesync timesync;

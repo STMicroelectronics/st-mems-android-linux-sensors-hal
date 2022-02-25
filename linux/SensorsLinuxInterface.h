@@ -21,12 +21,14 @@
 
 #include <ISTMSensorsHAL.h>
 #include <IUtils.h>
+#include <PropertiesManager.h>
 
 using stm::core::ISTMSensorsHAL;
 using stm::core::ISTMSensorsCallback;
 using stm::core::ISTMSensorsCallbackData;
 using stm::core::STMSensor;
 using stm::core::IConsole;
+using stm::core::PropertiesManager;
 
 struct SensorsLinuxInterface : public ISTMSensorsCallback {
 public:
@@ -59,4 +61,6 @@ private:
      * Print console
      */
     IConsole &console;
+
+    PropertiesManager& propertiesManager;
 };

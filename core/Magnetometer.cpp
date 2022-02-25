@@ -41,6 +41,8 @@ Magnetometer::Magnetometer(HWSensorBaseCommonData *data, const char *name,
 {
     (void) wakeup;
 
+    rotMatrix = propertiesManager.getRotationMatrix(MagnSensorType);
+
     sensor_t_data.resolution = GAUSS_TO_UTESLA(data->channels[0].scale);
     sensor_t_data.maxRange = sensor_t_data.resolution * (std::pow(2, data->channels[0].bits_used - 1) - 1);
     sensor_event.data.dataLen = 3;
@@ -132,22 +134,11 @@ void Magnetometer::loadBiasValues(void)
 
 void Magnetometer::ProcessData(SensorBaseData *data)
 {
-    float tmp_raw_data[SENSOR_DATA_3AXIS];
+    std::array<float, 3> magnTmp;
 
-    memcpy(tmp_raw_data, data->raw, SENSOR_DATA_3AXIS * sizeof(float));
-
-    data->raw[0] = GAUSS_TO_UTESLA(SENSOR_X_DATA(tmp_raw_data[0],
-                                                 tmp_raw_data[1],
-                                                 tmp_raw_data[2],
-                                                 CONFIG_ST_HAL_MAGN_ROT_MATRIX));
-    data->raw[1] = GAUSS_TO_UTESLA(SENSOR_Y_DATA(tmp_raw_data[0],
-                                                 tmp_raw_data[1],
-                                                 tmp_raw_data[2],
-                                                 CONFIG_ST_HAL_MAGN_ROT_MATRIX));
-    data->raw[2] = GAUSS_TO_UTESLA(SENSOR_Z_DATA(tmp_raw_data[0],
-                                                 tmp_raw_data[1],
-                                                 tmp_raw_data[2],
-                                                 CONFIG_ST_HAL_MAGN_ROT_MATRIX));
+    memcpy(magnTmp.data(), data->raw, SENSOR_DATA_3AXIS * sizeof(float));
+    magnTmp = rotMatrix * magnTmp;
+    memcpy(data->raw, magnTmp.data(), SENSOR_DATA_3AXIS * sizeof(float));
 
     if (HAL_ENABLE_MAGN_CALIBRATION != 0) {
         std::array<float, 3> magnData;

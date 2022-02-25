@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018 The Android Open Source Project
- * Copyright (C) 2015-2020 STMicroelectronics
+ * Copyright (C) 2022 STMicroelectronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,36 +17,33 @@
 
 #pragma once
 
-#include "HWSensorBase.h"
+#include <string>
+#include <array>
+#include <vector>
 
-#include <STMGyroCalibration.h>
+#include <IConsole.h>
 
 namespace stm {
 namespace core {
 
-/*
- * class Gyroscope
- */
-class Gyroscope : public HWSensorBaseWithPollrate {
+class PropertiesParser {
 public:
-    Gyroscope(HWSensorBaseCommonData *data, const char *name,
-              struct device_iio_sampling_freqs *sfa, int handle,
-              unsigned int hw_fifo_len, float power_consumption, bool wakeup);
+    static PropertiesParser makeRotationMatrixParser(std::string text);
 
-    int64_t bias_last_pollrate;
+    static PropertiesParser makeSensorPlacementParser(std::string text);
 
-    virtual int libsInit(void) override;
-    virtual int Enable(int handle, bool enable, bool lock_en_mutex);
-    virtual void ProcessData(SensorBaseData *data);
+    bool isValid() const;
+
+    const std::vector<float>& getData() const;
 
 private:
-    STMGyroCalibration& gyroCalibration;
+    PropertiesParser() = delete;
 
-    void saveBiasValues(void) const;
+    PropertiesParser(const std::string& text, int numElements);
 
-    void loadBiasValues(void);
+    std::vector<float> data;
 
-    Matrix<3, 3, float> rotMatrix;
+    bool valid;
 };
 
 } // namespace core
