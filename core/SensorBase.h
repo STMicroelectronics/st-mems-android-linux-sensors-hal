@@ -146,6 +146,7 @@ protected:
 
     std::unique_ptr<std::thread> dataThread;
     std::unique_ptr<std::thread> eventsThread;
+    std::atomic<bool> threadsRunning;
 
     ISTMSensorsCallback *sensorsCallback;
 
@@ -171,9 +172,12 @@ public:
     SensorBase(const char *name, int handle, const STMSensorType &type);
     virtual ~SensorBase();
 
-    bool IsValidClass();
+    SensorBase(const SensorBase& rhl) = delete;
+    SensorBase(SensorBase&& rhl) = delete;
+    SensorBase& operator=(const SensorBase& rhl) = delete;
+    SensorBase& operator=(SensorBase&& rhl) = delete;
 
-    virtual int CustomInit();
+    bool IsValidClass();
 
     virtual int libsInit(void) { return 0; };
 
@@ -214,11 +218,11 @@ public:
     virtual void ReceiveDataFromDependency(int handle, SensorBaseData *data);
     virtual int GetLatestValidDataFromDependency(int dependency_id, SensorBaseData *data, int64_t timesync);
 
-    static void *ThreadDataWork(void *context);
-    virtual void ThreadDataTask();
+    static void *ThreadDataWork(void *context, std::atomic<bool>& threadsRunning);
+    virtual void ThreadDataTask(std::atomic<bool>& threadsRunning);
 
-    static void *ThreadEventsWork(void *context);
-    virtual void ThreadEventsTask();
+    static void *ThreadEventsWork(void *context, std::atomic<bool>& threadsRunning);
+    virtual void ThreadEventsTask(std::atomic<bool>& threadsRunning);
 
     virtual int InjectionMode(bool enable);
     virtual int InjectSensorData(const sensors_event_t *data);

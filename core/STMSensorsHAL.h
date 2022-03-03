@@ -31,7 +31,7 @@ public:
     static STMSensorsHAL& getInstance(void);
     ~STMSensorsHAL(void);
 
-    void initialize(const ISTMSensorsCallback &sensorsCallback) final;
+    int initialize(const ISTMSensorsCallback &sensorsCallback) final;
 
     const STMSensorsList& getSensorsList(void) final;
 
@@ -97,7 +97,11 @@ private:
 
     void *hal_data;
 
+    bool initialized;
+
     bool handleIsValid(uint32_t handle) const;
+
+    void terminate(void);
 
     static void internalPoll(STMSensorsHAL *hal, std::atomic<bool> *running);
 };

@@ -36,21 +36,16 @@ STMSensorsHAL& STMSensorsHAL::getInstance(void)
 STMSensorsHAL::STMSensorsHAL(void)
               : sensorsCallback(&emptySTMSensorCallback),
                 console(IConsole::getInstance()),
-                dataReceivedThreadRunning(false)
+                dataReceivedThreadRunning(false),
+                initialized(false)
 {
-    st_hal_open_sensors(&hal_data, sensorsList);
 
-    if (hal_data) {
-        dataReceivedThreadRunning = true;
-        dataReceivedThread = std::make_unique<std::thread>(internalPoll, this, &dataReceivedThreadRunning);
-    }
 }
 
 STMSensorsHAL::~STMSensorsHAL(void)
 {
-    dataReceivedThreadRunning = false;
-    if (dataReceivedThread != nullptr) {
-        dataReceivedThread->join();
+    if (initialized) {
+        terminate();
     }
 }
 
@@ -85,17 +80,29 @@ void STMSensorsHAL::internalPoll(STMSensorsHAL *hal, std::atomic<bool> *running)
  * initialize: implementation of an interface,
  *             reference: ISTMSensorsHAL.h
  */
-void STMSensorsHAL::initialize(const ISTMSensorsCallback &sensorsCallback)
+int STMSensorsHAL::initialize(const ISTMSensorsCallback &sensorsCallback)
 {
+    if (initialized) {
+        terminate();
+    }
+
+    int err = st_hal_open_sensors(&hal_data, sensorsList);
+    if (err) {
+        return err;
+    }
+
+    dataReceivedThreadRunning = true;
+    dataReceivedThread = std::make_unique<std::thread>(internalPoll, this, &dataReceivedThreadRunning);
+
     for (auto &sensor : getSensorsList().getList()) {
         activate(sensor.getHandle(), false);
     }
 
-    if (hal_data) {
-        st_hal_dev_set_callbacks(hal_data, sensorsCallback);
-    }
-
+    st_hal_dev_set_callbacks(hal_data, sensorsCallback);
     this->sensorsCallback = (ISTMSensorsCallback *)&sensorsCallback;
+    initialized = true;
+
+    return 0;
 }
 
 /**
@@ -161,6 +168,27 @@ bool STMSensorsHAL::handleIsValid(uint32_t handle) const
     }
 
     return true;
+}
+
+void STMSensorsHAL::terminate(void)
+{
+    for (auto &sensor : getSensorsList().getList()) {
+        activate(sensor.getHandle(), false);
+    }
+
+    this->sensorsCallback = (ISTMSensorsCallback *)&emptySTMSensorCallback;
+
+    dataReceivedThreadRunning = false;
+    if (dataReceivedThread && dataReceivedThread->joinable()) {
+        dataReceivedThread->join();
+    }
+
+    if (hal_data) {
+        st_hal_close_sensors(hal_data);
+    }
+
+    sensorsList.clear();
+    initialized = false;
 }
 
 } // namespace core

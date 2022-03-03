@@ -33,7 +33,6 @@ add_library(stmicroelectronics-sensors-core-linux
             STMSensor.cpp
             ISTMSensorsCallbackData.cpp
             STMSensorsCallbackData.cpp
-            SensorsGraph.cpp
             SensorsSupported.cpp
             Accelerometer.cpp
             ChangeODRTimestampStack.cpp

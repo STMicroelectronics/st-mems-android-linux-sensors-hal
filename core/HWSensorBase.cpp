@@ -622,7 +622,7 @@ void HWSensorBase::ProcessFlushData(int __attribute__((unused))handle, int64_t t
     pthread_mutex_unlock(&sample_in_processing_mutex);
 }
 
-void HWSensorBase::ThreadDataTask()
+void HWSensorBase::ThreadDataTask(std::atomic<bool>& threadsRunning)
 {
     uint8_t *data;
     unsigned int hw_fifo_len;
@@ -645,8 +645,8 @@ void HWSensorBase::ThreadDataTask()
         return;
     }
 
-    while (true) {
-        err = poll(&pollfd_iio[0], 1, -1);
+    while (threadsRunning.load()) {
+        err = poll(&pollfd_iio[0], 1, 200);
         if (err <= 0) {
             continue;
         }
@@ -733,13 +733,13 @@ void HWSensorBase::ThreadDataTask()
     }
 }
 
-void HWSensorBase::ThreadEventsTask()
+void HWSensorBase::ThreadEventsTask(std::atomic<bool>& threadsRunning)
 {
     struct device_iio_events event_data[10];
     int err, i, read_size;
 
-    while (true) {
-        err = poll(&pollfd_iio[1], 1, -1);
+    while (threadsRunning.load()) {
+        err = poll(&pollfd_iio[1], 1, 200);
         if (err <= 0) {
             continue;
         }

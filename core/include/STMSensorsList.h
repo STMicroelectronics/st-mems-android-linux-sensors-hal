@@ -32,6 +32,8 @@ public:
 
     const std::vector<STMSensor>& getList(void) const;
 
+    void clear();
+
 private:
     /**
      * List of available sensors

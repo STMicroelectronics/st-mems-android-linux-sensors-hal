@@ -65,5 +65,10 @@ const std::vector<STMSensor>& STMSensorsList::getList(void) const
     return list;
 }
 
+void STMSensorsList::clear()
+{
+    list.clear();
+}
+
 } // namespace core
 } // namespace stm

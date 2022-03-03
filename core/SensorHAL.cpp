@@ -156,42 +156,42 @@ static int st_hal_set_operation_mode(unsigned int mode);
  *
  * Return value: sensor class pointer on success, NULL pointer on fail.
  */
-static SensorBase* st_hal_create_virtual_class_sensor(const STMSensorType &sensor_type,
-                                                      int handle)
+static std::shared_ptr<SensorBase> st_hal_create_virtual_class_sensor(const STMSensorType &sensor_type,
+                                                                      int handle)
 {
-    SensorBase *sb = nullptr;
+    std::shared_ptr<SensorBase> sensor = nullptr;
 
     if (sensor_type.isInternal()) {
         if (sensor_type == AccelGyroFusion6XSensorType) {
-            sb = new SWAccelGyroFusion6X("Accel-Gyro Fusion 6X", handle);
+            sensor = std::make_shared<SWAccelGyroFusion6X>("Accel-Gyro Fusion 6X", handle);
         } else if (sensor_type == AccelMagnGyroFusion9XSensorType) {
-            sb = new SWAccelMagnGyroFusion9X("Accel-Magn-Gyro Fusion 9X", handle);
+            sensor = std::make_shared<SWAccelMagnGyroFusion9X>("Accel-Magn-Gyro Fusion 9X", handle);
         }
     } else {
         if (sensor_type == AccelUncalibSensorType) {
-            sb = new SWAccelerometerUncalibrated("Accelerometer Uncalibrated Sensor", handle);
+            sensor = std::make_shared<SWAccelerometerUncalibrated>("Accelerometer Uncalibrated Sensor", handle);
         } else if (sensor_type == MagnUncalibSensorType) {
-            sb = new SWMagnetometerUncalibrated("Magnetometer Uncalibrated Sensor", handle);
+            sensor = std::make_shared<SWMagnetometerUncalibrated>("Magnetometer Uncalibrated Sensor", handle);
         } else if (sensor_type == GyroUncalibSensorType) {
-            sb = new SWGyroscopeUncalibrated("Gyroscope Uncalibrated Sensor", handle);
+            sensor = std::make_shared<SWGyroscopeUncalibrated>("Gyroscope Uncalibrated Sensor", handle);
         } else if (sensor_type == GameRotationVecSensorType) {
-            sb = new SWGameRotationVector("iNemoEngine Game Rotation Vector Sensor", handle);
+            sensor = std::make_shared<SWGameRotationVector>("iNemoEngine Game Rotation Vector Sensor", handle);
         } else if (sensor_type == RotationVecSensorType) {
-            sb = new SWRotationVector("iNemoEngine Rotation Vector Sensor", handle);
+            sensor = std::make_shared<SWRotationVector>("iNemoEngine Rotation Vector Sensor", handle);
         } else if (sensor_type == OrientationSensorType) {
-            sb = new SWOrientation("iNemoEngine Orientation Sensor", handle);
+            sensor = std::make_shared<SWOrientation>("iNemoEngine Orientation Sensor", handle);
         } else if (sensor_type == GravitySensorType) {
-            sb = new SWGravity("iNemoEngine Gravity Sensor", handle);
+            sensor = std::make_shared<SWGravity>("iNemoEngine Gravity Sensor", handle);
         } else if (sensor_type == LinearAccelSensorType) {
-            sb = new SWLinearAccel("iNemoEngine Linear Acceleration Sensor", handle);
+            sensor = std::make_shared<SWLinearAccel>("iNemoEngine Linear Acceleration Sensor", handle);
         }
     }
 
-    if (sb == nullptr) {
+    if (sensor == nullptr) {
         return nullptr;
     }
 
-    return sb->IsValidClass() ? sb : nullptr;
+    return sensor->IsValidClass() ? sensor : nullptr;
 }
 
 /*
@@ -201,10 +201,11 @@ static SensorBase* st_hal_create_virtual_class_sensor(const STMSensorType &senso
  *
  * Return value: sensor class pointer on success, NULL pointer on fail.
  */
-static SensorBase* st_hal_create_class_sensor(STSensorHAL_iio_devices_data *data, int sensorId)
+static std::shared_ptr<SensorBase> st_hal_create_class_sensor(STSensorHAL_iio_devices_data *data,
+                                                              int sensorId)
 {
     struct HWSensorBaseCommonData class_data;
-    SensorBase *sb = nullptr;
+    std::shared_ptr<SensorBase> sensor = nullptr;
 
     if ((strlen(data->iio_sysfs_path.c_str()) + 1 > HW_SENSOR_BASE_IIO_SYSFS_PATH_MAX) ||
         (strlen(data->deviceName.c_str()) + 1 > HW_SENSOR_BASE_IIO_DEVICE_NAME_MAX) ||
@@ -221,71 +222,90 @@ static SensorBase* st_hal_create_class_sensor(STSensorHAL_iio_devices_data *data
     class_data.num_channels = data->num_channels;
 
     if (data->sensor_type == AccelSensorType) {
-        sb = new Accelerometer(&class_data, data->androidName.c_str(), &data->sfa,
-                               sensorId, data->hw_fifo_len,
-                               data->power_consumption, data->wake_up_sensor);
+        sensor = std::make_shared<Accelerometer>(&class_data,
+                                                 data->androidName.c_str(), &data->sfa,
+                                                 sensorId, data->hw_fifo_len,
+                                                 data->power_consumption,
+                                                 data->wake_up_sensor);
     } else if (data->sensor_type == MagnSensorType) {
-        sb = new Magnetometer(&class_data, data->androidName.c_str(), &data->sfa,
-                              sensorId, data->hw_fifo_len,
-                              data->power_consumption, data->wake_up_sensor);
+        sensor = std::make_shared<Magnetometer>(&class_data,
+                                                data->androidName.c_str(), &data->sfa,
+                                                sensorId, data->hw_fifo_len,
+                                                data->power_consumption,
+                                                data->wake_up_sensor);
     } else if (data->sensor_type == GyroSensorType) {
-        sb = new Gyroscope(&class_data, data->androidName.c_str(), &data->sfa,
-                           sensorId, data->hw_fifo_len,
-                           data->power_consumption, data->wake_up_sensor);
+        sensor = std::make_shared<Gyroscope>(&class_data,
+                                             data->androidName.c_str(), &data->sfa,
+                                             sensorId, data->hw_fifo_len,
+                                             data->power_consumption,
+                                             data->wake_up_sensor);
     } else if (data->sensor_type == StepDetectorSensorType) {
-        sb = new StepDetector(&class_data, data->androidName.c_str(),
-                              sensorId, data->hw_fifo_len,
-                              data->power_consumption, data->wake_up_sensor);
+        sensor = std::make_shared<StepDetector>(&class_data,
+                                                data->androidName.c_str(),
+                                                sensorId, data->hw_fifo_len,
+                                                data->power_consumption,
+                                                data->wake_up_sensor);
     } else if (data->sensor_type == StepCounterSensorType) {
-        sb = new StepCounter(&class_data, data->androidName.c_str(),
-                             sensorId, data->hw_fifo_len,
-                             data->power_consumption, data->wake_up_sensor);
+        sensor = std::make_shared<StepCounter>(&class_data,
+                                               data->androidName.c_str(),
+                                               sensorId, data->hw_fifo_len,
+                                               data->power_consumption,
+                                               data->wake_up_sensor);
     } else if (data->sensor_type == SignMotionSensorType) {
-        sb = new SignMotion(&class_data, data->androidName.c_str(),
-                            sensorId, data->power_consumption);
+        sensor = std::make_shared<SignMotion>(&class_data,
+                                              data->androidName.c_str(),
+                                              sensorId,
+                                              data->power_consumption);
     } else if (data->sensor_type == TiltDetectorSensorType) {
-        sb = new TiltSensor(&class_data, data->androidName.c_str(),
-                            sensorId, data->hw_fifo_len,
-                            data->power_consumption);
+        sensor = std::make_shared<TiltSensor>(&class_data,
+                                              data->androidName.c_str(),
+                                              sensorId, data->hw_fifo_len,
+                                              data->power_consumption);
     } else if (data->sensor_type == PressureSensorType) {
-        sb = new Pressure(&class_data, data->androidName.c_str(), &data->sfa,
-                          sensorId, data->hw_fifo_len,
-                          data->power_consumption, data->wake_up_sensor);
+        sensor = std::make_shared<Pressure>(&class_data,
+                                            data->androidName.c_str(), &data->sfa,
+                                            sensorId, data->hw_fifo_len,
+                                            data->power_consumption,
+                                            data->wake_up_sensor);
     } else if ((data->sensor_type == WristTiltGestureSensorType) ||
                (data->sensor_type == GlaceGestureSensorType) ||
                (data->sensor_type == WakeGestureSensorType) ||
                (data->sensor_type == PickupGestureSensorType)||
                (data->sensor_type == MotionDetectSensorType) ||
                (data->sensor_type == StationaryDetectSensorType)) {
-        sb = new Gesture(&class_data, data->androidName.c_str(),
-                         sensorId, data->hw_fifo_len,
-                         data->power_consumption);
+        sensor = std::make_shared<Gesture>(&class_data,
+                                           data->androidName.c_str(),
+                                           sensorId, data->hw_fifo_len,
+                                           data->power_consumption);
     } else if (data->sensor_type == DeviceOrientationSensorType) {
-        sb = new DeviceOrientation(&class_data, data->androidName.c_str(),
-                                   &data->sfa, sensorId,
-                                   data->hw_fifo_len,
-                                   data->power_consumption,
-                                   data->wake_up_sensor);
+        sensor = std::make_shared<DeviceOrientation>(&class_data,
+                                                     data->androidName.c_str(),
+                                                     &data->sfa, sensorId,
+                                                     data->hw_fifo_len,
+                                                     data->power_consumption,
+                                                     data->wake_up_sensor);
     } else if (data->sensor_type == HumiditySensorType) {
-        sb = new RHumidity(&class_data, data->androidName.c_str(), &data->sfa,
-                           sensorId, data->hw_fifo_len,
-                           data->power_consumption,
-                           data->wake_up_sensor);
+        sensor = std::make_shared<RHumidity>(&class_data,
+                                             data->androidName.c_str(), &data->sfa,
+                                             sensorId, data->hw_fifo_len,
+                                             data->power_consumption,
+                                             data->wake_up_sensor);
     } else if (data->sensor_type == AmbTemperatureSensorType) {
-        sb = new Temp(&class_data, data->androidName.c_str(), &data->sfa,
-                      sensorId, data->hw_fifo_len,
-                      data->power_consumption,
-                      data->wake_up_sensor);
+        sensor = std::make_shared<Temp>(&class_data,
+                                        data->androidName.c_str(), &data->sfa,
+                                        sensorId, data->hw_fifo_len,
+                                        data->power_consumption,
+                                        data->wake_up_sensor);
     } else {
         return nullptr;
     }
 
-#ifdef CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS
-    if (sb->IsValidClass())
+#ifdef CONnullptrFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS
+    if (sensor->IsValidClass())
         ((HWSensorBase *)sb)->GetSelfTestAvailable();
 #endif /* CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS */
 
-    return sb->IsValidClass() ? sb : nullptr;
+    return sensor->IsValidClass() ? sensor : nullptr;
 }
 
 /*
@@ -496,10 +516,9 @@ int st_hal_dev_flush(void *data, uint32_t handle)
 
     auto nodeId = hal_data->handleToNodeId_.find(handle);
 
-    for (auto &node : hal_data->graph) {
-        if (nodeId->second == node.id) {
-            return node.payload->flushRequest(node.payload->GetHandle(), true);
-        }
+    auto sensor = hal_data->graph[nodeId->second];
+    if (sensor != nullptr) {
+        return sensor->flushRequest(sensor->GetHandle(), true);
     }
 
     return -EINVAL;
@@ -519,10 +538,9 @@ __attribute__((unused)) static int st_hal_dev_inject_sensor_data(struct sensors_
 
     auto nodeId = hal_data->handleToNodeId_.find(data->sensor);
 
-    for (auto &node : hal_data->graph) {
-        if (nodeId->second == node.id) {
-            return node.payload->InjectSensorData(data);
-        }
+    auto sensor = hal_data->graph[nodeId->second];
+    if (sensor != nullptr) {
+        return sensor->InjectSensorData(data);
     }
 
     return -EINVAL;
@@ -544,10 +562,9 @@ int st_hal_dev_batch(void *data, int handle, int64_t period_ns, int64_t timeout)
 
     auto nodeId = hal_data->handleToNodeId_.find(handle);
 
-    for (auto &node : hal_data->graph) {
-        if (nodeId->second == node.id) {
-            return node.payload->SetDelay(node.payload->GetHandle(), period_ns, timeout, true);
-        }
+    auto sensor = hal_data->graph[nodeId->second];
+    if (sensor != nullptr) {
+        return sensor->SetDelay(sensor->GetHandle(), period_ns, timeout, true);
     }
 
     return -EINVAL;
@@ -616,28 +633,19 @@ int st_hal_dev_activate(void *data, uint32_t handle, bool enable)
 
     auto nodeId = hal_data->handleToNodeId_.find(handle);
 
-    for (auto &node : hal_data->graph) {
-        if (nodeId->second == node.id) {
-            return node.payload->Enable(node.payload->GetHandle(), enable, true);
-        }
+    auto sensor = hal_data->graph[nodeId->second];
+    if (sensor != nullptr) {
+        return sensor->Enable(sensor->GetHandle(), enable, true);
     }
 
     return -EINVAL;
 }
 
-/**
- * st_hal_dev_close() - Close device sensors module
- * @dev: sensors device structure.
- *
- * Return value: 0 on success, negative number on fail.
- */
-__attribute__((unused)) static int st_hal_dev_close(struct hw_device_t *dev)
+void st_hal_close_sensors(void *pdata)
 {
-    STSensorHAL_data *hal_data = (STSensorHAL_data *)dev;
+    STSensorHAL_data *hal_data = (STSensorHAL_data *)pdata;
 
-    free(hal_data);
-
-    return 0;
+    delete hal_data;
 }
 
 /**
@@ -669,65 +677,84 @@ int st_hal_open_sensors(void **pdata, STMSensorsList &sensorsList)
         console.error("No IIO sensors found!");
         free(*pdata);
         *pdata = nullptr;
-        return 0;
+        return -ENODEV;
     }
 
     for (auto &iioDeviceData : iioDataList) {
-        SensorBase *sensor = st_hal_create_class_sensor(&iioDeviceData,
-                                                        internalSensorId);
+        std::shared_ptr<SensorBase> sensor = st_hal_create_class_sensor(&iioDeviceData,
+                                                                        internalSensorId);
         if (sensor == nullptr) {
             console.error(iioDeviceData.deviceName + ": failed to create HW sensor class.");
             continue;
         }
 
-        hal_data->graph.addNode(sensor);
-        internalSensorId++;
+        if (!sensor->libsInit() && sensor->IsValidClass()) {
+            hal_data->graph.addNode(sensor->GetHandle(), sensor);
+            internalSensorId++;
+        }
+    }
+    if (hal_data->graph.empty()) {
+        console.error("no hardware sensors!");
+        free(*pdata);
+        *pdata = nullptr;
+        return -ENODEV;
     }
 
     for (auto &virtualSensor : sensorsSWSupportedList) {
-        SensorBase *sensor = st_hal_create_virtual_class_sensor(virtualSensor.type, internalSensorId);
+        std::shared_ptr<SensorBase> sensor = st_hal_create_virtual_class_sensor(virtualSensor.type,
+                                                                                internalSensorId);
         if (sensor == nullptr) {
             console.error(": failed to create SW sensor class.");
             continue;
         }
 
-        hal_data->graph.addNode(sensor);
-        internalSensorId++;
+        if (!sensor->libsInit() && sensor->IsValidClass()) {
+            hal_data->graph.addNode(sensor->GetHandle(), sensor);
+            internalSensorId++;
+        }
     }
 
     std::vector<int> nodesToRemove;
 
-    for (auto &sensor : hal_data->graph) {
-        auto &listDependenciesType = sensor.payload->GetDepenciesTypeList();
-        sensor.payload->CustomInit();
-        bool Gvalid = sensor.payload->IsValidClass();
+    for (auto& sensor : hal_data->graph) {
+        auto s = sensor.second.payload;
+        auto &listDependenciesType = s->GetDepenciesTypeList();
+        bool validDependencies = true;
 
         for (auto dependecyType : listDependenciesType) {
             bool valid = false;
 
             for (auto &sensorDependecy : hal_data->graph) {
-                if ((sensorDependecy.payload->GetType() == dependecyType) && sensorDependecy.valid) {
-                    sensor.payload->AddSensorDependency(sensorDependecy.payload);
-                    hal_data->graph.addEdge(sensor.id, sensorDependecy.id);
+                auto sDependency = sensorDependecy.second.payload;
+
+                if (sDependency->GetType() == dependecyType) {
+                    hal_data->graph.addEdge(s->GetHandle(), sDependency->GetHandle());
                     valid = true;
                     break;
                 }
             }
-
-            Gvalid &= valid;
+            if (!valid) {
+                validDependencies = false;
+            }
         }
-        if (!Gvalid) {
-            sensor.valid = false;
-            nodesToRemove.push_back(sensor.id);
+        if (!validDependencies) {
+            nodesToRemove.push_back(s->GetHandle());
         }
     }
 
     for (auto &id : nodesToRemove) {
-        hal_data->graph.removeNode(id);
+        hal_data->graph.removeNodeAnd(id);
+    }
+
+    auto sortedNodesToVisit = hal_data->graph.getTopologicalSortReverse();
+    for (auto& dependencyNodeId : sortedNodesToVisit) {
+        for (auto& nodeId : hal_data->graph.getArrivingNodesId(dependencyNodeId)) {
+            hal_data->graph[nodeId]->AddSensorDependency(hal_data->graph[dependencyNodeId].get());
+        }
     }
 
     for (auto &node : hal_data->graph) {
-        struct sensor_t sensorData = node.payload->GetSensor_tData();
+        struct sensor_t sensorData = node.second.payload->GetSensor_tData();
         if (sensorData.type.isInternal()) {
             continue;
         }
@@ -750,18 +777,18 @@ int st_hal_open_sensors(void **pdata, STMSensorsList &sensorsList)
             continue;
         }
 
-        hal_data->handleToNodeId_.insert(std::pair<uint32_t, int>(sensor->getHandle(), node.id));
-        hal_data->sensorIdToHandle.insert(std::pair<int, uint32_t>(node.payload->GetHandle(), sensor->getHandle()));
+        hal_data->handleToNodeId_.insert(std::pair<uint32_t, int>(sensor->getHandle(), node.first));
+        hal_data->sensorIdToHandle.insert(std::pair<int, uint32_t>(node.first, sensor->getHandle()));
 
         struct pollfd sensorPollFd;
         sensorPollFd.events = POLLIN;
-        sensorPollFd.fd = node.payload->GetFdPipeToRead();
+        sensorPollFd.fd = node.second.payload->GetFdPipeToRead();
 
         hal_data->androidPollFd.push_back(sensorPollFd);
     }
 
     for (auto &node : hal_data->graph) {
-        node.payload->startThreads();
+        node.second.payload->startThreads();
     }
 
 #ifdef CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS
@@ -794,11 +821,7 @@ void st_hal_dev_set_callbacks(void *data, const ISTMSensorsCallback &sensorsCall
     STSensorHAL_data *hal_data = (STSensorHAL_data *)data;
 
     for (auto &node : hal_data->graph) {
-        node.payload->setCallbacks(sensorsCallback);
-    }
-
-    for (auto &node : hal_data->graph) {
-        node.payload->libsInit();
+        node.second.payload->setCallbacks(sensorsCallback);
     }
 
     st_hal_print_timesync_version();

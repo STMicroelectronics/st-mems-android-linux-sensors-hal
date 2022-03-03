@@ -133,7 +133,7 @@ void SelfTest::ThreadCmdTask()
 
             for (auto &node : hal_data->graph) {
                 if (nodeId->second == cmd_data.handle) {
-                    results_data.status = node.payload->ExecuteSelfTest();
+                    results_data.status = node.second.payload->ExecuteSelfTest();
                 }
             }
 

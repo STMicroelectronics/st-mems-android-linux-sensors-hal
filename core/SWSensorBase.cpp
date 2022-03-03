@@ -282,7 +282,7 @@ void SWSensorBase::ReceiveDataFromDependency(int handle, SensorBaseData *data)
     }
 }
 
-void SWSensorBase::ThreadDataTask()
+void SWSensorBase::ThreadDataTask(std::atomic<bool>& threadsRunning)
 {
     int err, flush_handle;
     unsigned int i, fifo_len;
@@ -300,8 +300,8 @@ void SWSensorBase::ThreadDataTask()
         return;
     }
 
-    while (1) {
-        err = poll(&android_pollfd, 1, -1);
+    while (threadsRunning.load()) {
+        err = poll(&android_pollfd, 1, 200);
         if (err < 0)
             continue;
 

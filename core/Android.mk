@@ -61,7 +61,6 @@ LOCAL_SRC_FILES := \
     STMSensor.cpp \
     ISTMSensorsCallbackData.cpp \
     STMSensorsCallbackData.cpp \
-    SensorsGraph.cpp \
     SensorsSupported.cpp \
     Accelerometer.cpp \
     ChangeODRTimestampStack.cpp \

@@ -45,8 +45,10 @@ public:
     /**
      * initialize: initialize the library to reset condition
      * @sensorsCallback: object receiving sensors data.
+     *
+     * Return value: 0 on success, else a negative error code.
      */
-    virtual void initialize(const ISTMSensorsCallback &sensorsCallback) = 0;
+    virtual int initialize(const ISTMSensorsCallback &sensorsCallback) = 0;
 
     /**
      * getSensorsList: retrieve sensors list

@@ -31,6 +31,7 @@ static IConsole &console { IConsole::getInstance() };
 
 SensorBase::SensorBase(const char *name, int handle, const STMSensorType &type)
     : sensor_t_data(type),
+      threadsRunning(true),
       sensorsCallback(nullptr)
 {
     int i, err, pipe_fd[2];
@@ -105,8 +106,16 @@ invalid_the_class:
 
 SensorBase::~SensorBase()
 {
+    threadsRunning = false;
+
     close(write_pipe_fd);
     close(read_pipe_fd);
+
+    if (dataThread  && dataThread->joinable())
+        dataThread->join();
+
+    if (eventsThread && eventsThread->joinable())
+        eventsThread->join();
 }
 
 DependencyID SensorBase::GetDependencyIDFromHandle(int handle)
@@ -127,11 +136,6 @@ void SensorBase::InvalidThisClass()
 bool SensorBase::IsValidClass()
 {
     return valid_class;
-}
-
-int SensorBase::CustomInit()
-{
-    return 0;
 }
 
 int SensorBase::GetHandle()
@@ -507,11 +511,11 @@ void SensorBase::RemoveSensorDependency(SensorBase *p)
 int SensorBase::startThreads(void)
 {
     if (hasDataChannels()) {
-        dataThread = std::make_unique<std::thread>(ThreadDataWork, this);
+        dataThread = std::make_unique<std::thread>(ThreadDataWork, this, std::ref(threadsRunning));
     }
 
     if (hasEventChannels()) {
-        eventsThread = std::make_unique<std::thread>(ThreadEventsWork, this);
+        eventsThread = std::make_unique<std::thread>(ThreadEventsWork, this, std::ref(threadsRunning));
     }
 
     return 0;
@@ -668,32 +672,32 @@ int64_t SensorBase::GetMinPeriod(bool lock_en_mutex)
     return min == INT64_MAX ? 0 : min;
 }
 
-void *SensorBase::ThreadDataWork(void *context)
+void *SensorBase::ThreadDataWork(void *context, std::atomic<bool>& threadsRunning)
 {
     SensorBase *mypointer = (SensorBase *)context;
 
-    mypointer->ThreadDataTask();
+    mypointer->ThreadDataTask(threadsRunning);
 
     return mypointer;
 }
 
-void SensorBase::ThreadDataTask()
+void SensorBase::ThreadDataTask(std::atomic<bool>& threadsRunning)
 {
-    pthread_exit(NULL);
+    (void)threadsRunning;
 }
 
-void *SensorBase::ThreadEventsWork(void *context)
+void *SensorBase::ThreadEventsWork(void *context, std::atomic<bool>& threadsRunning)
 {
     SensorBase *mypointer = (SensorBase *)context;
 
-    mypointer->ThreadEventsTask();
+    mypointer->ThreadEventsTask(threadsRunning);
 
     return mypointer;
 }
 
-void SensorBase::ThreadEventsTask()
+void SensorBase::ThreadEventsTask(std::atomic<bool>& threadsRunning)
 {
-    pthread_exit(NULL);
+    (void)threadsRunning;
 }
 
 int SensorBase::InjectionMode(bool __attribute__((unused))enable)

@@ -26,6 +26,8 @@ namespace core {
 
 int st_hal_open_sensors(void **data, STMSensorsList &sensorsList);
 
+void st_hal_close_sensors(void *data);
+
 void st_hal_dev_set_callbacks(void *data, const ISTMSensorsCallback &sensorsCallback);
 
 int st_hal_dev_activate(void *data, uint32_t handle, bool enable);

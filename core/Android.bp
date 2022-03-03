@@ -27,7 +27,6 @@ cc_library_static {
         "STMSensor.cpp",
         "ISTMSensorsCallbackData.cpp",
         "STMSensorsCallbackData.cpp",
-        "SensorsGraph.cpp",
         "SensorsSupported.cpp",
         "Accelerometer.cpp",
         "ChangeODRTimestampStack.cpp",

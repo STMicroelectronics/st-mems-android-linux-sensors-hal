@@ -112,8 +112,8 @@ public:
     virtual int flushRequest(int handle, bool lock_en_mute) override;
     virtual void ProcessFlushData(int handle, int64_t timestamp) override;
     void processSyncEvent(struct device_iio_events *event_data);
-    virtual void ThreadDataTask();
-    virtual void ThreadEventsTask();
+    virtual void ThreadDataTask(std::atomic<bool>& threadsRunning);
+    virtual void ThreadEventsTask(std::atomic<bool>& threadsRunning);
 
     virtual int InjectionMode(bool enable);
     virtual int InjectSensorData(const sensors_event_t *data);

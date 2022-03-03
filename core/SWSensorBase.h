@@ -67,7 +67,7 @@ SWSensorBase(const char *name, int handle, STMSensorType sensor_type,
     virtual int flushRequest(int handle, bool lock_en_mutex) override;
     virtual void ProcessFlushData(int handle, int64_t timestamp);
 
-    virtual void ThreadDataTask();
+    virtual void ThreadDataTask(std::atomic<bool>& threadsRunning);
 
     bool hasDataChannels() { return true; }
 
