@@ -160,7 +160,10 @@ SensorsHidlInterface::initialize(const MQDescriptorSync<Event>& eventQueueDescri
     AndroidPropertiesLoader propertiesLoader;
     propertiesManager.load(propertiesLoader);
 
-    sensorsCore.initialize(*dynamic_cast<ISTMSensorsCallback *>(this));
+    if (sensorsCore.initialize(*dynamic_cast<ISTMSensorsCallback *>(this))) {
+        console.error("failed to initialize the core library");
+        return Result::BAD_VALUE;
+    }
 
     addInfoMng = std::make_unique<AdditionalInfoManager>(sensorsCore.getSensorsList());
 
