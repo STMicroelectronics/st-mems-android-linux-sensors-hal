@@ -44,7 +44,6 @@ SensorsHidlInterface::SensorsHidlInterface(void)
                        lastDirectChannelHandle(0),
                        propertiesManager(PropertiesManager::getInstance())
 {
-    addInfoMng = std::make_unique<AdditionalInfoManager>(sensorsCore.getSensorsList());
 }
 
 SensorsHidlInterface::~SensorsHidlInterface(void)
@@ -162,6 +161,8 @@ SensorsHidlInterface::initialize(const MQDescriptorSync<Event>& eventQueueDescri
     propertiesManager.load(propertiesLoader);
 
     sensorsCore.initialize(*dynamic_cast<ISTMSensorsCallback *>(this));
+
+    addInfoMng = std::make_unique<AdditionalInfoManager>(sensorsCore.getSensorsList());
 
     mSensorProxyMngr.reset();
     mSensorProxyMngr.addChannel(frameworkChHandle);

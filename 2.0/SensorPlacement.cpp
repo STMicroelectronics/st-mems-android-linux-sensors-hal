@@ -15,12 +15,10 @@
  * limitations under the License.
  */
 
-#include <regex>
-#include <cutils/properties.h>
+#include <cmath>
 
+#include <IConsole.h>
 #include "SensorPlacement.h"
-
-static const std::string placementPropNameSuffix = "ro.stm.sensors.placement.";
 
 SensorPlacement::SensorPlacement(void)
     : data({ 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f })
@@ -44,90 +42,94 @@ SensorPlacement::SensorPlacement(void)
  */
 void SensorPlacement::loadFromProp(stm::core::SensorType sensorType)
 {
-    std::string propertyName(placementPropNameSuffix);
-    char propertyValue[PROPERTY_VALUE_MAX];
+    stm::core::PropertiesManager& propertiesManager = stm::core::PropertiesManager::getInstance();
+    std::array<float, 3> sensorPosition;
+    Matrix<3, 3, float> rotMatrix;
     using stm::core::SensorType;
 
     switch (sensorType) {
     case SensorType::ACCELEROMETER:
     case SensorType::ACCELEROMETER_UNCALIBRATED:
-        propertyName += "accel";
+    case SensorType::GRAVITY:
+    case SensorType::LINEAR_ACCELERATION:
+        rotMatrix = propertiesManager.getRotationMatrix(SensorType::ACCELEROMETER);
+        sensorPosition = propertiesManager.getSensorPlacement(SensorType::ACCELEROMETER);
         break;
     case SensorType::MAGNETOMETER:
     case SensorType::MAGNETOMETER_UNCALIBRATED:
-        propertyName += "magn";
-        break;
-    case SensorType::ORIENTATION:
-        propertyName += "orientation";
+    case SensorType::GEOMAGNETIC_ROTATION_VECTOR:
+        rotMatrix = propertiesManager.getRotationMatrix(SensorType::MAGNETOMETER);
+        sensorPosition = propertiesManager.getSensorPlacement(SensorType::MAGNETOMETER);
         break;
     case SensorType::GYROSCOPE:
     case SensorType::GYROSCOPE_UNCALIBRATED:
-        propertyName += "gyro";
+    case SensorType::ORIENTATION:
+    case SensorType::ROTATION_VECTOR:
+    case SensorType::GAME_ROTATION_VECTOR:
+        rotMatrix = propertiesManager.getRotationMatrix(SensorType::GYROSCOPE);
+        sensorPosition = propertiesManager.getSensorPlacement(SensorType::GYROSCOPE);
         break;
     case SensorType::PRESSURE:
-        propertyName += "press";
-        break;
-    case SensorType::GRAVITY:
-        propertyName += "gravity";
-        break;
-    case SensorType::LINEAR_ACCELERATION:
-        propertyName += "linear";
-        break;
-    case SensorType::ROTATION_VECTOR:
-        propertyName += "rotation_vector";
-        break;
-    case SensorType::GAME_ROTATION_VECTOR:
-        propertyName += "game_vector";
-        break;
-    case SensorType::GEOMAGNETIC_ROTATION_VECTOR:
-        propertyName += "geomag_vector";
+        rotMatrix = propertiesManager.getRotationMatrix(sensorType);
+        sensorPosition = propertiesManager.getSensorPlacement(sensorType);
         break;
     default:
-        break;
-    }
-    if (propertyName.size() >= PROPERTY_KEY_MAX) {
         return;
     }
 
-    console.debug(std::string("property get: " + propertyName));
+    if (!invertRotationMatrix(rotMatrix)) {
+        stm::core::IConsole& console = stm::core::IConsole::getInstance();
+        console.error("failed to invert the rotation matrix, check input matrix!");
+        return;
+    }
 
-    property_get(propertyName.c_str(), propertyValue, "1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0");
-
-    std::array<float, 12> placementMatrix;
-    if (parsePropValue(propertyValue, placementMatrix)) {
-        data = placementMatrix;
+    int counter = 0;
+    for (auto row = 0U; row < 3; ++row) {
+        for (auto col = 0U; col < 3; ++col) {
+            data[counter++] = rotMatrix[row][col];
+        }
+        data[counter++] = sensorPosition[row];
     }
 }
 
-/**
- * parsePropValue: parse string read from system property for sensor placement
- * @value: string value.
- * @placement: return 4x3 matrix storing placement info.
- *
- * Return value: true if placement string is correct and matrix can be used, false otherwise.
- */
-bool SensorPlacement::parsePropValue(std::string value,
-                                     std::array<float, 12> &placement) const
+bool SensorPlacement::invertRotationMatrix(Matrix<3, 3, float>& matrix)
 {
-    const std::regex digitsRegex("[+-]?([0-9]*[.])?[0-9]+\\,*");
-    int digitsFound = 0;
+    Matrix<3, 3, float> invMatrix;
 
-    auto digitsBegin = std::sregex_iterator(value.begin(),
-                                            value.end(),
-                                            digitsRegex);
+    invMatrix[0][0] = matrix[1][1] * matrix[2][2] - matrix[1][2] * matrix[2][1];
+    invMatrix[1][0] = -(matrix[1][0] * matrix[2][2] - matrix[1][2] * matrix[2][0]);
+    invMatrix[2][0] = matrix[1][0] * matrix[2][1] - matrix[1][1] * matrix[2][0];
 
-    auto digitsEnd = std::sregex_iterator();
-
-    for (std::sregex_iterator it = digitsBegin; it != digitsEnd; ++it) {
-        std::smatch match = *it;
-        std::size_t pos = match.str().find(',');
-        placement[digitsFound++] = std::stof(match.str().substr(0, pos));
-    }
-    if (digitsFound == 12) {
-        return true;
+    float determinant = matrix[0][0] * invMatrix[0][0] +
+                        matrix[0][1] * invMatrix[1][0] +
+                        matrix[0][2] * invMatrix[2][0];
+    if (determinant < 1e-6) {
+        return false;
     }
 
-    console.error("sensor placement matrix is not valid, please check format!");
+    invMatrix[1][1] = matrix[2][2] * matrix[0][0] - matrix[2][0] * matrix[0][2];
+    invMatrix[2][1] = matrix[2][1] * matrix[0][0] - matrix[2][0] * matrix[0][1];
+    invMatrix[2][2] = matrix[1][1] * matrix[0][0] - matrix[1][0] * matrix[0][1];
 
-    return false;
+    if ((std::fabs(matrix[0][1] - matrix[1][0]) < 1e6) &&
+        (std::fabs(matrix[0][2] - matrix[2][0]) < 1e6) &&
+        (std::fabs(matrix[1][2] - matrix[2][1]) < 1e6)) {
+        invMatrix[0][1] = invMatrix[1][0];
+        invMatrix[0][2] = invMatrix[2][0];
+        invMatrix[1][2] = invMatrix[2][1];
+    } else {
+        invMatrix[0][1] = -(matrix[2][2] * matrix[0][1] - matrix[2][1] * matrix[0][2]);
+        invMatrix[0][2] = matrix[1][2] * matrix[0][1] - matrix[1][1] * matrix[0][2];
+        invMatrix[1][2] = -(matrix[1][2] * matrix[0][0] - matrix[1][0] * matrix[0][2]);
+    }
+
+    for (auto row = 0; row < 3; ++row) {
+        for (auto col = 0; col < 3; ++col) {
+            invMatrix[row][col] /= determinant;
+        }
+    }
+
+    matrix = invMatrix;
+
+    return true;
 }
