@@ -50,12 +50,10 @@ struct HWSensorBaseCommonData {
     struct device_iio_scales sa;
 } typedef HWSensorBaseCommonData;
 
-#ifdef CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS
 struct selftest_data {
     unsigned int available;
     char mode[5][20];
 };
-#endif /* CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS */
 
 class HWSensorBase;
 class HWSensorBaseWithPollrate;
@@ -71,9 +69,8 @@ protected:
     std::mutex flushRequesteLock;
     HWSensorBaseCommonData common_data;
     ChangeODRTimestampStack odr_switch;
-#ifdef CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS
+
     struct selftest_data selftest;
-#endif /* CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS */
     uint8_t *injection_data;
     bool has_event_channels;
 
@@ -98,10 +95,8 @@ public:
                  float power_consumption);
     virtual ~HWSensorBase();
 
-#ifdef CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS
     virtual selftest_status ExecuteSelfTest();
     void GetSelfTestAvailable();
-#endif /* CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS */
 
     virtual int Enable(int handle, bool enable, bool lock_en_mute);
     virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout, bool lock_en_mute);

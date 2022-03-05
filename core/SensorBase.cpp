@@ -230,12 +230,10 @@ char* SensorBase::GetName()
     return (char *)sensor_t_data.name;
 }
 
-#ifdef CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS
 selftest_status SensorBase::ExecuteSelfTest()
 {
     return NOT_AVAILABLE;
 }
-#endif /* CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS */
 
 int SensorBase::Enable(int handle, bool enable, bool lock_en_mutex)
 {

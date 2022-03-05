@@ -19,6 +19,7 @@
 
 #include <vector>
 #include <map>
+#include <memory>
 
 #include <poll.h>
 
@@ -115,9 +116,7 @@ struct STSensorHAL_data {
     std::map<uint32_t, int> handleToNodeId_;
     std::map<int, uint32_t> sensorIdToHandle;
 
-#ifdef CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS
-    SelfTest *self_test;
-#endif /* CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS */
+    std::shared_ptr<SelfTest> selfTest;
 
     std::vector<struct pollfd> androidPollFd;
 } typedef STSensorHAL_data;

@@ -39,10 +39,7 @@
 #include <FlushBufferStack.h>
 #include <ChangeODRTimestampStack.h>
 #include <ISTMSensorsCallback.h>
-
-#ifdef CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS
 #include <SelfTest.h>
-#endif /* CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS */
 
 namespace stm {
 namespace core {
@@ -197,9 +194,7 @@ public:
     virtual int startThreads(void);
     virtual void stopThreads(void);
 
-#ifdef CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS
     virtual selftest_status ExecuteSelfTest();
-#endif /* CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS */
 
     virtual int Enable(int handle, bool enable, bool lock_en_mutex);
     bool GetStatus(bool lock_en_mutex);

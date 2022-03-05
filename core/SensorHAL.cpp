@@ -301,10 +301,9 @@ static std::shared_ptr<SensorBase> st_hal_create_class_sensor(STSensorHAL_iio_de
         return nullptr;
     }
 
-#ifdef CONnullptrFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS
-    if (sensor->IsValidClass())
-        ((HWSensorBase *)sb)->GetSelfTestAvailable();
-#endif /* CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS */
+    if (sensor->IsValidClass()) {
+        ((HWSensorBase*)sensor.get())->GetSelfTestAvailable();
+    }
 
     return sensor->IsValidClass() ? sensor : nullptr;
 }
@@ -646,7 +645,7 @@ void st_hal_close_sensors(void *pdata)
 {
     STSensorHAL_data *hal_data = (STSensorHAL_data *)pdata;
 
-    delete hal_data;
+    delete(hal_data);
 }
 
 /**
@@ -662,6 +661,7 @@ int st_hal_open_sensors(void **pdata, STMSensorsList &sensorsList)
 
     *pdata = new STSensorHAL_data();
     if (!*pdata) {
+        *pdata = nullptr;
         return -ENOMEM;
     }
 
@@ -792,12 +792,10 @@ int st_hal_open_sensors(void **pdata, STMSensorsList &sensorsList)
         node.second.payload->startThreads();
     }
 
-#ifdef CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS
-    hal_data->self_test = new SelfTest(hal_data);
-    if (!hal_data->self_test->IsValidClass()) {
-        console.error("Failed to allocate SelfTest class");
+    hal_data->selfTest = std::make_shared<SelfTest>(hal_data);
+    if (!hal_data->selfTest->IsValidClass()) {
+        console.error("selftest functions cannot be loaded correctly");
     }
-#endif /* CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS */
 
     console.debug(std::to_string(sensorsList.getList().size()) + " sensors available and ready");
 

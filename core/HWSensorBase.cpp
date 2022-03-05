@@ -243,9 +243,7 @@ HWSensorBase::HWSensorBase(HWSensorBaseCommonData *data, const char *name,
     sensor_t_data.power = power_consumption;
     sensor_t_data.fifoMaxEventCount = hw_fifo_len;
 
-#ifdef CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS
     selftest.available = 0;
-#endif /* CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS */
 
     scan_size = size_from_channelarray(common_data.channels, common_data.num_channels);
 
@@ -310,7 +308,6 @@ HWSensorBase::~HWSensorBase()
     close(pollfd_iio[1].fd);
 }
 
-#ifdef CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS
 void HWSensorBase::GetSelfTestAvailable()
 {
     int err;
@@ -345,7 +342,6 @@ selftest_status HWSensorBase::ExecuteSelfTest()
 
     return PASS;
 }
-#endif /* CONFIG_ST_HAL_HAS_SELFTEST_FUNCTIONS */
 
 int HWSensorBase::WriteBufferLenght(unsigned int buf_len)
 {
