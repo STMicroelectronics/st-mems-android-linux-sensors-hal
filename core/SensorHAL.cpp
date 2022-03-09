@@ -335,6 +335,9 @@ static int st_hal_set_fullscale(const char *iio_sysfs_path,
         iio_sensor_type = DEVICE_IIO_ACC;
     } else if (sensor_type == MagnSensorType) {
         iio_sensor_type = DEVICE_IIO_MAGN;
+        if (max_value > 0) {
+            max_value /= 100;
+        }
     } else if (sensor_type == GyroSensorType) {
         iio_sensor_type = DEVICE_IIO_GYRO;
     } else if (sensor_type == AmbTemperatureSensorType) {

@@ -65,9 +65,9 @@ PropertiesManager::PropertiesManager()
       identityMatrix(createIdentityMatrix()),
       console(IConsole::getInstance())
 {
-    maxRanges[SensorType::ACCELEROMETER] = HAL_ACCEL_MAX_RANGE_G;
-    maxRanges[SensorType::GYROSCOPE] = HAL_MAGN_MAX_RANGE_G;
-    maxRanges[SensorType::MAGNETOMETER] = HAL_GYRO_MAX_RANGE_DPS;
+    maxRanges[SensorType::ACCELEROMETER] = HAL_ACCEL_MAX_RANGE_MS2;
+    maxRanges[SensorType::GYROSCOPE] = HAL_GYRO_MAX_RANGE_RPS;
+    maxRanges[SensorType::MAGNETOMETER] = HAL_MAGN_MAX_RANGE_UT;
 }
 
 Matrix<3, 3, float> PropertiesManager::createIdentityMatrix() const

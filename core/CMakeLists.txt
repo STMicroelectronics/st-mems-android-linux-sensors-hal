@@ -24,9 +24,9 @@ add_compile_options(-DHAL_ENABLE_ACCEL_CALIBRATION=1
                     -DHAL_ENABLE_SENSORS_FUSION=1
                     -DHAL_ENABLE_TIMESYNC=0
                     -DHAL_MAX_ODR_HZ=110
-                    -DHAL_ACCEL_MAX_RANGE_G=2
-                    -DHAL_MAGN_MAX_RANGE_G=20
-                    -DHAL_GYRO_MAX_RANGE_DPS=1000)
+                    -DHAL_ACCEL_MAX_RANGE_MS2=18
+                    -DHAL_MAGN_MAX_RANGE_UT=2000
+                    -DHAL_GYRO_MAX_RANGE_RPS=17)
 
 add_library(stmicroelectronics-sensors-core-linux
             STATIC
