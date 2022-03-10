@@ -1,0 +1,29 @@
+#+TITLE: stm-sensors-hal-iio core documentation
+#+SUBTITLE: notes
+#+AUTHOR: Denis Ciocca
+
+* Introduction
+
+This is the documentation page for the core components of the sensors-hal iio.
+
+* Configuration
+
+Configuration is performed at compile time using CFLAGS.
+Depending on which 'wrapper' you are building, changes have to be made in the correspondent Makefile (Android.bp, Android.mk, CMakeLists.txt)
+
+List of general parameters:
+
+- HAL_MAX_ODR_HZ :: [int] max odr value that will be used by HAL
+- HAL_ACCEL_MAX_RANGE_MS2 :: [int, m/s^2] max value that we would like to measure with accelerometer
+- HAL_MAGN_MAX_RANGE_UT :: [int, uTesla] max value that we would like to measure with magnetometer
+- HAL_GYRO_MAX_RANGE_RPS :: [int, radiants] max value that we would like to measure with gyroscope
+
+The just listed parameters can also be changed dynamically at run-time. Check wrappers documentation for details.
+
+Enable/Disable libraries (by default mock libraries):
+
+- HAL_ENABLE_ACCEL_CALIBRATION :: [possible values: 0 (disabled) or not 0 (enabled)]
+- HAL_ENABLE_GYRO_CALIBRATION :: [possible values: 0 (disabled) or not 0 (enabled)]
+- HAL_ENABLE_MAGN_CALIBRATION :: [possible values: 0 (disabled) or not 0 (enabled)]
+- HAL_ENABLE_SENSORS_FUSION :: [possible values: 0 (disabled) or not 0 (enabled)]
+- HAL_ENABLE_TIMESYNC :: [possible values: 0 (disabled) or not 0 (enabled)]

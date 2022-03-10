@@ -4,7 +4,7 @@
 
 * Introduction
 
-This repository hosts the STMicroelectronics HAL (Hardware Abstraction Layer) for mems sensors running in Android or Linux systems based on the STMicroelectronics github hosted [[https://github.com/STMicroelectronics/STMems_Linux_IIO_drivers][IIO drivers]].
+This repository hosts the STMicroelectronics HAL (Hardware Abstraction Layer) for mems sensors running in Android or Linux systems based on the STMicroelectronics github hosted [[https://github.com/STMicroelectronics/st-mems-android-linux-drivers-iio][IIO drivers]].
 
 This HAL implementation is leaning on the [[https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/Documentation/iio][Linux IIO framework]] to gather data from sensor device drivers.
 
@@ -31,8 +31,16 @@ You can find the related documentation for Android here:
 - [[file:2.0/readme.org][HIDL 2.0]]
 - [[file:legacy/readme.org][Legacy]]
 
+[[file:2.0/readme.org][Here]] you can find the related documentation.
+
 * Linux
 
 In Linux, HAL is build as an executable using cmake. Current version does list the sensors found and exit, user needs to implement the final application.
 
 [[file:linux/readme.org][Here]] you can find the related documentation.
+
+* Core
+
+This is the main component of the project. All the 'wrappers' are using this component for sending commands and receive data stream.
+
+[[file:core/readme.org][Here]] you can find the related documentation.

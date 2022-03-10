@@ -6,6 +6,42 @@
 
 This is the documentation page for the Android HIDL 2.0 components of the sensors-hal iio.
 
+* Configuration
+** Android properties
+
+Android [[system https://source.android.com/devices/architecture/configuration/add-system-properties][system properties]] can be used to configure at run-time some parameters.
+If a parameter is set by using system properties, default value for that property will be discarded.
+
+- persist.vendor.stm.sensors.max-odr
+- persist.vendor.stm.sensors.rot-matrix-1.SENSORTYPE
+- persist.vendor.stm.sensors.rot-matrix-2.SENSORTYPE
+- persist.vendor.stm.sensors.placement-1.SENSORTYPE
+- persist.vendor.stm.sensors.placement-2.SENSORTYPE
+- persist.vendor.stm.sensors.max-range.SENSORTYPE
+
+where SENSORTYPE can be one of these values:
+
+- accel
+- magn
+- gyro
+
+Example of properties usage (i.e. device/<vendor>/<board>/system.prop):
+
+#+begin_src conf
+persist.vendor.stm.sensors.max-odr = 250 #max odr that can be used is 250Hz
+
+persist.vendor.stm.sensors.rot-matrix-1.accel = "1,0,0,0,1,0,0,0,1" #accel rotation matrix
+persist.vendor.stm.sensors.placement-1.accel = "10,20,30" #accel position in cm
+
+persist.vendor.stm.sensors.max-range.accel = 70 #accel full-scale to support reading of at least 70m/s^2
+persist.vendor.stm.sensors.max-range.magn = 2000 #magn full-scale to support reading of at least 2000uT
+persist.vendor.stm.sensors.max-range.gyro = 8 #gyro full-scale to support reading of at least 8rad/s
+#+end_src
+
+** Default settings
+
+Default parameters can be set at compile time by changing the Android.bp cflags (under core, see core documentation).
+
 * Build instructions
 
 1> clone this repository into desired folder (i.e. hardware/st/sensors-hal):
