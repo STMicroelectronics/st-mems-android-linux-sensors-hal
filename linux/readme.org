@@ -6,6 +6,50 @@
 
 This is the documentation page for the Linux components of the sensors-hal iio.
 
+* Configuration
+** runtime configuration (startup)
+
+Configuration file can be used to set parameters at runtime (during init).
+If a parameter is set in the configuration file, default value for that parameter will be discarded.
+
+Here a list of possible parameters:
+
+- max-odr
+- rot-matrix-1.SENSORTYPE
+- rot-matrix-2.SENSORTYPE
+- placement-1.SENSORTYPE
+- placement-2.SENSORTYPE
+- max-range.SENSORTYPE
+
+where SENSORTYPE can be one of these values:
+
+- accel
+- magn
+- gyro
+
+Example of configuration file usage (default /etc/stm-sensors-hal/config):
+
+#+begin_src conf
+#max odr that can be used is 250Hz
+max-odr = 250
+
+#accel rotation matrix
+rot-matrix-1.accel = "1.0,0,0,0,1.0,0,0,0,1.0"
+#accel position in mm
+placement-1.accel = "10,20,30"
+
+#accel full-scale to support reading of at least 70m/s^2
+max-range.accel = 70
+#magn full-scale to support reading of at least 2000uT
+max-range.magn = 2000
+#gyro full-scale to support reading of at least 8rad/s
+max-range.gyro = 8
+#+end_src
+
+** Default settings
+
+Default parameters can be set at compile time by changing the CMakeLists.txt cflags (under core, see core documentation).
+
 * Build instructions
 
 1> clone this repository into desired folder:

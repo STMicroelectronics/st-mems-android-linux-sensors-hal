@@ -24,6 +24,8 @@
 #include "LinuxPropertiesLoader.h"
 #include <IConsole.h>
 
+static const std::string configFilename = "/etc/stm-sensors-hal/config";
+
 SensorsLinuxInterface::SensorsLinuxInterface(void)
                       : sensorsCore(ISTMSensorsHAL::getInstance()),
                         console(IConsole::getInstance()),
@@ -40,7 +42,9 @@ int SensorsLinuxInterface::initialize(void)
 {
     LinuxPropertiesLoader linuxPropertiesLoader;
 
-    propertiesManager.load(linuxPropertiesLoader);
+    if (!linuxPropertiesLoader.loadFromConfigFile(configFilename)) {
+        propertiesManager.load(linuxPropertiesLoader);
+    }
 
     sensorsCore.initialize(*dynamic_cast<ISTMSensorsCallback *>(this));
 

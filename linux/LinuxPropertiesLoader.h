@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <IConsole.h>
 #include <PropertiesManager.h>
 
 using stm::core::PropertyId;
@@ -24,7 +25,21 @@ using stm::core::SensorPropertyId;
 using stm::core::SensorType;
 
 class LinuxPropertiesLoader : public stm::core::PropertiesLoader {
+private:
+    stm::core::IConsole& console = stm::core::IConsole::getInstance();
+
+    std::unordered_map<SensorPropertyId,
+                       std::unordered_map<SensorType, std::string>> sensorProperties;
+
+    std::unordered_map<PropertyId, std::string> properties;
+
+    SensorType getSensorTypeForProperty(const std::string& line);
+
+    void parseConfigLine(std::string& line);
+
 public:
+    int loadFromConfigFile(const std::string& filename);
+
     virtual int readInt(PropertyId property) const override;
 
     virtual std::string readString(SensorPropertyId property,
