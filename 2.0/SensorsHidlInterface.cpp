@@ -18,6 +18,7 @@
 #include <android/hardware/sensors/2.0/types.h>
 #include <memory>
 #include <utility>
+#include <fstream>
 
 #include <IConsole.h>
 #include "Convert.h"
@@ -503,11 +504,24 @@ SensorsHidlInterface::onNewSensorsData(const std::vector<ISTMSensorsCallbackData
 int SensorsHidlInterface::onSaveDataRequest(const std::string& resourceID,
                                             const void *data, ssize_t len)
 {
-    (void) resourceID;
-    (void) data;
-    (void) len;
+    std::string filename = std::string(HAL_PRIVATE_DATA_PATH) + "/" + resourceID;
+    std::ofstream resourceFile;
 
-    return -EIO;
+    std::lock_guard<std::mutex> lock(mLoadAndSaveLock);
+
+    resourceFile.open(filename, std::ios::out | std::ios::binary | std::ios::trunc);
+    if (!resourceFile.is_open()) {
+        return -ENOENT;
+    }
+
+    resourceFile.write(static_cast<const char *>(data), len);
+    if (!resourceFile.good()) {
+        resourceFile.close();
+        return -EIO;
+    }
+    resourceFile.close();
+
+    return len;
 }
 
 /**
@@ -521,11 +535,25 @@ int SensorsHidlInterface::onSaveDataRequest(const std::string& resourceID,
 int SensorsHidlInterface::onLoadDataRequest(const std::string& resourceID,
                                             void *data, ssize_t len)
 {
-    (void) resourceID;
-    (void) data;
-    (void) len;
+    std::string filename = std::string(HAL_PRIVATE_DATA_PATH) + "/" + resourceID;
+    std::ifstream resourceFile;
 
-    return -EIO;
+    std::lock_guard<std::mutex> lock(mLoadAndSaveLock);
+
+    resourceFile.open(filename, std::ios::in | std::ios::binary);
+    if (!resourceFile.is_open()) {
+        return -ENOENT;
+    }
+
+    resourceFile.read(static_cast<char *>(data), len);
+    if (!resourceFile.good()) {
+        resourceFile.close();
+        return -EIO;
+    }
+
+    resourceFile.close();
+
+    return len;
 }
 
 /**

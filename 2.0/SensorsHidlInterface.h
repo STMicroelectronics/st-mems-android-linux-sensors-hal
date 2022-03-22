@@ -221,6 +221,8 @@ private:
      */
     std::unordered_map<int32_t, int64_t> sensorCurrentPollrateNs;
 
+    std::mutex mLoadAndSaveLock;
+
     PropertiesManager& propertiesManager;
 
     void deleteEventFlag(void);
