@@ -49,25 +49,27 @@ Gyroscope::Gyroscope(HWSensorBaseCommonData *data, const char *name,
 int Gyroscope::libsInit(void)
 {
     std::string libVersionMsg { "gyro calibration library: " };
-    int err = 0;
 
     if (HAL_ENABLE_GYRO_CALIBRATION != 0) {
         libVersionMsg += gyroCalibration.getLibVersion();
         console.info(libVersionMsg);
 
         // TODO fix the values used as parameters
-        err = gyroCalibration.init(1.0f,
-                                   1.0f,
-                                   20.0f,
-                                   sensor_t_data.maxRange);
-
-        loadBiasValues();
+        return gyroCalibration.init(1.0f,
+                                    1.0f,
+                                    20.0f,
+                                    sensor_t_data.maxRange);
     } else {
         libVersionMsg += std::string("not enabled!");
         console.info(libVersionMsg);
     }
 
-    return err;
+    return 0;
+}
+
+void Gyroscope::postSetup(void)
+{
+    loadBiasValues();
 }
 
 int Gyroscope::Enable(int handle, bool enable, bool lock_en_mutex)
@@ -113,7 +115,7 @@ void Gyroscope::saveBiasValues(void) const
     gyroCalibration.getBias(bias);
 
     if (sensorsCallback != nullptr) {
-        if (sensorsCallback->onSaveDataRequest("gyro_bias.dat", &bias, sizeof(bias))) {
+        if (sensorsCallback->onSaveDataRequest("gyro_bias.dat", &bias, sizeof(bias)) <= 0) {
             console.warning("failed to save gyro bias");
         }
     }
@@ -126,7 +128,7 @@ void Gyroscope::loadBiasValues(void)
     gyroCalibration.resetBiasMatrix(bias);
 
     if (sensorsCallback != nullptr) {
-        if (sensorsCallback->onLoadDataRequest("gyro_bias.dat", &bias, sizeof(bias))) {
+        if (sensorsCallback->onLoadDataRequest("gyro_bias.dat", &bias, sizeof(bias)) <= 0) {
             console.warning("failed to load gyro bias");
         }
     }

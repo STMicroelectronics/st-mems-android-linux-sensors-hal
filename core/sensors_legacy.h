@@ -30,6 +30,8 @@ void st_hal_close_sensors(void *data);
 
 void st_hal_dev_set_callbacks(void *data, const ISTMSensorsCallback &sensorsCallback);
 
+void st_hal_dev_post_setup(void *data);
+
 int st_hal_dev_activate(void *data, uint32_t handle, bool enable);
 
 int st_hal_dev_batch(void *data, int handle, int64_t period_ns,

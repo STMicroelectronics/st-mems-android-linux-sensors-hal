@@ -226,6 +226,7 @@ public:
     virtual bool hasDataChannels();
 
     void setCallbacks(const ISTMSensorsCallback &sensorsCallback);
+    virtual void postSetup(void) {};
 
     virtual int getHandleOfMyTrigger(void) const;
 };

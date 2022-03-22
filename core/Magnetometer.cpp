@@ -51,21 +51,23 @@ Magnetometer::Magnetometer(HWSensorBaseCommonData *data, const char *name,
 int Magnetometer::libsInit(void)
 {
     std::string libVersionMsg { "magn calibration library: " };
-    int err = 0;
 
     if (HAL_ENABLE_MAGN_CALIBRATION != 0) {
         libVersionMsg += magnCalibration.getLibVersion();
         console.info(libVersionMsg);
 
-        err = magnCalibration.init(sensor_t_data.maxRange);
-
-        loadBiasValues();
+        return magnCalibration.init(sensor_t_data.maxRange);
     } else {
         libVersionMsg += std::string("not enabled!");
         console.info(libVersionMsg);
     }
 
-    return err;
+    return 0;
+}
+
+void Magnetometer::postSetup(void)
+{
+    loadBiasValues();
 }
 
 int Magnetometer::Enable(int handle, bool enable, bool lock_en_mutex)
@@ -111,7 +113,7 @@ void Magnetometer::saveBiasValues(void) const
     magnCalibration.getBias(bias);
 
     if (sensorsCallback != nullptr) {
-        if (sensorsCallback->onSaveDataRequest("magn_bias.dat", &bias, sizeof(bias))) {
+        if (sensorsCallback->onSaveDataRequest("magn_bias.dat", &bias, sizeof(bias)) <= 0) {
             console.error("failed to save magn bias");
         }
     }
@@ -124,7 +126,7 @@ void Magnetometer::loadBiasValues(void)
     magnCalibration.resetBiasMatrix(bias);
 
     if (sensorsCallback != nullptr) {
-        if (sensorsCallback->onLoadDataRequest("magn_bias.dat", &bias, sizeof(bias))) {
+        if (sensorsCallback->onLoadDataRequest("magn_bias.dat", &bias, sizeof(bias)) <= 0) {
             console.error("failed to load magn bias");
         }
     }

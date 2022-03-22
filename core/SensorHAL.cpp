@@ -829,6 +829,15 @@ void st_hal_dev_set_callbacks(void *data, const ISTMSensorsCallback &sensorsCall
     st_hal_print_timesync_version();
 }
 
+void st_hal_dev_post_setup(void *data)
+{
+    STSensorHAL_data *hal_data = (STSensorHAL_data *)data;
+
+    for (auto &node : hal_data->graph) {
+        node.second.payload->postSetup();
+    }
+}
+
 /**
  * st_hal_set_operation_mode() - Set HAL mode
  * @mode: HAL mode.

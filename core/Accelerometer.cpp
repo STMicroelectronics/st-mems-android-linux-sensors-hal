@@ -49,21 +49,23 @@ Accelerometer::Accelerometer(HWSensorBaseCommonData *data,
 int Accelerometer::libsInit(void)
 {
     std::string libVersionMsg { "accel calibration library: " };
-    int err = 0;
 
     if (HAL_ENABLE_ACCEL_CALIBRATION != 0) {
         libVersionMsg += accelCalibration.getLibVersion();
         console.info(libVersionMsg);
 
-        err = accelCalibration.init(sensor_t_data.maxRange);
-
-        loadBiasValues();
+        return accelCalibration.init(sensor_t_data.maxRange);
     } else {
         libVersionMsg += std::string("not enabled!");
         console.info(libVersionMsg);
     }
 
-    return err;
+    return 0;
+}
+
+void Accelerometer::postSetup(void)
+{
+    loadBiasValues();
 }
 
 int Accelerometer::Enable(int handle, bool enable, bool lock_en_mutex)
@@ -109,7 +111,7 @@ void Accelerometer::saveBiasValues(void) const
     accelCalibration.getBias(bias);
 
     if (sensorsCallback != nullptr) {
-        if (sensorsCallback->onSaveDataRequest("accel_bias.dat", &bias, sizeof(bias))) {
+        if (sensorsCallback->onSaveDataRequest("accel_bias.dat", &bias, sizeof(bias)) <= 0) {
             console.warning("failed to save accel bias");
         }
     }
@@ -122,7 +124,7 @@ void Accelerometer::loadBiasValues(void)
     accelCalibration.resetBiasMatrix(bias);
 
     if (sensorsCallback != nullptr) {
-        if (sensorsCallback->onLoadDataRequest("accel_bias.dat", &bias, sizeof(bias))) {
+        if (sensorsCallback->onLoadDataRequest("accel_bias.dat", &bias, sizeof(bias)) <= 0) {
             console.warning("failed to load accel bias");
         }
     }

@@ -39,6 +39,7 @@ public:
 
     virtual int Enable(int handle, bool enable, bool lock_en_mutex);
     virtual void ProcessData(SensorBaseData *data);
+    virtual void postSetup(void) override;
 
 private:
     STMMagnCalibration& magnCalibration;

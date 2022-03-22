@@ -102,6 +102,8 @@ int STMSensorsHAL::initialize(const ISTMSensorsCallback &sensorsCallback)
     this->sensorsCallback = (ISTMSensorsCallback *)&sensorsCallback;
     initialized = true;
 
+    st_hal_dev_post_setup(hal_data);
+
     return 0;
 }
 
