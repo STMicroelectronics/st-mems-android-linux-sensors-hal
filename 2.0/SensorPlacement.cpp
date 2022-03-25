@@ -108,12 +108,12 @@ bool SensorPlacement::invertRotationMatrix(Matrix<3, 3, float>& matrix)
     }
 
     invMatrix[1][1] = matrix[2][2] * matrix[0][0] - matrix[2][0] * matrix[0][2];
-    invMatrix[2][1] = matrix[2][1] * matrix[0][0] - matrix[2][0] * matrix[0][1];
+    invMatrix[2][1] = -(matrix[2][1] * matrix[0][0] - matrix[2][0] * matrix[0][1]);
     invMatrix[2][2] = matrix[1][1] * matrix[0][0] - matrix[1][0] * matrix[0][1];
 
-    if ((std::fabs(matrix[0][1] - matrix[1][0]) < 1e6) &&
-        (std::fabs(matrix[0][2] - matrix[2][0]) < 1e6) &&
-        (std::fabs(matrix[1][2] - matrix[2][1]) < 1e6)) {
+    if ((std::fabs(matrix[0][1] - matrix[1][0]) < 1e-6) &&
+        (std::fabs(matrix[0][2] - matrix[2][0]) < 1e-6) &&
+        (std::fabs(matrix[1][2] - matrix[2][1]) < 1e-6)) {
         invMatrix[0][1] = invMatrix[1][0];
         invMatrix[0][2] = invMatrix[2][0];
         invMatrix[1][2] = invMatrix[2][1];
