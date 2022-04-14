@@ -24,7 +24,7 @@ namespace core {
 
 class SWGyroscopeUncalibrated : public SWSensorBaseWithPollrate {
 public:
-    SWGyroscopeUncalibrated(const char *name, int handle);
+    SWGyroscopeUncalibrated(const char *name, int handle, int module);
 
     virtual void ProcessData(SensorBaseData *data);
 };

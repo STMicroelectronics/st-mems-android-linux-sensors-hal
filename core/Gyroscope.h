@@ -31,7 +31,8 @@ class Gyroscope : public HWSensorBaseWithPollrate {
 public:
     Gyroscope(HWSensorBaseCommonData *data, const char *name,
               struct device_iio_sampling_freqs *sfa, int handle,
-              unsigned int hw_fifo_len, float power_consumption, bool wakeup);
+              unsigned int hw_fifo_len, float power_consumption,
+              bool wakeup, int module);
 
     int64_t bias_last_pollrate;
 
@@ -48,6 +49,8 @@ private:
     void loadBiasValues(void);
 
     Matrix<3, 3, float> rotMatrix;
+
+    std::string biasFileName;
 };
 
 } // namespace core

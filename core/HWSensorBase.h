@@ -92,7 +92,8 @@ public:
                  const char *name,
                  int handle, const STMSensorType &sensor_type,
                  unsigned int hw_fifo_len,
-                 float power_consumption);
+                 float power_consumption,
+                 int module);
     virtual ~HWSensorBase();
 
     virtual selftest_status ExecuteSelfTest();
@@ -130,7 +131,8 @@ public:
     HWSensorBaseWithPollrate(HWSensorBaseCommonData *data, const char *name,
                              struct device_iio_sampling_freqs *sfa, int handle,
                              const STMSensorType &sensor_type,
-                             unsigned int hw_fifo_len, float power_consumption);
+                             unsigned int hw_fifo_len, float power_consumption,
+                             int module);
     virtual ~HWSensorBaseWithPollrate();
 
     virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout,

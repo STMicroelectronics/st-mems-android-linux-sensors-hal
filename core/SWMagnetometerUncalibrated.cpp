@@ -24,10 +24,10 @@
 namespace stm {
 namespace core {
 
-SWMagnetometerUncalibrated::SWMagnetometerUncalibrated(const char *name, int handle)
+SWMagnetometerUncalibrated::SWMagnetometerUncalibrated(const char *name, int handle, int module)
                           : SWSensorBaseWithPollrate(name, handle,
                                                      MagnUncalibSensorType,
-                                                     true, true, true, true)
+                                                     true, true, true, true, module)
 {
     dependencies_type_list.push_back(MagnSensorType);
     id_sensor_trigger = SENSOR_DEPENDENCY_ID_0;

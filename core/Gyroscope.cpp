@@ -27,15 +27,17 @@ namespace core {
 
 Gyroscope::Gyroscope(HWSensorBaseCommonData *data, const char *name,
                      struct device_iio_sampling_freqs *sfa, int handle,
-                     unsigned int hw_fifo_len, float power_consumption, bool wakeup)
+                     unsigned int hw_fifo_len, float power_consumption,
+                     bool wakeup, int module)
     : HWSensorBaseWithPollrate(data, name, sfa, handle,
-                               GyroSensorType, hw_fifo_len, power_consumption),
+                               GyroSensorType, hw_fifo_len, power_consumption, module),
       bias_last_pollrate(0),
       gyroCalibration(STMGyroCalibration::getInstance())
 {
     (void) wakeup;
 
     rotMatrix = propertiesManager.getRotationMatrix(GyroSensorType);
+    biasFileName = std::string("gyro_bias_") + std::to_string(moduleId) + std::string(".dat");
 
     sensor_t_data.resolution = data->channels[0].scale;
     sensor_t_data.maxRange = sensor_t_data.resolution * (std::pow(2, data->channels[0].bits_used - 1) - 1);
@@ -115,7 +117,7 @@ void Gyroscope::saveBiasValues(void) const
     gyroCalibration.getBias(bias);
 
     if (sensorsCallback != nullptr) {
-        if (sensorsCallback->onSaveDataRequest("gyro_bias.dat", &bias, sizeof(bias)) <= 0) {
+        if (sensorsCallback->onSaveDataRequest(biasFileName, &bias, sizeof(bias)) <= 0) {
             console.warning("failed to save gyro bias");
         }
     }
@@ -128,7 +130,7 @@ void Gyroscope::loadBiasValues(void)
     gyroCalibration.resetBiasMatrix(bias);
 
     if (sensorsCallback != nullptr) {
-        if (sensorsCallback->onLoadDataRequest("gyro_bias.dat", &bias, sizeof(bias)) <= 0) {
+        if (sensorsCallback->onLoadDataRequest(biasFileName, &bias, sizeof(bias)) <= 0) {
             console.warning("failed to load gyro bias");
         }
     }

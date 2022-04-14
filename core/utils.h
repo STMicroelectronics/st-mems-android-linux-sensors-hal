@@ -162,6 +162,7 @@ public:
     static int set_clock_type(const char *device_dir, const char *type);
     static int get_selftest_available(const char *device_dir, char list[][20]);
     static int execute_selftest(const char *device_dir, char *mode);
+    static int get_module_id(const char *device_dir);
 };
 
 } // namespace core

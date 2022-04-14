@@ -54,6 +54,7 @@ static const char *device_iio_current_timestamp_clock = "current_timestamp_clock
 static const char *device_iio_scan_elements_en = "_en";
 static const char *device_iio_selftest_available_filename = "selftest_available";
 static const char *device_iio_selftest_filename = "selftest";
+static const char *device_iio_module_id_filename = "module_id";
 
 static IConsole &console = IConsole::getInstance();
 
@@ -1165,6 +1166,24 @@ int device_iio_utils::execute_selftest(const char *device_dir, char *mode)
     }
 
     return -EINVAL;
+}
+
+int device_iio_utils::get_module_id(const char *device_dir)
+{
+    char filename[DEVICE_IIO_MAX_FILENAME_LEN];
+    int err, id;
+
+    err = sprintf(filename, "%s/%s", device_dir, device_iio_module_id_filename);
+    if (err < 0) {
+        return 100;
+    }
+
+    err = sysfs_read_int(filename, &id);
+    if (err < 0) {
+        return 100;
+    }
+
+    return id;
 }
 
 } // namespace core

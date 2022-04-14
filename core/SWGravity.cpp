@@ -24,10 +24,10 @@
 namespace stm {
 namespace core {
 
-SWGravity::SWGravity(const char *name, int handle)
+SWGravity::SWGravity(const char *name, int handle, int module)
     : SWSensorBaseWithPollrate(name, handle,
                                GravitySensorType,
-                               true, false, true, false)
+                               true, false, true, false, module)
 {
     sensor_t_data.maxRange = ST_HAL_GRAVITY_MAX_ON_EARTH;
 

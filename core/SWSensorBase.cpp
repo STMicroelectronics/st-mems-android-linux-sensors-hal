@@ -29,8 +29,8 @@ static IConsole &console { IConsole::getInstance() };
 
 SWSensorBase::SWSensorBase(const char *name, int handle, STMSensorType sensor_type,
                            bool use_dependency_resolution, bool use_dependency_range,
-                           bool use_dependency_delay, bool use_dependency_name)
-    : SensorBase(name, handle, sensor_type)
+                           bool use_dependency_delay, bool use_dependency_name, int module)
+    : SensorBase(name, handle, sensor_type, module)
 {
     int err, pipe_fd[2];
 
@@ -355,10 +355,10 @@ int SWSensorBase::getHandleOfMyTrigger(void) const
 SWSensorBaseWithPollrate::SWSensorBaseWithPollrate(const char *name, int handle, STMSensorType sensor_type,
                                                    bool use_dependency_resolution,
                                                    bool use_dependency_range, bool use_dependency_delay,
-                                                   bool use_dependency_name)
+                                                   bool use_dependency_name, int module)
     : SWSensorBase(name, handle, sensor_type,
                    use_dependency_resolution, use_dependency_range,
-                   use_dependency_delay, use_dependency_name)
+                   use_dependency_delay, use_dependency_name, module)
 {
 
 }

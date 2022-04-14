@@ -24,7 +24,7 @@ namespace core {
 
 class SWOrientation : public SWSensorBaseWithPollrate {
 public:
-    SWOrientation(const char *name, int handle);
+    SWOrientation(const char *name, int handle, int module);
 
     virtual void ProcessData(SensorBaseData *data);
 };

@@ -24,7 +24,7 @@ namespace core {
 
 class SWMagnetometerUncalibrated : public SWSensorBaseWithPollrate {
 public:
-    SWMagnetometerUncalibrated(const char *name, int handle);
+    SWMagnetometerUncalibrated(const char *name, int handle, int module);
 
     virtual void ProcessData(SensorBaseData *data);
 };

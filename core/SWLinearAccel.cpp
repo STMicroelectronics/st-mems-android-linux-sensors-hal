@@ -24,10 +24,10 @@
 namespace stm {
 namespace core {
 
-SWLinearAccel::SWLinearAccel(const char *name, int handle)
+SWLinearAccel::SWLinearAccel(const char *name, int handle, int module)
     : SWSensorBaseWithPollrate(name, handle,
                                LinearAccelSensorType,
-                               true, false, true, false)
+                               true, false, true, false, module)
 {
     sensor_t_data.maxRange = ST_HAL_GRAVITY_MAX_ON_EARTH;
 

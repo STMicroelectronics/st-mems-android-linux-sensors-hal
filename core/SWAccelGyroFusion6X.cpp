@@ -24,10 +24,10 @@
 namespace stm {
 namespace core {
 
-SWAccelGyroFusion6X::SWAccelGyroFusion6X(const char *name, int handle)
+SWAccelGyroFusion6X::SWAccelGyroFusion6X(const char *name, int handle, int module)
     : SWSensorBaseWithPollrate(name, handle,
                                AccelGyroFusion6XSensorType,
-                               false, false, true, false),
+                               false, false, true, false, module),
       sensorsFusion(STMSensorsFusion6Axis::getInstance())
 {
     sensor_t_data.minRateHz = CONFIG_ST_HAL_MIN_FUSION_POLLRATE;

@@ -24,7 +24,7 @@ namespace core {
 
 class SWAccelerometerUncalibrated : public SWSensorBaseWithPollrate {
 public:
-    SWAccelerometerUncalibrated(const char *name, int handle);
+    SWAccelerometerUncalibrated(const char *name, int handle, int module);
 
     virtual void ProcessData(SensorBaseData *data);
 };

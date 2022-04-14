@@ -25,9 +25,9 @@ namespace stm {
 namespace core {
 
 Gesture::Gesture(HWSensorBaseCommonData *data, const char *name, int handle,
-                 unsigned int hw_fifo_len, float power_consumption)
+                 unsigned int hw_fifo_len, float power_consumption, int module)
     : HWSensorBase(data, name, handle, TiltDetectorSensorType,
-                   hw_fifo_len, power_consumption)
+                   hw_fifo_len, power_consumption, module)
 {
     sensor_t_data.resolution = 1.0f;
     sensor_t_data.maxRange = 1.0f;

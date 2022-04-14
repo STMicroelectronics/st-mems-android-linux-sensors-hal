@@ -25,9 +25,9 @@ namespace stm {
 namespace core {
 
 SignMotion::SignMotion(HWSensorBaseCommonData *data, const char *name, int handle,
-                       float power_consumption)
+                       float power_consumption, int module)
     : HWSensorBase(data, name, handle,
-                   SignMotionSensorType, 0, power_consumption)
+                   SignMotionSensorType, 0, power_consumption, module)
 {
     sensor_t_data.resolution = 1.0f;
     sensor_t_data.maxRange = 1.0f;

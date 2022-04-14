@@ -147,6 +147,8 @@ protected:
 
     ISTMSensorsCallback *sensorsCallback;
 
+    int moduleId;
+
     void InvalidThisClass();
     bool GetStatusExcludeHandle(int handle);
     bool GetStatusOfHandle(int handle);
@@ -166,7 +168,7 @@ protected:
     void DeleteLatestNewPollrate();
 
 public:
-    SensorBase(const char *name, int handle, const STMSensorType &type);
+    SensorBase(const char *name, int handle, const STMSensorType &type, int module);
     virtual ~SensorBase();
 
     SensorBase(const SensorBase& rhl) = delete;
@@ -229,6 +231,8 @@ public:
     virtual void postSetup(void) {};
 
     virtual int getHandleOfMyTrigger(void) const;
+
+    int getModuleId(void) const { return moduleId; };
 };
 
 } // namespace core

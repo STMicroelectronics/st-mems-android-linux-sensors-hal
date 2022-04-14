@@ -31,7 +31,7 @@ protected:
     IUtils &utils { IUtils::getInstance() };
 
 public:
-    SWAccelGyroFusion6X(const char *name, int handle);
+    SWAccelGyroFusion6X(const char *name, int handle, int module);
 
     virtual int CustomInit();
 

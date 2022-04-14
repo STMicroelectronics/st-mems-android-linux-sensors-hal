@@ -226,8 +226,9 @@ static int ProcessInjectionData(float *data,
 
 HWSensorBase::HWSensorBase(HWSensorBaseCommonData *data, const char *name,
                            int handle, const STMSensorType &sensor_type, unsigned int hw_fifo_len,
-                           float power_consumption)
-    : SensorBase(name, handle, sensor_type)
+                           float power_consumption,
+                           int module)
+    : SensorBase(name, handle, sensor_type, module)
 {
     int err;
     char *buffer_path;
@@ -823,8 +824,8 @@ int HWSensorBase::InjectSensorData(const sensors_event_t *data)
 HWSensorBaseWithPollrate::HWSensorBaseWithPollrate(HWSensorBaseCommonData *data,
                                                    const char *name, struct device_iio_sampling_freqs *sfa,
                                                    int handle, const STMSensorType &sensor_type, unsigned int hw_fifo_len,
-                                                   float power_consumption)
-    : HWSensorBase(data, name, handle, sensor_type, hw_fifo_len, power_consumption)
+                                                   float power_consumption, int module)
+    : HWSensorBase(data, name, handle, sensor_type, hw_fifo_len, power_consumption, module)
 {
     float min_sampling_frequency = UINT_MAX, max_sampling_frequency = 0;
     unsigned int i;

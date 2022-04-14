@@ -54,7 +54,7 @@ protected:
 public:
 SWSensorBase(const char *name, int handle, STMSensorType sensor_type,
              bool use_dependency_resolution, bool use_dependency_range,
-             bool use_dependency_delay, bool use_dependency_name);
+             bool use_dependency_delay, bool use_dependency_name, int module);
     virtual ~SWSensorBase();
 
     virtual int Enable(int handle, bool enable, bool lock_en_mutex);
@@ -82,7 +82,7 @@ class SWSensorBaseWithPollrate : public SWSensorBase {
 public:
     SWSensorBaseWithPollrate(const char *name, int handle, STMSensorType sensor_type,
                              bool use_dependency_resolution, bool use_dependency_range,
-                             bool use_dependency_delay, bool use_dependency_name);
+                             bool use_dependency_delay, bool use_dependency_name, int module);
     virtual ~SWSensorBaseWithPollrate();
 
     virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout, bool lock_en_mutex);

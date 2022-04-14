@@ -26,9 +26,10 @@ namespace stm {
 namespace core {
 
 StepCounter::StepCounter(HWSensorBaseCommonData *data, const char *name,
-                         int handle, unsigned int hw_fifo_len, float power_consumption, bool wakeup)
+                         int handle, unsigned int hw_fifo_len, float power_consumption,
+                         bool wakeup, int module)
     : HWSensorBase(data, name, handle,
-                   StepCounterSensorType, hw_fifo_len, power_consumption)
+                   StepCounterSensorType, hw_fifo_len, power_consumption, module)
 {
     (void)wakeup;
 

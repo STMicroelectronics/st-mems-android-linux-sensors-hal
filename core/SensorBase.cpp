@@ -29,10 +29,11 @@ namespace core {
 
 static IConsole &console { IConsole::getInstance() };
 
-SensorBase::SensorBase(const char *name, int handle, const STMSensorType &type)
+SensorBase::SensorBase(const char *name, int handle, const STMSensorType &type, int module)
     : sensor_t_data(type),
       threadsRunning(true),
-      sensorsCallback(nullptr)
+      sensorsCallback(nullptr),
+      moduleId(module)
 {
     int i, err, pipe_fd[2];
 

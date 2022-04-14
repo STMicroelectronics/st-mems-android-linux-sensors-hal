@@ -27,10 +27,11 @@ namespace core {
 
 Pressure::Pressure(HWSensorBaseCommonData *data, const char *name,
                    struct device_iio_sampling_freqs *sfa, int handle,
-                   unsigned int hw_fifo_len, float power_consumption, bool wakeup)
+                   unsigned int hw_fifo_len, float power_consumption,
+                   bool wakeup, int module)
     : HWSensorBaseWithPollrate(data, name, sfa, handle,
                                PressureSensorType,
-                               hw_fifo_len, power_consumption)
+                               hw_fifo_len, power_consumption, module)
 {
     (void)wakeup;
 

@@ -24,7 +24,7 @@ namespace core {
 
 class SWGravity : public SWSensorBaseWithPollrate {
 public:
-    SWGravity(const char *name, int handle);
+    SWGravity(const char *name, int handle, int module);
 
     virtual void ProcessData(SensorBaseData *data);
 };

@@ -28,7 +28,8 @@ namespace core {
 class StepDetector : public HWSensorBase {
 public:
     StepDetector(HWSensorBaseCommonData *data, const char *name, int handle,
-                 unsigned int hw_fifo_len, float power_consumption, bool wakeup);
+                 unsigned int hw_fifo_len, float power_consumption,
+                 bool wakeup, int module);
 
     virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout,
                          bool lock_en_mute);

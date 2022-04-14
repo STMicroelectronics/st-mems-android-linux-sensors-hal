@@ -24,10 +24,10 @@
 namespace stm {
 namespace core {
 
-SWRotationVector::SWRotationVector(const char *name, int handle)
+SWRotationVector::SWRotationVector(const char *name, int handle, int module)
     : SWSensorBaseWithPollrate(name, handle,
                                RotationVecSensorType,
-                               true, true, true, false)
+                               true, true, true, false, module)
 {
     dependencies_type_list.push_back(AccelMagnGyroFusion9XSensorType);
     id_sensor_trigger = SENSOR_DEPENDENCY_ID_0;

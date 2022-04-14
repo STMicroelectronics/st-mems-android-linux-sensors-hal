@@ -15,10 +15,10 @@
 namespace stm {
 namespace core {
 
-SWGameRotationVector::SWGameRotationVector(const char *name, int handle)
+SWGameRotationVector::SWGameRotationVector(const char *name, int handle, int module)
     : SWSensorBaseWithPollrate(name, handle,
                                GameRotationVecSensorType,
-                               true, true, true, false)
+                               true, true, true, false, module)
 {
     dependencies_type_list.push_back(AccelGyroFusion6XSensorType);
     id_sensor_trigger = SENSOR_DEPENDENCY_ID_0;

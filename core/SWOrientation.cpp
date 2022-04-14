@@ -24,10 +24,10 @@
 namespace stm {
 namespace core {
 
-SWOrientation::SWOrientation(const char *name, int handle)
+SWOrientation::SWOrientation(const char *name, int handle, int module)
     : SWSensorBaseWithPollrate(name, handle,
                                OrientationSensorType,
-                               true, false, true, false)
+                               true, false, true, false, module)
 {
     sensor_t_data.maxRange = 360.0f;
 

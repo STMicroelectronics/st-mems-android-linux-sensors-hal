@@ -24,10 +24,11 @@
 namespace stm {
 namespace core {
 
-SWAccelerometerUncalibrated::SWAccelerometerUncalibrated(const char *name, int handle)
+SWAccelerometerUncalibrated::SWAccelerometerUncalibrated(const char *name, int handle, int module)
                            : SWSensorBaseWithPollrate(name, handle,
                                                       AccelUncalibSensorType,
-                                                      true, true, true, true)
+                                                      true, true, true, true,
+                                                      module)
 {
     dependencies_type_list.push_back(AccelSensorType);
     id_sensor_trigger = SENSOR_DEPENDENCY_ID_0;

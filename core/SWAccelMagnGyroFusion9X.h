@@ -29,7 +29,7 @@ protected:
     SensorBaseData outdata;
 
 public:
-    SWAccelMagnGyroFusion9X(const char *name, int handle);
+    SWAccelMagnGyroFusion9X(const char *name, int handle, int module);
 
     virtual int CustomInit();
 

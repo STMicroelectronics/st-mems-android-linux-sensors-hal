@@ -26,9 +26,9 @@ namespace core {
 
 StepDetector::StepDetector(HWSensorBaseCommonData *data, const char *name,
                            int handle, unsigned int hw_fifo_len,
-                           float power_consumption, bool wakeup)
+                           float power_consumption, bool wakeup, int module)
     : HWSensorBase(data, name, handle,
-                   StepDetectorSensorType, hw_fifo_len, power_consumption)
+                   StepDetectorSensorType, hw_fifo_len, power_consumption, module)
 {
     (void)wakeup;
 

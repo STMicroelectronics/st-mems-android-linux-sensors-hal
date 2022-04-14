@@ -32,16 +32,18 @@ namespace core {
 
 Magnetometer::Magnetometer(HWSensorBaseCommonData *data, const char *name,
                            struct device_iio_sampling_freqs *sfa, int handle,
-                           unsigned int hw_fifo_len, float power_consumption, bool wakeup)
+                           unsigned int hw_fifo_len, float power_consumption,
+                           bool wakeup, int module)
     : HWSensorBaseWithPollrate(data, name, sfa, handle,
                                MagnSensorType,
-                               hw_fifo_len, power_consumption),
+                               hw_fifo_len, power_consumption, module),
       bias_last_pollrate(0),
       magnCalibration(STMMagnCalibration::getInstance())
 {
     (void) wakeup;
 
     rotMatrix = propertiesManager.getRotationMatrix(MagnSensorType);
+    biasFileName = std::string("magn_bias_") + std::to_string(moduleId) + std::string(".dat");
 
     sensor_t_data.resolution = GAUSS_TO_UTESLA(data->channels[0].scale);
     sensor_t_data.maxRange = sensor_t_data.resolution * (std::pow(2, data->channels[0].bits_used - 1) - 1);
@@ -113,7 +115,7 @@ void Magnetometer::saveBiasValues(void) const
     magnCalibration.getBias(bias);
 
     if (sensorsCallback != nullptr) {
-        if (sensorsCallback->onSaveDataRequest("magn_bias.dat", &bias, sizeof(bias)) <= 0) {
+        if (sensorsCallback->onSaveDataRequest(biasFileName, &bias, sizeof(bias)) <= 0) {
             console.error("failed to save magn bias");
         }
     }
@@ -126,7 +128,7 @@ void Magnetometer::loadBiasValues(void)
     magnCalibration.resetBiasMatrix(bias);
 
     if (sensorsCallback != nullptr) {
-        if (sensorsCallback->onLoadDataRequest("magn_bias.dat", &bias, sizeof(bias)) <= 0) {
+        if (sensorsCallback->onLoadDataRequest(biasFileName, &bias, sizeof(bias)) <= 0) {
             console.error("failed to load magn bias");
         }
     }

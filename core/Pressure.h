@@ -29,7 +29,8 @@ class Pressure : public HWSensorBaseWithPollrate {
 public:
     Pressure(HWSensorBaseCommonData *data, const char *name,
              struct device_iio_sampling_freqs *sfa, int handle,
-             unsigned int hw_fifo_len, float power_consumption, bool wakeup);
+             unsigned int hw_fifo_len, float power_consumption,
+             bool wakeup, int module);
 
     virtual void ProcessData(SensorBaseData *data);
 };

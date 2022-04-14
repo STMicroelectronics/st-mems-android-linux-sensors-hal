@@ -24,7 +24,7 @@ namespace core {
 
 class SWRotationVector : public SWSensorBaseWithPollrate {
 public:
-    SWRotationVector(const char *name, int handle);
+    SWRotationVector(const char *name, int handle, int module);
 
     virtual void ProcessData(SensorBaseData *data);
 };

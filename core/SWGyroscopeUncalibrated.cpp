@@ -24,10 +24,10 @@
 namespace stm {
 namespace core {
 
-SWGyroscopeUncalibrated::SWGyroscopeUncalibrated(const char *name, int handle)
+SWGyroscopeUncalibrated::SWGyroscopeUncalibrated(const char *name, int handle, int module)
                        : SWSensorBaseWithPollrate(name, handle,
                                                   GyroUncalibSensorType,
-                                                  true, true, true, true)
+                                                  true, true, true, true, module)
 {
     dependencies_type_list.push_back(GyroSensorType);
     id_sensor_trigger = SENSOR_DEPENDENCY_ID_0;

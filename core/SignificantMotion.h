@@ -28,7 +28,7 @@ namespace core {
 class SignMotion : public HWSensorBase {
 public:
     SignMotion(HWSensorBaseCommonData *data, const char *name, int handle,
-               float power_consumption);
+               float power_consumption, int module);
 
     virtual int FlushData(int handle, bool lock_en_mutex);
     virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout,

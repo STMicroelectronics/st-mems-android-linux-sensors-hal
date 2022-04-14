@@ -24,7 +24,7 @@ namespace core {
 
 class SWLinearAccel : public SWSensorBaseWithPollrate {
 public:
-    SWLinearAccel(const char *name, int handle);
+    SWLinearAccel(const char *name, int handle, int module);
 
     virtual int CustomInit();
     virtual void ProcessData(SensorBaseData *data);

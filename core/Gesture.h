@@ -28,7 +28,7 @@ namespace core {
 class Gesture : public HWSensorBase {
 public:
     Gesture(HWSensorBaseCommonData *data, const char *name, int handle,
-            unsigned int hw_fifo_len, float power_consumption);
+            unsigned int hw_fifo_len, float power_consumption, int module);
 
     virtual void ProcessEvent(struct device_iio_events *event_data);
     /* used to maintain compatibility with lsm6dsm */
