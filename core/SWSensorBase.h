@@ -57,19 +57,19 @@ SWSensorBase(const char *name, int handle, STMSensorType sensor_type,
              bool use_dependency_delay, bool use_dependency_name, int module);
     virtual ~SWSensorBase();
 
-    virtual int Enable(int handle, bool enable, bool lock_en_mutex);
+    virtual int Enable(int handle, bool enable, bool lock_en_mutex) override;
 
-    virtual int AddSensorDependency(SensorBase *p);
-    virtual void RemoveSensorDependency(SensorBase *p);
+    virtual int AddSensorDependency(SensorBase *p) override;
+    virtual void RemoveSensorDependency(SensorBase *p) override;
 
-    virtual void ReceiveDataFromDependency(int handle, SensorBaseData *data);
+    virtual void ReceiveDataFromDependency(int handle, SensorBaseData *data) override;
 
     virtual int flushRequest(int handle, bool lock_en_mutex) override;
-    virtual void ProcessFlushData(int handle, int64_t timestamp);
+    virtual void ProcessFlushData(int handle, int64_t timestamp) override;
 
-    virtual void ThreadDataTask(std::atomic<bool>& threadsRunning);
+    virtual void ThreadDataTask(std::atomic<bool>& threadsRunning) override;
 
-    bool hasDataChannels() { return true; }
+    bool hasDataChannels() override { return true; }
 
     int getHandleOfMyTrigger(void) const override;
 };
@@ -85,9 +85,9 @@ public:
                              bool use_dependency_delay, bool use_dependency_name, int module);
     virtual ~SWSensorBaseWithPollrate();
 
-    virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout, bool lock_en_mutex);
+    virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout, bool lock_en_mutex) override;
     virtual int flushRequest(int handle, bool lock_en_mutex) override;
-    virtual void WriteDataToPipe(int64_t hw_pollrate);
+    virtual void WriteDataToPipe(int64_t hw_pollrate) override;
 };
 
 } // namespace core

@@ -96,28 +96,28 @@ public:
                  int module);
     virtual ~HWSensorBase();
 
-    virtual selftest_status ExecuteSelfTest();
+    virtual selftest_status ExecuteSelfTest() override;
     void GetSelfTestAvailable();
 
-    virtual int Enable(int handle, bool enable, bool lock_en_mute);
-    virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout, bool lock_en_mute);
+    virtual int Enable(int handle, bool enable, bool lock_en_mute) override;
+    virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout, bool lock_en_mute) override;
 
-    virtual int AddSensorDependency(SensorBase *p);
-    virtual void RemoveSensorDependency(SensorBase *p);
+    virtual int AddSensorDependency(SensorBase *p) override;
+    virtual void RemoveSensorDependency(SensorBase *p) override;
 
-    virtual void ProcessData(SensorBaseData *data);
+    virtual void ProcessData(SensorBaseData *data) override;
     virtual void ProcessEvent(struct device_iio_events *event_data);
     virtual int flushRequest(int handle, bool lock_en_mute) override;
     virtual void ProcessFlushData(int handle, int64_t timestamp) override;
     void processSyncEvent(struct device_iio_events *event_data);
-    virtual void ThreadDataTask(std::atomic<bool>& threadsRunning);
-    virtual void ThreadEventsTask(std::atomic<bool>& threadsRunning);
+    virtual void ThreadDataTask(std::atomic<bool>& threadsRunning) override;
+    virtual void ThreadEventsTask(std::atomic<bool>& threadsRunning) override;
 
-    virtual int InjectionMode(bool enable);
-    virtual int InjectSensorData(const sensors_event_t *data);
+    virtual int InjectionMode(bool enable) override;
+    virtual int InjectSensorData(const sensors_event_t *data) override;
 
-    bool hasEventChannels() { return has_event_channels; }
-    bool hasDataChannels() { return common_data.num_channels > 0; }
+    bool hasEventChannels() override { return has_event_channels; }
+    bool hasDataChannels() override { return common_data.num_channels > 0; }
 };
 
 /*
@@ -136,9 +136,9 @@ public:
     virtual ~HWSensorBaseWithPollrate();
 
     virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout,
-                         bool lock_en_mute);
+                         bool lock_en_mute) override;
     virtual int flushRequest(int handle, bool lock_en_mute) override;
-    virtual void WriteDataToPipe(int64_t hw_pollrate);
+    virtual void WriteDataToPipe(int64_t hw_pollrate) override;
 };
 
 } // namespace core

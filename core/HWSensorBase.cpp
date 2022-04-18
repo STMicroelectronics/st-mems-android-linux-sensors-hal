@@ -827,7 +827,7 @@ HWSensorBaseWithPollrate::HWSensorBaseWithPollrate(HWSensorBaseCommonData *data,
                                                    float power_consumption, int module)
     : HWSensorBase(data, name, handle, sensor_type, hw_fifo_len, power_consumption, module)
 {
-    float min_sampling_frequency = UINT_MAX, max_sampling_frequency = 0;
+    float min_sampling_frequency = FLT_MAX, max_sampling_frequency = 0;
     unsigned int i;
 
     memcpy(&sampling_frequency_available, sfa, sizeof(sampling_frequency_available));

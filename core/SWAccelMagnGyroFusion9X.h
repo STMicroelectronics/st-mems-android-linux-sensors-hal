@@ -35,9 +35,9 @@ public:
 
     virtual int libsInit(void) override;
 
-    virtual int Enable(int handle, bool enable, bool lock_en_mutex);
-    virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout, bool lock_en_mutex);
-    virtual void ProcessData(SensorBaseData *data);
+    virtual int Enable(int handle, bool enable, bool lock_en_mutex) override;
+    virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout, bool lock_en_mutex) override;
+    virtual void ProcessData(SensorBaseData *data) override;
 
 private:
     STMSensorsFusion9Axis& sensorsFusion;

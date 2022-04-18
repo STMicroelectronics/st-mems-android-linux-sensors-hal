@@ -37,8 +37,8 @@ public:
     int64_t bias_last_pollrate;
 
     virtual int libsInit(void) override;
-    virtual int Enable(int handle, bool enable, bool lock_en_mutex);
-    virtual void ProcessData(SensorBaseData *data);
+    virtual int Enable(int handle, bool enable, bool lock_en_mutex) override;
+    virtual void ProcessData(SensorBaseData *data) override;
     virtual void postSetup(void) override;
 
 private:
