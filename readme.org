@@ -15,6 +15,7 @@ You can find a list of sensors supported directly into the source code [[file:co
 Four different components can be identified:
 
 - core :: This is the main component of the HAL. All the adapter components are interacting with the core in order to send commands and receive sensors data and events.
+- android multi-hal (Android 11 and above) :: Android [[https://source.android.com/devices/sensors/sensors-multihal][multi-hal]] adapter.
 - android hidl 2.0 (Android 11 and above) :: Android [[https://source.android.com/devices/architecture/hidl-cpp][HIDL]] 2.0 adapter (full treble).
 - android legacy (Android 10 and inferior) :: Android [[https://source.android.com/devices/architecture/hal][legacy]] (pre full treble) adapter.
 - linux :: Linux implementation adapter.
@@ -28,6 +29,7 @@ In Android HIDL 2.0 (full treble) mode, HAL is build as an executable and a serv
 
 You can find the related documentation for Android here:
 
+- [[file:multi-hal/readme.org][multi-hal 2.x]]
 - [[file:2.0/readme.org][HIDL 2.0]]
 - [[file:legacy/readme.org][Legacy]]
 

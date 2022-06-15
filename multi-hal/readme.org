@@ -1,0 +1,119 @@
+#+TITLE: stm-sensors-hal-iio Android multi-hal 2.x
+#+SUBTITLE: notes
+#+AUTHOR: Denis Ciocca
+
+* Introduction
+
+This is the documentation page for the Android multi-hal 2.x components of the sensors-hal iio.
+
+* Configuration
+** Default settings
+
+Default parameters can be set at compile time by changing the Android.bp cflags (under core, see core documentation).
+
+* Build instructions
+
+1> clone this repository into desired folder (i.e. hardware/st/sensors-hal):
+
+#+begin_src shell
+git clone https://github.com/STMicroelectronics/st-mems-android-linux-sensors-hal.git hardware/st/sensors-hal
+#+end_src
+
+2> enable soong module (i.e. hardware/st/sensors-hal/multi-hal/Android.bp):
+
+#+begin_src makefile
+...
+enabled: true,
+...
+#+end_src
+
+3> create the hals.conf file (device/<vendor>/<board>/multi-hal/hals.conf) that lists the names of the sub-hals to load:
+
+#+begin_src conf
+android.hardware.sensors@2.1-subhal.stmicroelectronics.so
+#+end_src
+
+4> modify the device makefile (i.e. device/<vendor>/<board>/device.mk) by adding these lines:
+
+#+begin_src makefile
+# Build stm-sensors-hal with multi-hal 2.1 interface
+PRODUCT_PACKAGES += \
+	android.hardware.sensors@2.1-service.multihal \
+	android.hardware.sensors@2.1-subhal.stmicroelectronics
+
+# Copy multi-hal config file
+PRODUCT_COPY_FILES += \
+	$(LOCAL_PATH)/multi-hal/hals.conf:$(TARGET_COPY_OUT_VENDOR)/etc/sensors/hals.conf
+
+# Copy sensors config file(s)
+PRODUCT_COPY_FILES += \
+	frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.accelerometer.xml \
+	frameworks/native/data/etc/android.hardware.sensor.ambient_temperature.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.ambient_temperature.xml \
+	frameworks/native/data/etc/android.hardware.sensor.compass.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.compass.xml \
+	frameworks/native/data/etc/android.hardware.sensor.gyroscope.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.gyroscope.xml \
+	frameworks/native/data/etc/android.hardware.sensor.hifi_sensors.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.hifi_sensors.xml \
+	frameworks/native/data/etc/android.hardware.sensor.relative_humidity.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.relative_humidity.xml \
+	frameworks/native/data/etc/android.hardware.sensor.stepcounter.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.stepcounter.xml \
+	frameworks/native/data/etc/android.hardware.sensor.stepdetector.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.stepdetector.xml
+#+end_src
+
+5> modify the sepolicy file_contexts file (i.e. device/<vendor>/<board>/sepolicy/file_contexts) by adding these lines:
+
+#+begin_src conf
+/vendor/bin/hw/android\.hardware\.sensors@2\.1-service\.multihal  u:object_r:hal_sensors_default_exec:s0
+#+end_src
+
+6> modify the uevent rules file (i.e. device/<vendor>/<board>/ueventd.rc) by adding these lines:
+
+#+begin_src conf
+#common iio char devices
+/dev/iio:device* 0666 system system
+
+#sensors common
+/sys/bus/iio/devices/iio:device* buffer/enable 0666 system system
+/sys/bus/iio/devices/iio:device* buffer/length 0666 system system
+/sys/bus/iio/devices/iio:device* sampling_frequency 0666 system system
+/sys/bus/iio/devices/iio:device* hwfifo_flush 0666 system system
+/sys/bus/iio/devices/iio:device* hwfifo_enabled 0666 system system
+/sys/bus/iio/devices/iio:device* hwfifo_watermark 0666 system system
+/sys/bus/iio/devices/iio:device* injection_mode 0666 system system
+/sys/bus/iio/devices/iio:device* current_timestamp_clock 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_timestamp_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_count_en 0666 system system
+
+#accelerometer sensor
+/sys/bus/iio/devices/iio:device* in_accel_x_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_accel_y_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_accel_z_scale 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_accel_x_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_accel_y_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_accel_z_en 0666 system system
+
+#gyroscope sensor
+/sys/bus/iio/devices/iio:device* in_anglvel_x_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_anglvel_y_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_anglvel_z_scale 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_anglvel_x_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_anglvel_y_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_anglvel_z_en 0666 system system
+
+#magnetometer sensor
+/sys/bus/iio/devices/iio:device* in_magn_x_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_magn_y_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_magn_z_scale 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_magn_x_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_magn_y_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_magn_z_en 0666 system system
+
+#step counter sensor
+/sys/bus/iio/devices/iio:device* scan_elements/in_step_counter_en 0666 system system
+/sys/bus/iio/devices/iio:device* max_delivery_rate 0666 system system
+
+#temperature sensor
+/sys/bus/iio/devices/iio:device* scan_elements/in_temp_en 0666 system system
+
+#gesture sensor
+/sys/bus/iio/devices/iio:device* scan_elements/in_gesture_en 0666 system system
+#+end_src
+
+7> build aosp as described into [[https://source.android.com/setup/build/building][official documentation]].
