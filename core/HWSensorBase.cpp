@@ -375,6 +375,10 @@ int HWSensorBase::Enable(int handle, bool enable, bool lock_en_mutex)
         pthread_mutex_lock(&enable_mutex);
     }
 
+    if (enable && GetStatusOfHandle(handle)) {
+        goto unlock_mutex;
+    }
+
     old_status = GetStatus(false);
     old_status_no_handle = GetStatusExcludeHandle(handle);
     timestampEnable = utils.getTime();
