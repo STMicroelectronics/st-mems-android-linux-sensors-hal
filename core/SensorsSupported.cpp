@@ -70,7 +70,7 @@ SensorsSupported SensorsSupported::RelativeHumidity(const std::string &d_name, c
     return SensorsSupported(d_name, STMSensorType(SensorType::RELATIVE_HUMIDITY), DEVICE_IIO_HUMIDITYRELATIVE, a_name, power);
 }
 
-const std::array<struct SensorsSupported, 151> sensorsSupportedList = {
+const std::array<struct SensorsSupported, 158> sensorsSupportedList = {
     /* LSM6DSV16X */
     SensorsSupported::Accel("lsm6dsv16x_accel", "LSM6DSV16X Accelerometer Sensor", 0.0f),
     SensorsSupported::Magn("lsm6dsv16x_magn", "LSM6DSV16X Magnetometer Sensor", 0.0f),
@@ -91,6 +91,15 @@ const std::array<struct SensorsSupported, 151> sensorsSupportedList = {
     SensorsSupported::StepCounter("lsm6dsr_step_c", "LSM6DSR Step Counter Sensor", 0.0f),
     SensorsSupported::SignMotion("lsm6dsr_sign_motion", "LSM6DSR Significant Motion Sensor", 0.0f),
     SensorsSupported::Pressure("lsm6dsr_press", "LSM6DSR Pressure Sensor", 0.0f),
+
+    /* LSM6DSRX */
+    SensorsSupported::Accel("lsm6dsrx_accel", "LSM6DSRX Accelerometer Sensor", 240E-3f),
+    SensorsSupported::Magn("lsm6dsrx_magn", "LSM6DSRX Magnetometer Sensor", 0.0f),
+    SensorsSupported::Gyro("lsm6dsrx_gyro", "LSM6DSRX Gyroscope Sensor", 0.0f),
+    SensorsSupported::StepDetector("lsm6dsrx_step_d", "LSM6DSRX Step Detector Sensor", 0.0f),
+    SensorsSupported::StepCounter("lsm6dsrx_step_c", "LSM6DSRX Step Counter Sensor", 0.0f),
+    SensorsSupported::SignMotion("lsm6dsrx_sign_motion", "LSM6DSRX Significant Motion Sensor", 0.0f),
+    SensorsSupported::Pressure("lsm6dsrx_press", "LSM6DSRX Pressure Sensor", 0.0f),
 
     /* LSM6DSO */
     SensorsSupported::Accel("lsm6dso_accel", "LSM6DSO Accelerometer Sensor", 240E-3f),
