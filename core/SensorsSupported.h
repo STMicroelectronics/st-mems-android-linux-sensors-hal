@@ -57,7 +57,7 @@ struct SensorsSupported {
     static SensorsSupported RelativeHumidity(const std::string &d_name, const std::string &a_name, float power);
 };
 
-extern const std::array<struct SensorsSupported, 158> sensorsSupportedList;
+extern const std::array<struct SensorsSupported, 159> sensorsSupportedList;
 
 struct SWSensorsSupported {
     SWSensorsSupported(STMSensorType type) : type(type) {}
