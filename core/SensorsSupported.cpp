@@ -70,12 +70,18 @@ SensorsSupported SensorsSupported::RelativeHumidity(const std::string &d_name, c
     return SensorsSupported(d_name, STMSensorType(SensorType::RELATIVE_HUMIDITY), DEVICE_IIO_HUMIDITYRELATIVE, a_name, power);
 }
 
-const std::array<struct SensorsSupported, 144> sensorsSupportedList = {
+const std::array<struct SensorsSupported, 148> sensorsSupportedList = {
     /* LSM6DSV16X */
     SensorsSupported::Accel("lsm6dsv16x_accel", "LSM6DSV16X Accelerometer Sensor", 0.0f),
     SensorsSupported::Magn("lsm6dsv16x_magn", "LSM6DSV16X Magnetometer Sensor", 0.0f),
     SensorsSupported::Gyro("lsm6dsv16x_gyro", "LSM6DSV16X Gyroscope Sensor", 0.0f),
     SensorsSupported::Pressure("lsm6dsv16x_press", "LSM6DSV16X Pressure Sensor", 0.0f),
+
+    /* LSM6DSV */
+    SensorsSupported::Accel("lsm6dsv_accel", "LSM6DSV Accelerometer Sensor", 0.0f),
+    SensorsSupported::Magn("lsm6dsv_magn", "LSM6DSV Magnetometer Sensor", 0.0f),
+    SensorsSupported::Gyro("lsm6dsv_gyro", "LSM6DSV Gyroscope Sensor", 0.0f),
+    SensorsSupported::Pressure("lsm6dsv_press", "LSM6DSV Pressure Sensor", 0.0f),
 
     /* LSM6DSR */
     SensorsSupported::Accel("lsm6dsr_accel", "LSM6DSR Accelerometer Sensor", 240E-3f),
