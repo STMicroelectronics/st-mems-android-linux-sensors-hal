@@ -564,14 +564,22 @@ int SensorsHidlInterface::onLoadDataRequest(const std::string& resourceID,
 void SensorsHidlInterface::postEvents(const std::vector<Event> &events, bool wakeup)
 {
     std::lock_guard<std::mutex> lock(mWriteLock);
+    size_t numToWrite = events.size();
 
-    if (mEventQueue->write(events.data(), events.size())) {
-        mEventQueueFlag->wake(static_cast<uint32_t>(EventQueueFlagBits::READ_AND_PROCESS));
+    do {
+        if (mEventQueue->write(events.data(), events.size())) {
+            mEventQueueFlag->wake(static_cast<uint32_t>(EventQueueFlagBits::READ_AND_PROCESS));
 
-        if (wakeup) {
-            updateWakeLock(events.size(), 0);
+            if (wakeup) {
+               updateWakeLock(events.size(), 0);
+            }
         }
-    }
+
+        if (events.size() > mEventQueue->availableToWrite())
+            numToWrite = events.size() - mEventQueue->availableToWrite();
+        else
+            numToWrite = 0;
+    } while (numToWrite > 0);
 }
 
 /**
