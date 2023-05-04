@@ -357,7 +357,12 @@ static int st_hal_set_fullscale(const char *iio_sysfs_path,
     } else if (sensor_type == GyroSensorType) {
         iio_sensor_type = DEVICE_IIO_GYRO;
     } else if (sensor_type == AmbTemperatureSensorType) {
-        /* temperature sensors generally do not support change full scale */
+        /*
+         * temperature sensors generally do not support change full scale
+         * in case of in_temp_scale_available is not available
+         */
+        channels[0].scale = sa->scales[0];
+
         return 0;
     } else {
         return -EINVAL;

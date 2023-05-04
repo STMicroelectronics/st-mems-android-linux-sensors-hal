@@ -128,6 +128,9 @@ PRODUCT_COPY_FILES += \
 
 #gesture sensor
 /sys/bus/iio/devices/iio:device* scan_elements/in_gesture_en 0666 system system
+
+#pressure sensor
+/sys/bus/iio/devices/iio:device* scan_elements/in_pressure_en 0666 system system
 #+end_src
 
 5> build aosp as described into [[https://source.android.com/setup/build/building][official documentation]].

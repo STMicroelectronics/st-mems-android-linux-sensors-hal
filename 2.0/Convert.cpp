@@ -211,8 +211,14 @@ bool convertFromSTMSensor(const stm::core::STMSensor &src,
     dst->version = src.getVersion();
     dst->type = sensorType;
     dst->typeAsString = "";
-    dst->maxRange = std::ceil(src.getMaxRange());
-    dst->resolution = src.getResolution();
+    if (sensorType == V1_0::SensorType::AMBIENT_TEMPERATURE) {
+        dst->resolution = src.getResolution() / 1000.0f;
+        dst->maxRange = std::ceil(src.getMaxRange() / 1000.0f);
+    } else {
+        dst->resolution = src.getResolution();
+        dst->maxRange = std::ceil(src.getMaxRange());
+    }
+
     dst->power = src.getPower();
 
     if (src.isOnChange()) {
@@ -304,6 +310,13 @@ void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorDa
         event.u.uncal.x_bias = sensorData.getData().at(3);
         event.u.uncal.y_bias = sensorData.getData().at(4);
         event.u.uncal.z_bias = sensorData.getData().at(5);
+        break;
+    case SensorType::PRESSURE:
+    case SensorType::AMBIENT_TEMPERATURE:
+        if (sensorData.getData().size() < 1) {
+            return;
+        }
+        event.u.scalar = sensorData.getData().at(0);
         break;
     case SensorType::META_DATA:
         event.u.meta.what = V1_0::MetaDataEventType::META_DATA_FLUSH_COMPLETE;

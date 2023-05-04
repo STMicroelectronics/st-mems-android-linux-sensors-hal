@@ -42,7 +42,8 @@ STMSensor::STMSensor(const std::string &name,
             power(power),
             minRateHz(minRateHz),
             maxRateHz(maxRateHz),
-            onChange(minRateHz < 1e-9 ? true : false),
+            onChange(((minRateHz < 1e-9) ||
+                     (type == SensorType::AMBIENT_TEMPERATURE) )? true : false),
             fifoRsvdCount(fifoRsvdCount),
             fifoMaxCount(fifoMaxCount),
             wakeUp(wakeUp)
