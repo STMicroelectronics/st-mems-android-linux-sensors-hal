@@ -312,11 +312,20 @@ void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorDa
         event.u.uncal.z_bias = sensorData.getData().at(5);
         break;
     case SensorType::PRESSURE:
+    case SensorType::RELATIVE_HUMIDITY:
+    case SensorType::SIGNIFICANT_MOTION:
+    case SensorType::STEP_DETECTOR:
     case SensorType::AMBIENT_TEMPERATURE:
         if (sensorData.getData().size() < 1) {
             return;
         }
         event.u.scalar = sensorData.getData().at(0);
+        break;
+    case SensorType::STEP_COUNTER:
+        if (sensorData.getData().size() < 1) {
+            return;
+        }
+        event.u.stepCount = sensorData.getData().at(0);
         break;
     case SensorType::META_DATA:
         event.u.meta.what = V1_0::MetaDataEventType::META_DATA_FLUSH_COMPLETE;
