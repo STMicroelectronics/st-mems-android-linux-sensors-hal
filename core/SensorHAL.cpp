@@ -356,6 +356,8 @@ static int st_hal_set_fullscale(const char *iio_sysfs_path,
         }
     } else if (sensor_type == GyroSensorType) {
         iio_sensor_type = DEVICE_IIO_GYRO;
+    } else if (sensor_type == PressureSensorType) {
+        iio_sensor_type = DEVICE_IIO_PRESSURE;
     } else if (sensor_type == AmbTemperatureSensorType) {
         /*
          * temperature sensors generally do not support change full scale
@@ -366,6 +368,16 @@ static int st_hal_set_fullscale(const char *iio_sysfs_path,
         return 0;
     } else {
         return -EINVAL;
+    }
+
+    /*
+     * specific case where there is no choice, in this case
+     * the device_iio_utils::set_scale could fails
+     */
+    if (sa->length == 1) {
+        channels[0].scale = sa->scales[0];
+
+        return 0;
     }
 
     if (channels[0].sign) {
