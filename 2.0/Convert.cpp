@@ -278,8 +278,17 @@ void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorDa
     switch (sensorData.getSensorType()) {
     case SensorType::ACCELEROMETER:
     case SensorType::MAGNETOMETER:
-    case SensorType::ORIENTATION:
     case SensorType::GYROSCOPE:
+        if (sensorData.getData().size() < 3) {
+            return;
+        }
+        event.u.vec3.x = sensorData.getData().at(0);
+        event.u.vec3.y = sensorData.getData().at(1);
+        event.u.vec3.z = sensorData.getData().at(2);
+        /* report accuracy */
+        event.u.vec3.status = static_cast<V1_0::SensorStatus>(int(sensorData.getData().at(3)));
+        break;
+    case SensorType::ORIENTATION:
     case SensorType::GRAVITY:
     case SensorType::LINEAR_ACCELERATION:
         if (sensorData.getData().size() < 3) {
