@@ -34,42 +34,7 @@ namespace core {
 #define DEVICE_IIO_MAX_SAMP_FREQ_AVAILABLE      10
 #define DEVICE_IIO_SCALE_AVAILABLE              10
 
-/*
- * To fill values for following define please refer to
- * driver implementation and kernel version
- */
-typedef enum {
-    DEVICE_IIO_ACC = 3,
-    DEVICE_IIO_GYRO = 4,
-    DEVICE_IIO_MAGN = 5,
-    DEVICE_IIO_LIGHT = 6,
-    DEVICE_IIO_PROXIMITY = 8,
-    DEVICE_IIO_TEMP = 9,
-    DEVICE_IIO_INCLI = 10,
-    DEVICE_IIO_ROT = 11,
-    DEVICE_IIO_ANGL = 12,
-    DEVICE_IIO_TIMESTAMP = 13,
-    DEVICE_IIO_PRESSURE = 17,
-    DEVICE_IIO_HUMIDITYRELATIVE = 18,
-    DEVICE_IIO_ACTIVITY = 19,
-    DEVICE_IIO_STEPS = 20,
-    DEVICE_IIO_SIGN_MOTION = 29,
-    DEVICE_IIO_STEP_DETECTOR = 30,
-    DEVICE_IIO_STEP_COUNTER = 31,
-    DEVICE_IIO_TILT = 32,
-    DEVICE_IIO_TAP = 33,
-    DEVICE_IIO_TAP_TAP = 34,
-    DEVICE_IIO_WRIST_TILT_GESTURE = 35,
-    DEVICE_IIO_GESTURE = 36,
-} device_iio_chan_type_t;
-
-/*
- * Event defines, need to be copied from your linux
- * kernel distro
- */
-#define DEVICE_IIO_EV_DIR_FIFO_DATA             0x05
-#define DEVICE_IIO_EV_TYPE_FIFO_FLUSH           0x06
-#define DEVICE_IIO_EV_TYPE_TIME_SYNC            0x07
+#include <local/sensorhal_iio_types.h>
 
 #define DISABLE_CHANNEL                         0
 #define ENABLE_CHANNEL                          1
