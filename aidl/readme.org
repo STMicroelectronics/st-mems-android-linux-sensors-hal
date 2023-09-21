@@ -1,0 +1,141 @@
+#+TITLE: stm-sensors-hal-iio Android AIDL
+#+SUBTITLE: notes
+#+AUTHOR: MEMS Software Solutions Team
+
+* Introduction
+
+This is the documentation page for the Android AIDL components of the sensors-hal iio.
+
+* Configuration
+** Android properties
+
+Android [[system https://source.android.com/devices/architecture/configuration/add-system-properties][system properties]] can be used to configure at run-time some parameters.
+If a parameter is set by using system properties, default value for that property will be discarded.
+
+- persist.vendor.stm.sensors.max-odr
+- persist.vendor.stm.sensors.rot-matrix-1.SENSORTYPE
+- persist.vendor.stm.sensors.rot-matrix-2.SENSORTYPE
+- persist.vendor.stm.sensors.placement-1.SENSORTYPE
+- persist.vendor.stm.sensors.placement-2.SENSORTYPE
+- persist.vendor.stm.sensors.max-range.SENSORTYPE
+
+where SENSORTYPE can be one of these values:
+
+- accel
+- magn
+- gyro
+
+Example of properties usage (i.e. device/<vendor>/<board>/system.prop):
+
+#+begin_src conf
+persist.vendor.stm.sensors.max-odr = 250 #max odr that can be used is 250Hz
+
+persist.vendor.stm.sensors.rot-matrix-1.accel = "1,0,0,0,1,0,0,0,1" #accel rotation matrix
+persist.vendor.stm.sensors.placement-1.accel = "10,20,30" #accel position in cm
+
+persist.vendor.stm.sensors.max-range.accel = 70 #accel full-scale to support reading of at least 70m/s^2
+persist.vendor.stm.sensors.max-range.magn = 2000 #magn full-scale to support reading of at least 2000uT
+persist.vendor.stm.sensors.max-range.gyro = 8 #gyro full-scale to support reading of at least 8rad/s
+#+end_src
+
+** Default settings
+
+Default parameters can be set at compile time by changing the Android.bp cflags (under core, see core documentation).
+
+* Build instructions
+
+1> clone this repository into desired folder (i.e. hardware/st/sensors-hal):
+
+#+begin_src shell
+git clone https://github.com/STMicroelectronics/st-mems-android-linux-sensors-hal.git hardware/st/sensors-hal
+#+end_src
+
+** Android 13 and above
+
+2> enable soong module (i.e. hardware/st/sensors-hal/aidl/Android.bp):
+
+#+begin_src makefile
+...
+enabled: true,
+...
+#+end_src
+
+3> modify the device makefile (i.e. device/<vendor>/<board>/device.mk) by adding these lines:
+
+#+begin_src makefile
+# Build stm-sensors-hal in full treble mode
+PRODUCT_PACKAGES += \
+	android.hardware.sensors@aidl-service.stmicroelectronics
+
+# Copy sensors config file(s)
+PRODUCT_COPY_FILES += \
+	frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml \
+	frameworks/native/data/etc/android.hardware.sensor.ambient_temperature.xml:system/etc/permissions/android.hardware.sensor.ambient_temperature.xml \
+	frameworks/native/data/etc/android.hardware.sensor.compass.xml:system/etc/permissions/android.hardware.sensor.compass.xml \
+	frameworks/native/data/etc/android.hardware.sensor.gyroscope.xml:system/etc/permissions/android.hardware.sensor.gyroscope.xml \
+	frameworks/native/data/etc/android.hardware.sensor.hifi_sensors.xml:system/etc/permissions/android.hardware.sensor.hifi_sensors.xml \
+	frameworks/native/data/etc/android.hardware.sensor.relative_humidity.xml:system/etc/permissions/android.hardware.sensor.relative_humidity.xml \
+	frameworks/native/data/etc/android.hardware.sensor.stepcounter.xml:system/etc/permissions/android.hardware.sensor.stepcounter.xml \
+	frameworks/native/data/etc/android.hardware.sensor.stepdetector.xml:system/etc/permissions/android.hardware.sensor.stepdetector.xml
+#+end_src
+
+4> modify the sepolicy file_contexts file (i.e. device/<vendor>/<board>/sepolicy/file_contexts) by adding these lines:
+
+#+begin_src conf
+/vendor/bin/hw/android\.hardware\.sensors@aidl-service\.stmicroelectronics u:object_r:hal_sensors_default_exec:s0
+#+end_src
+
+5> modify the uevent rules file (i.e. device/<vendor>/<board>/ueventd.rc) by adding these lines:
+
+#+begin_src conf
+#common iio char devices
+/dev/iio:device* 0666 system system
+
+#sensors common
+/sys/bus/iio/devices/iio:device* buffer/enable 0666 system system
+/sys/bus/iio/devices/iio:device* buffer/length 0666 system system
+/sys/bus/iio/devices/iio:device* sampling_frequency 0666 system system
+/sys/bus/iio/devices/iio:device* hwfifo_flush 0666 system system
+/sys/bus/iio/devices/iio:device* hwfifo_enabled 0666 system system
+/sys/bus/iio/devices/iio:device* hwfifo_watermark 0666 system system
+/sys/bus/iio/devices/iio:device* injection_mode 0666 system system
+/sys/bus/iio/devices/iio:device* current_timestamp_clock 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_timestamp_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_count_en 0666 system system
+
+#accelerometer sensor
+/sys/bus/iio/devices/iio:device* in_accel_x_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_accel_y_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_accel_z_scale 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_accel_x_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_accel_y_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_accel_z_en 0666 system system
+
+#gyroscope sensor
+/sys/bus/iio/devices/iio:device* in_anglvel_x_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_anglvel_y_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_anglvel_z_scale 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_anglvel_x_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_anglvel_y_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_anglvel_z_en 0666 system system
+
+#magnetometer sensor
+/sys/bus/iio/devices/iio:device* in_magn_x_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_magn_y_scale 0666 system system
+/sys/bus/iio/devices/iio:device* in_magn_z_scale 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_magn_x_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_magn_y_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_magn_z_en 0666 system system
+
+#step counter sensor
+/sys/bus/iio/devices/iio:device* scan_elements/in_step_counter_en 0666 system system
+/sys/bus/iio/devices/iio:device* max_delivery_rate 0666 system system
+
+#temperature sensor
+/sys/bus/iio/devices/iio:device* scan_elements/in_temp_en 0666 system system
+
+#gesture sensor
+/sys/bus/iio/devices/iio:device* scan_elements/in_gesture_en 0666 system system
+#+end_src
+
+6> build aosp as described into [[https://source.android.com/setup/build/building][official documentation]].

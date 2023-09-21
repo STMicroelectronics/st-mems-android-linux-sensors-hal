@@ -1,0 +1,5 @@
+service vendor.sensors-hal-aidl-stmicroelectronics /vendor/bin/hw/android.hardware.sensors@aidl-service.stmicroelectronics
+    class hal
+    user system
+    group system
+    rlimit rtprio 10 10
