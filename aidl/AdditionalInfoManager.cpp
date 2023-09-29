@@ -94,10 +94,25 @@ bool AdditionalInfoManager::isSupported(int sensorHandle) const
 Event AdditionalInfoManager::makeSensorPlacementFrame(int sensorHandle, int serial, int64_t timestamp) const
 {
     Event sensorEvent;
-    (void)serial;
+    AdditionalInfo additionalInfo;
+    AdditionalInfo::AdditionalInfoPayload::FloatValues data;
+
     sensorEvent.sensorHandle = sensorHandle;
     sensorEvent.sensorType = aidl::android::hardware::sensors::SensorType::ADDITIONAL_INFO;
     sensorEvent.timestamp = timestamp;
+    additionalInfo.serial = serial;
+    additionalInfo.type = aidl::android::hardware::sensors::AdditionalInfo::AdditionalInfoType::AINFO_SENSOR_PLACEMENT;
+
+    std::copy(placements[sensorHandle].getPayload().data(),
+              placements[sensorHandle].getPayload().data() +
+              placements[sensorHandle].getPayload().size(),
+              std::begin(data.values));
+    constexpr size_t OutDataLen = sizeof(data.values) / sizeof(float);
+    for (size_t i = placements[sensorHandle].getPayload().size(); i < OutDataLen; ++i) {
+        data.values[i] = 0.0f;
+    }
+    additionalInfo.payload.set<AdditionalInfo::AdditionalInfoPayload::dataFloat>(data);
+    sensorEvent.payload.set<Event::EventPayload::additional>(additionalInfo);
 
     return sensorEvent;
 }
@@ -119,6 +134,7 @@ Event AdditionalInfoManager::getBeginFrame(int sensorHandle, int64_t timestamp)
     sensorEvent.timestamp = timestamp;
     additionalInfo.serial = 0;
     additionalInfo.type = aidl::android::hardware::sensors::AdditionalInfo::AdditionalInfoType::AINFO_BEGIN;
+    sensorEvent.payload.set<Event::EventPayload::additional>(additionalInfo);
 
     return sensorEvent;
 }
@@ -140,6 +156,7 @@ Event AdditionalInfoManager::getEndFrame(int sensorHandle, int serial, int64_t t
     sensorEvent.timestamp = timestamp;
     additionalInfo.serial = serial;
     additionalInfo.type = aidl::android::hardware::sensors::AdditionalInfo::AdditionalInfoType::AINFO_END;
+    sensorEvent.payload.set<Event::EventPayload::additional>(additionalInfo);
 
     return sensorEvent;
 }
