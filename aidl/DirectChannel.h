@@ -27,7 +27,7 @@ struct LockfreeBuffer {
     LockfreeBuffer(void *buf, size_t size);
     ~LockfreeBuffer(void) = default;
 
-    void write(const Event &ev);
+    void write(Event &ev);
 
 private:
     /**
@@ -57,7 +57,7 @@ public:
 
     bool isValid(void) const;
 
-    void writeEvent(const Event &event);
+    void writeEvent(Event &event);
 
 protected:
     /**
@@ -79,11 +79,11 @@ public:
     AshmemDirectChannelBuffer(const SharedMemInfo &mem);
     ~AshmemDirectChannelBuffer(void) override;
 
-//private:
+private:
     /**
      * MemoryFile shared memory file descriptor
      */
-//    int mFd;
+    int mFd;
 };
 
 struct GrallocDirectChannelBuffer : public DirectChannelBufferBase {

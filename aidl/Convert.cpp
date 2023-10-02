@@ -267,7 +267,7 @@ bool convertFromSTMSensor(const stm::core::STMSensor &src,
                 directReportMaxRate = static_cast<int32_t>(ISensors::RateLevel::VERY_FAST);
             }
 
-            dst->flags |= (directReportMaxRate << static_cast<uint8_t>(SensorInfo::SENSOR_FLAG_BITS_MASK_DIRECT_REPORT));
+            dst->flags |= (directReportMaxRate << static_cast<uint8_t>(SensorInfo::SENSOR_FLAG_SHIFT_DIRECT_REPORT));
         }
     }
 

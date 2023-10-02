@@ -217,7 +217,7 @@ class SensorsAidlInterface : public BnSensors, public ISTMSensorsCallback {
     /**
      * Last used  channel handle for direct report channel
      */
-    //int32_t lastDirectChannelHandle;
+    int32_t lastDirectChannelHandle;
 
     /**
      * Mutex for the direct channel buffer map

@@ -39,6 +39,8 @@ namespace android {
 namespace hardware {
 namespace sensors {
 
+constexpr int64_t hzToNs(int64_t hz) { return 1e9 / hz; };
+
 SensorsAidlInterface::SensorsAidlInterface()
                      : mReadWakeLockQueueRun(false),
                        mOutstandingWakeUpEvents(0),
@@ -46,7 +48,7 @@ SensorsAidlInterface::SensorsAidlInterface()
                        mEventQueueFlag(nullptr),
                        sensorsCore(ISTMSensorsHAL::getInstance()),
                        console(IConsole::getInstance()),
-                       //lastDirectChannelHandle(0),
+                       lastDirectChannelHandle(0),
                        propertiesManager(PropertiesManager::getInstance()) {
 }
 
@@ -123,16 +125,6 @@ ScopedAStatus SensorsAidlInterface::batch(int32_t in_sensorHandle, int64_t in_sa
     }
 
     return ScopedAStatus::ok();
-}
-
-ScopedAStatus SensorsAidlInterface::configDirectReport(int32_t /* in_sensorHandle */,
-                                          int32_t /* in_channelHandle */,
-                                          ISensors::RateLevel /* in_rate */,
-                                          int32_t* _aidl_return)
-{
-    *_aidl_return = EX_UNSUPPORTED_OPERATION;
-
-    return ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
 }
 
 ScopedAStatus SensorsAidlInterface::flush(int32_t in_sensorHandle)
@@ -245,12 +237,150 @@ ScopedAStatus SensorsAidlInterface::injectSensorData(const Event& in_event)
     return ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
 }
 
-ScopedAStatus SensorsAidlInterface::registerDirectChannel(const ISensors::SharedMemInfo& /* in_mem */,
-                                             int32_t* _aidl_return)
+ScopedAStatus SensorsAidlInterface::configDirectReport(int32_t in_sensorHandle,
+                                          int32_t in_channelHandle,
+                                          ISensors::RateLevel in_rate,
+                                          int32_t* _aidl_return)
 {
-    *_aidl_return = EX_UNSUPPORTED_OPERATION;
+    if (in_sensorHandle == -1) {
+        if (in_rate == ISensors::RateLevel::STOP) {
+            // stop all active sensors in that particular channel handle
+            auto sensorsHandles = mSensorProxyMngr.getRegisteredSensorsInChannel(in_channelHandle);
+            for (auto &sh : sensorsHandles) {
+                updateSensorsRequests(sh, in_channelHandle, 0, 0);
+                mSensorProxyMngr.unregisterSensorFromChannel(sh, in_channelHandle);
+            }
+            *_aidl_return = in_sensorHandle;
+            return ScopedAStatus::ok();
+        } else {
+            *_aidl_return = 0;
 
-    return ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
+            return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
+        }
+    }
+
+    const stm::core::STMSensor *sensor = getSTMSensor(in_sensorHandle);
+    if (sensor == nullptr) {
+        *_aidl_return = 0;
+
+        return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
+    }
+
+    if (!(sensorFlags[in_sensorHandle] &
+          (SensorInfo::SENSOR_FLAG_BITS_DIRECT_CHANNEL_ASHMEM | SensorInfo::SENSOR_FLAG_BITS_DIRECT_CHANNEL_GRALLOC))) {
+        *_aidl_return = 0;
+
+        return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
+    }
+
+    uint64_t rateInNs;
+
+    int32_t supportedMaxRate = (sensorFlags[in_sensorHandle] & SensorInfo::SENSOR_FLAG_BITS_MASK_DIRECT_REPORT) >>
+                               static_cast<uint8_t>(SensorInfo::SENSOR_FLAG_SHIFT_DIRECT_REPORT);
+
+    switch (in_rate) {
+    case ISensors::RateLevel::STOP:
+        rateInNs = 0;
+        break;
+    case ISensors::RateLevel::NORMAL:
+        rateInNs = hzToNs(50);
+        break;
+    case ISensors::RateLevel::FAST:
+        if (supportedMaxRate < static_cast<int32_t>(ISensors::RateLevel::FAST)) {
+            *_aidl_return = 0;
+
+            return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
+        }
+        rateInNs = hzToNs(200);
+        break;
+    case ISensors::RateLevel::VERY_FAST:
+        if (supportedMaxRate < static_cast<int32_t>(ISensors::RateLevel::VERY_FAST)) {
+            *_aidl_return = 0;
+
+            return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
+        }
+        rateInNs = hzToNs(800);
+        break;
+    default:
+        *_aidl_return = 0;
+
+        return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
+    }
+
+    if (rateInNs != 0)
+        mSensorProxyMngr.registerSensorToChannel(in_sensorHandle, in_channelHandle);
+
+    if (updateSensorsRequests(in_sensorHandle, in_channelHandle, rateInNs, 0)) {
+        mSensorProxyMngr.unregisterSensorFromChannel(in_sensorHandle, in_channelHandle);
+         *_aidl_return = 0;
+
+        return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
+    }
+
+    if (rateInNs == 0)
+        mSensorProxyMngr.unregisterSensorFromChannel(in_sensorHandle, in_channelHandle);
+
+    *_aidl_return = in_sensorHandle;
+
+    return ScopedAStatus::ok();
+}
+
+ScopedAStatus SensorsAidlInterface::registerDirectChannel(const ISensors::SharedMemInfo& in_mem,
+                                                          int32_t* _aidl_return)
+{
+    std::unique_ptr<DirectChannelBufferBase> directChannelBuffer;
+
+    // TODO verify memory region is valid
+    switch (in_mem.type) {
+    case ISensors::SharedMemInfo::SharedMemType::ASHMEM:
+        directChannelBuffer = std::make_unique<AshmemDirectChannelBuffer>(in_mem);
+        break;
+    case ISensors::SharedMemInfo::SharedMemType::GRALLOC:
+        directChannelBuffer = std::make_unique<GrallocDirectChannelBuffer>(in_mem);
+        break;
+    default:
+        *_aidl_return = EX_ILLEGAL_ARGUMENT;
+        return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
+    }
+
+    if (directChannelBuffer == nullptr) {
+        *_aidl_return = EX_NULL_POINTER;
+        return ScopedAStatus::fromExceptionCode(EX_NULL_POINTER);
+    }
+    if (!directChannelBuffer->isValid()) {
+        *_aidl_return = EX_ILLEGAL_ARGUMENT;
+        return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
+    }
+
+    int32_t channelHandle = lastDirectChannelHandle + 1;
+
+    if (mSensorProxyMngr.addChannel(channelHandle)) {
+        *_aidl_return = EX_ILLEGAL_ARGUMENT;
+        return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(mDirectChannelBufferLock);
+        mDirectChannelBuffer.insert(std::make_pair(channelHandle, std::move(directChannelBuffer)));
+    }
+
+    lastDirectChannelHandle = channelHandle;
+
+    *_aidl_return = lastDirectChannelHandle;
+
+    return ScopedAStatus::ok();
+}
+
+ScopedAStatus SensorsAidlInterface::unregisterDirectChannel(int32_t in_channelHandle)
+{
+    if (mSensorProxyMngr.removeChannel(in_channelHandle)) {
+        return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
+    }
+
+    std::lock_guard<std::mutex> lock(mDirectChannelBufferLock);
+    mDirectChannelBuffer.erase(in_channelHandle);
+
+    return ScopedAStatus::ok();
 }
 
 ScopedAStatus SensorsAidlInterface::setOperationMode(OperationMode mode)
@@ -259,11 +389,6 @@ ScopedAStatus SensorsAidlInterface::setOperationMode(OperationMode mode)
         return ScopedAStatus::ok();
 
     return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
-}
-
-ScopedAStatus SensorsAidlInterface::unregisterDirectChannel(int32_t /* in_channelHandle */)
-{
-    return ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
 }
 
 /**

@@ -62,7 +62,7 @@ cc_binary {
     cflags: [
         "-Wall",
         "-Wextra",
-        "-DHAL_ENABLE_DIRECT_REPORT_CHANNEL=0",
+        "-DHAL_ENABLE_DIRECT_REPORT_CHANNEL=1",
         "-DHAL_ENABLE_SENSOR_ADDITIONAL_INFO=1",
         "-DHAL_PRIVATE_DATA_PATH=\"/data/vendor/stm-sensors-hal\""
     ],
