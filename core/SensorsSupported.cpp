@@ -70,7 +70,7 @@ SensorsSupported SensorsSupported::RelativeHumidity(const std::string &d_name, c
     return SensorsSupported(d_name, STMSensorType(SensorType::RELATIVE_HUMIDITY), DEVICE_IIO_HUMIDITYRELATIVE, a_name, power);
 }
 
-const std::array<struct SensorsSupported, 159> sensorsSupportedList = {
+const std::array<struct SensorsSupported, 162> sensorsSupportedList = {
     /* LSM6DSV16X */
     SensorsSupported::Accel("lsm6dsv16x_accel", "LSM6DSV16X Accelerometer Sensor", 0.0f),
     SensorsSupported::Magn("lsm6dsv16x_magn", "LSM6DSV16X Magnetometer Sensor", 0.0f),
@@ -177,6 +177,11 @@ const std::array<struct SensorsSupported, 159> sensorsSupportedList = {
     SensorsSupported::Accel("asm330lhhx_accel", "ASM330LHHX Accelerometer Sensor", 0.0f),
     SensorsSupported::Gyro("asm330lhhx_gyro", "ASM330LHHX Gyroscope Sensor", 0.0f),
     SensorsSupported::InternalTemperature("asm330lhhx_temp", "ASM330LHHX Temperature Sensor", 0.0f),
+
+    /* ASM330LHHXG1 */
+    SensorsSupported::Accel("asm330lhhxg1_accel", "ASM330LHHXG1 Accelerometer Sensor", 0.0f),
+    SensorsSupported::Gyro("asm330lhhxg1_gyro", "ASM330LHHXG1 Gyroscope Sensor", 0.0f),
+    SensorsSupported::InternalTemperature("asm330lhhxg1_temp", "ASM330LHHXG1 Temperature Sensor", 0.0f),
 
     /* ISM330DLC */
     SensorsSupported::Accel("ism330dlc", "ISM330DLC Accelerometer Sensor", 0.0f),
