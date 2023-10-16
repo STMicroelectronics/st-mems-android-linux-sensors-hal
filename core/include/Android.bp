@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2018 The Android Open Source Project
- * Copyright (C) 2019-2020 STMicroelectronics
+ * Copyright (C) 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,31 +14,9 @@
  * limitations under the License.
  */
 
-#include <utils/SystemClock.h>
-
-#include <IUtils.h>
-
-using stm::core::IUtils;
-
-class Utils : public IUtils {
-public:
-    Utils(void) = default;
-    ~Utils(void) = default;
-
-    Utils(const Utils &) = delete;
-    Utils& operator= (const Utils &) = delete;
-
-    int64_t getTime(void) const override;
-};
-
-int64_t Utils::getTime(void) const
-{
-    return android::elapsedRealtimeNano();
+cc_library_headers {
+    name: "stmicroelectronics-sensors-commons",
+    vendor_available: true,
+    export_include_dirs: ["."],
 }
 
-IUtils& IUtils::getInstance(void)
-{
-    static Utils instance;
-
-    return instance;
-}

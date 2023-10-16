@@ -34,17 +34,16 @@ cc_binary {
     ],
     export_static_lib_headers: [
         "stmicroelectronics-sensors-core",
+        "stmicroelectronics-sensors.commons",
     ],
     static_libs: [
+	"stmicroelectronics-sensors.commons",
         "stmicroelectronics-sensors-core",
         "libstm-accel-calibration",
         "libstm-gyro-calibration",
         "libstm-magn-calibration",
         "libstm-sensors-fusion",
         "libstm-timesync",
-    ],
-    local_include_dirs: [
-        "commons",
     ],
     srcs: [
         "service.cpp",
@@ -53,11 +52,6 @@ cc_binary {
         "Convert.cpp",
         "DirectChannel.cpp",
         "SensorsCallback.cpp",
-        "commons/AndroidPropertiesLoader.cpp",
-        "commons/IConsole.cpp",
-        "commons/IUtils.cpp",
-        "commons/SensorPlacement.cpp",
-        "commons/SensorsDataProxyManager.cpp",
     ],
     cflags: [
         "-Wall",

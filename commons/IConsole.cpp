@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#define LOG_TAG "sensors@2.0-stm"
+#define LOG_TAG "stm-sensors"
 
 #include <log/log.h>
 #include <iostream>

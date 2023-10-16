@@ -27,15 +27,11 @@ cc_binary {
         "SensorsHidlInterface.cpp",
         "SensorsCallback.cpp",
         "Convert.cpp",
-        "IUtils.cpp",
-        "IConsole.cpp",
-        "SensorsDataProxyManager.cpp",
         "DirectChannel.cpp",
         "AdditionalInfoManager.cpp",
-        "SensorPlacement.cpp",
-        "AndroidPropertiesLoader.cpp"
     ],
     static_libs: [
+        "stmicroelectronics-sensors.commons",
         "stmicroelectronics-sensors-core",
         "libstm-accel-calibration",
         "libstm-gyro-calibration",
@@ -55,7 +51,8 @@ cc_binary {
         "libbase",
     ],
     export_static_lib_headers: [
-        "stmicroelectronics-sensors-core",
+        "stmicroelectronics-sensors.commons",
+        "stmicroelectronics-sensors-core"
     ],
     cflags: [
         "-Wall",
