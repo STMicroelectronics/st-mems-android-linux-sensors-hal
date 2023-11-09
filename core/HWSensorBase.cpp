@@ -516,6 +516,9 @@ void HWSensorBase::ProcessEvent(struct device_iio_events *event_data)
         } else {
             console.warning("received timesync event but feature not enabled!");
         }
+    } else {
+        console.error(std::string("received unrecognized event type " +
+                      std::to_string(event_type)));
     }
 }
 
