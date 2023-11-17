@@ -328,6 +328,14 @@ void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorDa
         event.payload.set<Event::EventPayload::Tag::uncal>(uncal);
         break;
     }
+    case SensorType::STEP_COUNTER:
+    case SensorType::STEP_DETECTOR: {
+        if (sensorData.getData().size() < 1)
+            return;
+
+	event.payload.set<Event::EventPayload::Tag::stepCount>(sensorData.getData().at(0));
+        break;
+    }
     case SensorType::META_DATA: {
         using MetaDataEventType =
             ::aidl::android::hardware::sensors::Event::EventPayload::MetaData::MetaDataEventType;

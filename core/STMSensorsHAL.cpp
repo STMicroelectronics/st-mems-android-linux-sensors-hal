@@ -61,8 +61,16 @@ void STMSensorsHAL::internalPoll(STMSensorsHAL *hal, std::atomic<bool> *running)
             std::vector<float> payload;
 
             for (auto i = 0; i < n; ++i) {
-                payload.resize(sdata[i].data.dataLen);
-                memcpy(payload.data(), sdata[i].data.data2, sdata[i].data.dataLen * sizeof(float));
+                switch (sdata->type) {
+                case SensorType::STEP_COUNTER:
+                    payload.push_back(sdata[i].u64.step_counter);
+                    break;
+                default:
+                    payload.resize(sdata[i].data.dataLen);
+                    memcpy(payload.data(), sdata[i].data.data2, sdata[i].data.dataLen * sizeof(float));
+                    break;
+                }
+
                 sensorsData.push_back(STMSensorsCallbackData(sdata[i].sensor,
                                                              sdata[i].type,
                                                              sdata[i].timestamp,
