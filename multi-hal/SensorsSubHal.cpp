@@ -22,6 +22,8 @@
 #include "SensorsSubHal.h"
 #include "Convert.h"
 
+#include <AndroidPropertiesLoader.h>
+
 #ifdef HAL_MULTIHAL_2_0
 ::android::hardware::sensors::V2_0::implementation::ISensorsSubHal* sensorsHalGetSubHal(uint32_t *version)
 {
@@ -52,7 +54,8 @@ template <class SubHalClass>
 SensorsSubHalBase<SubHalClass>::SensorsSubHalBase()
     : sensorsCore(ISTMSensorsHAL::getInstance()),
       console(IConsole::getInstance()),
-      initializedOnce(false)
+      initializedOnce(false),
+      propertiesManager(PropertiesManager::getInstance())
 {
 
 }
@@ -89,6 +92,8 @@ Return<V1_0::Result> SensorsSubHalBase<SubHalClass>::initialize(std::unique_ptr<
 {
     mCallback = std::move(halProxyCallback);
 
+    AndroidPropertiesLoader propertiesLoader;
+    propertiesManager.load(propertiesLoader);
     if (initializedOnce) {
         if (sensorsCore.initialize(*dynamic_cast<ISTMSensorsCallback *>(this))) {
             console.error("failed to initialize the core library");

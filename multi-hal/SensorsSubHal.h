@@ -23,6 +23,7 @@
 
 #include <ISTMSensorsHAL.h>
 #include <IConsole.h>
+#include <PropertiesManager.h>
 
 #include "HalProxyCallbackWrapper.h"
 
@@ -36,6 +37,7 @@ using ::stm::core::ISTMSensorsHAL;
 using ::stm::core::ISTMSensorsCallback;
 using ::stm::core::ISTMSensorsCallbackData;
 using ::stm::core::IConsole;
+using ::stm::core::PropertiesManager;
 
 template <class SubHalClass>
 class SensorsSubHalBase : public SubHalClass, public ISTMSensorsCallback {
@@ -100,6 +102,8 @@ private:
     void postEvents(const std::vector<V2_1::Event>& events, bool wakeup);
 
     const ::stm::core::STMSensor *getSTMSensor(int32_t sensorHandle) const;
+
+    PropertiesManager& propertiesManager;
 };
 
 class SensorsSubHalV2_0 : public SensorsSubHalBase<V2_0::implementation::ISensorsSubHal> {

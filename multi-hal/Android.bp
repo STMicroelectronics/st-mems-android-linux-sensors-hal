@@ -47,6 +47,7 @@ cc_defaults {
         "android.hardware.sensors@1.0-convert",
         "android.hardware.sensors@2.X-multihal",
         "stmicroelectronics-sensors-core",
+        "stmicroelectronics-sensors.commons",
         "libstm-accel-calibration",
         "libstm-gyro-calibration",
         "libstm-magn-calibration",
