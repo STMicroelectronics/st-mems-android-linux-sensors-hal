@@ -25,7 +25,9 @@ where SENSORTYPE can be one of these values:
 - magn
 - gyro
 
-Example of properties usage (i.e. device/<vendor>/<board>/system.prop):
+Example of properties usage, for inizializig them at Android boot,
+create a file as follow with properties settings (i.e. device/<vendor>/<board>/stm_sensors_hal.prop),
+containing:
 
 #+begin_src conf
 persist.vendor.stm.sensors.max-odr = 250 #max odr that can be used is 250Hz
@@ -38,9 +40,15 @@ persist.vendor.stm.sensors.max-range.magn = 2000 #magn full-scale to support rea
 persist.vendor.stm.sensors.max-range.gyro = 8 #gyro full-scale to support reading of at least 8rad/s
 #+end_src
 
+Add the following line in file in device makefile (device/<vendor>/<board>/device.mk) by adding these lines:
+
+#+begin_src makefile
+	TARGET_VENDOR_PROP += device/<vendor>/<board>/stm_sensors_hal.prop
+#+end_src
+
 ** Default settings
 
-Default parameters can be set at compile time by changing the Android.bp cflags (under core, see core documentation).
+Default parameters can alternatively be set at compile time by changing the Android.bp cflags (under core, see core documentation).
 
 * Build instructions
 
