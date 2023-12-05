@@ -57,7 +57,8 @@ SensorsSubHalBase<SubHalClass>::SensorsSubHalBase()
       initializedOnce(false),
       propertiesManager(PropertiesManager::getInstance())
 {
-
+    AndroidPropertiesLoader androidPropertiesLoader;
+    propertiesManager.load(androidPropertiesLoader);
 }
 
 template <class SubHalClass>
@@ -92,8 +93,6 @@ Return<V1_0::Result> SensorsSubHalBase<SubHalClass>::initialize(std::unique_ptr<
 {
     mCallback = std::move(halProxyCallback);
 
-    AndroidPropertiesLoader propertiesLoader;
-    propertiesManager.load(propertiesLoader);
     if (initializedOnce) {
         if (sensorsCore.initialize(*dynamic_cast<ISTMSensorsCallback *>(this))) {
             console.error("failed to initialize the core library");
