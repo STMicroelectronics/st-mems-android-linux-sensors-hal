@@ -25,6 +25,8 @@
 #include <IConsole.h>
 #include <PropertiesManager.h>
 
+#include "DirectChannel.h"
+#include "SensorsDataProxyManager.h"
 #include "HalProxyCallbackWrapper.h"
 
 namespace android {
@@ -38,6 +40,7 @@ using ::stm::core::ISTMSensorsCallback;
 using ::stm::core::ISTMSensorsCallbackData;
 using ::stm::core::IConsole;
 using ::stm::core::PropertiesManager;
+using ::android::hardware::sensors::V1_0::Result;
 
 template <class SubHalClass>
 class SensorsSubHalBase : public SubHalClass, public ISTMSensorsCallback {
@@ -104,6 +107,56 @@ private:
     const ::stm::core::STMSensor *getSTMSensor(int32_t sensorHandle) const;
 
     PropertiesManager& propertiesManager;
+
+    /**
+     * Last used channel handle for direct report channel
+     */
+    int32_t lastDirectChannelHandle;
+
+    /**
+     * Mutex for the direct channel buffer map
+     */
+    std::mutex mDirectChannelBufferLock;
+
+    /**
+     * map: channelHandle -> directChannelBuffer
+     */
+    std::unordered_map<int32_t, std::unique_ptr<DirectChannelBufferBase>> mDirectChannelBuffer;
+
+    /**
+     * map: sensorHandle -> framework requested pollrate
+     */
+    std::unordered_map<int32_t, int64_t> frameworkRequestPollrateNs;
+
+    /**
+     * map: sensorHandle -> framework requested max latency
+     */
+    std::unordered_map<int32_t, int64_t> frameworkRequestLatencyNs;
+
+    /**
+     * map: sensorHandle -> current sensor configured stream pollrate
+     */
+    std::unordered_map<int32_t, int64_t> sensorCurrentPollrateNs;
+
+    /**
+     * map: sensorHandle -> sensor flags
+     */
+    std::unordered_map<int32_t, uint32_t> sensorFlags;
+
+    /**
+     * Sensors proxy manager. Manage different requests on different channels down-sampling if necessary
+     */
+    SensorsDataProxyManager mSensorProxyMngr;
+
+    /**
+     * Identify the framework channel always with 0, direct report channels always uses > 0
+     */
+    static const int32_t frameworkChHandle = 0;
+
+    Return<int> updateSensorsRequests(int32_t sensorHandle,
+                              int32_t channelHandle,
+                              int64_t samplingPeriodNs,
+                              int64_t maxReportLatencyNs);
 };
 
 class SensorsSubHalV2_0 : public SensorsSubHalBase<V2_0::implementation::ISensorsSubHal> {

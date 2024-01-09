@@ -50,6 +50,8 @@ namespace sensors {
 namespace stm {
 namespace multihal {
 
+constexpr int64_t hzToNs(int64_t hz) { return 1e9 / hz; };
+
 template <class SubHalClass>
 SensorsSubHalBase<SubHalClass>::SensorsSubHalBase()
     : sensorsCore(ISTMSensorsHAL::getInstance()),
@@ -73,8 +75,12 @@ Return<void> SensorsSubHalBase<SubHalClass>::getSensorsList_(V2_1::ISensors::get
     hidl_vec<V2_1::SensorInfo> sensorsList(list.size());
     size_t n= 0, count = list.size();
 
+    sensorsList.resize(count);
+
     for (size_t i = 0; i < count; i++) {
         if (convertFromSTMSensor(list.at(i), &sensorsList[n])) {
+            sensorFlags[sensorsList[n].sensorHandle] = sensorsList[n].flags;
+
             n++;
         }
     }
@@ -102,6 +108,13 @@ Return<V1_0::Result> SensorsSubHalBase<SubHalClass>::initialize(std::unique_ptr<
         initializedOnce = true;
     }
 
+    frameworkRequestPollrateNs.clear();
+    frameworkRequestLatencyNs.clear();
+    sensorCurrentPollrateNs.clear();
+
+    mSensorProxyMngr.reset();
+    mSensorProxyMngr.addChannel(frameworkChHandle);
+
     return V1_0::Result::OK;
 }
 
@@ -127,12 +140,39 @@ template <class SubHalClass>
 Return<V1_0::Result> SensorsSubHalBase<SubHalClass>::activate(int32_t sensorHandle, bool enabled)
 {
     const ::stm::core::STMSensor *sensor = getSTMSensor(sensorHandle);
+    int64_t maxReportLatencyNs = 0;
+    int64_t samplingPeriodNs = 0;
+    int ret;
+
     if (sensor == nullptr) {
         return V1_0::Result::BAD_VALUE;
     }
 
-    if (sensorsCore.activate(sensorHandle, enabled)) {
-        return V1_0::Result::BAD_VALUE;
+    if (sensor->isOnChange()) {
+        if (sensorsCore.activate(sensorHandle, enabled)) {
+            return Result::BAD_VALUE;
+        }
+    } else {
+        if (enabled) {
+            samplingPeriodNs = frameworkRequestPollrateNs[sensorHandle];
+            maxReportLatencyNs = frameworkRequestLatencyNs[sensorHandle];
+
+            ret = mSensorProxyMngr.registerSensorToChannel(sensorHandle, frameworkChHandle);
+            if (ret) {
+                return Result::BAD_VALUE;
+            }
+        }
+
+        ret = updateSensorsRequests(sensorHandle, frameworkChHandle,
+                                    samplingPeriodNs, maxReportLatencyNs);
+        if ((ret < 0) && (ret != -ENODEV)) {
+            mSensorProxyMngr.unregisterSensorFromChannel(sensorHandle, frameworkChHandle);
+            return Result::BAD_VALUE;
+        }
+
+        if (!enabled) {
+            mSensorProxyMngr.unregisterSensorFromChannel(sensorHandle, frameworkChHandle);
+        }
     }
 
     return V1_0::Result::OK;
@@ -148,8 +188,24 @@ Return<V1_0::Result> SensorsSubHalBase<SubHalClass>::batch(int32_t sensorHandle,
         return V1_0::Result::BAD_VALUE;
     }
 
-    if (sensorsCore.setRate(sensorHandle, samplingPeriodNs, maxReportLatencyNs)) {
-        return V1_0::Result::BAD_VALUE;
+    if (sensor->isOnChange()) {
+        if (sensorsCore.setRate(sensorHandle, samplingPeriodNs,
+                                maxReportLatencyNs)) {
+            return Result::BAD_VALUE;
+        }
+    } else {
+        frameworkRequestPollrateNs[sensorHandle] = samplingPeriodNs;
+        frameworkRequestLatencyNs[sensorHandle] = maxReportLatencyNs;
+
+        auto channelsHandles = mSensorProxyMngr.getChannels(sensorHandle);
+        for (auto &ch : channelsHandles) {
+            if (ch == frameworkChHandle) {
+                if (updateSensorsRequests(sensorHandle, frameworkChHandle,
+                                          samplingPeriodNs, maxReportLatencyNs)) {
+                    return Result::BAD_VALUE;
+                }
+            }
+        }
     }
 
     return V1_0::Result::OK;
@@ -167,11 +223,46 @@ Return<V1_0::Result> SensorsSubHalBase<SubHalClass>::flush(int32_t sensorHandle)
 
 template <class SubHalClass>
 Return<void> SensorsSubHalBase<SubHalClass>::registerDirectChannel(const V1_0::SharedMemInfo& mem,
-								   V2_0::ISensors::registerDirectChannel_cb _hidl_cb)
+                                                                   V2_0::ISensors::registerDirectChannel_cb _hidl_cb)
 {
-    (void) mem;
+    std::unique_ptr<DirectChannelBufferBase> directChannelBuffer;
 
-    _hidl_cb(V1_0::Result::BAD_VALUE, -1);
+    switch (mem.type) {
+    case V1_0::SharedMemType::ASHMEM:
+        directChannelBuffer = std::make_unique<AshmemDirectChannelBuffer>(mem);
+        break;
+    case V1_0::SharedMemType::GRALLOC:
+        directChannelBuffer = std::make_unique<GrallocDirectChannelBuffer>(mem);
+        break;
+    default:
+        _hidl_cb(Result::BAD_VALUE, -1);
+        return Void();
+        break;
+    }
+
+    if (directChannelBuffer == nullptr) {
+        _hidl_cb(Result::NO_MEMORY, -1);
+        return Void();
+    }
+    if (!directChannelBuffer->isValid()) {
+        _hidl_cb(Result::BAD_VALUE, -1);
+        return Void();
+    }
+
+    int32_t channelHandle = lastDirectChannelHandle + 1;
+
+    if (mSensorProxyMngr.addChannel(channelHandle)) {
+        _hidl_cb(Result::BAD_VALUE, -1);
+        return Void();
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(mDirectChannelBufferLock);
+        mDirectChannelBuffer.insert(std::make_pair(channelHandle, std::move(directChannelBuffer)));
+    }
+
+    lastDirectChannelHandle = channelHandle;
+    _hidl_cb(Result::OK, channelHandle);
 
     return Void();
 }
@@ -179,9 +270,14 @@ Return<void> SensorsSubHalBase<SubHalClass>::registerDirectChannel(const V1_0::S
 template <class SubHalClass>
 Return<V1_0::Result> SensorsSubHalBase<SubHalClass>::unregisterDirectChannel(int32_t channelHandle)
 {
-    (void) channelHandle;
+    if (mSensorProxyMngr.removeChannel(channelHandle)) {
+        return Result::BAD_VALUE;
+    }
 
-    return V1_0::Result::BAD_VALUE;
+    std::lock_guard<std::mutex> lock(mDirectChannelBufferLock);
+    mDirectChannelBuffer.erase(channelHandle);
+
+    return Result::OK;
 }
 
 template <class SubHalClass>
@@ -190,18 +286,89 @@ Return<void> SensorsSubHalBase<SubHalClass>::configDirectReport(int32_t sensorHa
                                                                 V1_0::RateLevel rate,
                                                                 V2_0::ISensors::configDirectReport_cb _hidl_cb)
 {
-    (void) sensorHandle;
-    (void) channelHandle;
-    (void) rate;
+    if (sensorHandle == -1) {
+        if (rate == V1_0::RateLevel::STOP) {
+            // stop all active sensors in that particular channel handle
+            auto sensorsHandles = mSensorProxyMngr.getRegisteredSensorsInChannel(channelHandle);
+            for (auto &sh : sensorsHandles) {
+                updateSensorsRequests(sh, channelHandle, 0, 0);
+                mSensorProxyMngr.unregisterSensorFromChannel(sh, channelHandle);
+            }
 
-    _hidl_cb(V1_0::Result::BAD_VALUE, 0);
+            _hidl_cb(Result::OK, sensorHandle);
+            return Void();
+        } else {
+            _hidl_cb(Result::BAD_VALUE, 0);
+            return Void();
+        }
+    }
+
+    const ::stm::core::STMSensor *sensor = getSTMSensor(sensorHandle);
+    if (sensor == nullptr) {
+        _hidl_cb(Result::BAD_VALUE, 0);
+        return Void();
+    }
+
+    if (!(sensorFlags[sensorHandle] &
+          (V1_0::SensorFlagBits::DIRECT_CHANNEL_ASHMEM |
+           V1_0::SensorFlagBits::DIRECT_CHANNEL_GRALLOC))) {
+        _hidl_cb(Result::BAD_VALUE, 0);
+        return Void();
+    }
+
+    uint64_t rateInNs;
+
+    int32_t supportedMaxRate = (sensorFlags[sensorHandle] & V1_0::SensorFlagBits::MASK_DIRECT_REPORT) >>
+                               static_cast<uint8_t>(V1_0::SensorFlagShift::DIRECT_REPORT);
+
+    switch (rate) {
+    case V1_0::RateLevel::STOP:
+        rateInNs = 0;
+        break;
+    case V1_0::RateLevel::NORMAL:
+        rateInNs = hzToNs(50);
+        break;
+    case V1_0::RateLevel::FAST:
+        if (supportedMaxRate < static_cast<int32_t>(V1_0::RateLevel::FAST)) {
+            _hidl_cb(Result::BAD_VALUE, 0);
+            return Void();
+        }
+        rateInNs = hzToNs(200);
+        break;
+    case V1_0::RateLevel::VERY_FAST:
+        if (supportedMaxRate < static_cast<int32_t>(V1_0::RateLevel::VERY_FAST)) {
+            _hidl_cb(Result::BAD_VALUE, 0);
+            return Void();
+        }
+        rateInNs = hzToNs(800);
+        break;
+    default:
+        _hidl_cb(Result::BAD_VALUE, 0);
+        return Void();
+    }
+
+    if (rateInNs != 0) {
+        mSensorProxyMngr.registerSensorToChannel(sensorHandle, channelHandle);
+    }
+
+    if (updateSensorsRequests(sensorHandle, channelHandle, rateInNs, 0)) {
+        mSensorProxyMngr.unregisterSensorFromChannel(sensorHandle, channelHandle);
+       _hidl_cb(Result::BAD_VALUE, 0);
+        return Void();
+    }
+
+    if (rateInNs == 0) {
+        mSensorProxyMngr.unregisterSensorFromChannel(sensorHandle, channelHandle);
+    }
+
+    _hidl_cb(Result::OK, sensorHandle);
 
     return Void();
 }
 
 template <class SubHalClass>
 Return<void> SensorsSubHalBase<SubHalClass>::debug(const hidl_handle& fd,
-						   const hidl_vec<hidl_string>& args)
+                                                   const hidl_vec<hidl_string>& args)
 {
     (void) fd;
     (void) args;
@@ -223,6 +390,8 @@ void SensorsSubHalBase<SubHalClass>::onNewSensorsData(const std::vector<ISTMSens
         if (!convertFromSTMSensorType(sdata.getSensorType(), event.sensorType)) {
             if (sdata.getSensorType() != ::stm::core::SensorType::ODR_SWITCH_INFO) {
                 console.error("sensor event unknown, discarding...");
+            } else {
+                sensorCurrentPollrateNs[sdata.getSensorHandle()] = sdata.getData()[0];
             }
             continue;
         }
@@ -238,7 +407,25 @@ void SensorsSubHalBase<SubHalClass>::onNewSensorsData(const std::vector<ISTMSens
             const ::stm::core::STMSensor *sensor = getSTMSensor(sdata.getSensorHandle());
             if (sensor == nullptr) continue;
 
-            eventsList.push_back(event);
+            if (sensor->isOnChange()) {
+                eventsList.push_back(event);
+            } else {
+                auto channelsHandles =
+                    mSensorProxyMngr.getValidPushChannels(sdata.getTimestamp(),
+                                                          sdata.getSensorHandle(),
+                                                          sensorCurrentPollrateNs[sdata.getSensorHandle()]);
+
+                for (auto &channel : channelsHandles) {
+                    if (channel == frameworkChHandle) {
+                        eventsList.push_back(event);
+                    } else {
+                        if (mDirectChannelBufferLock.try_lock()) {
+                            mDirectChannelBuffer[channel]->writeEvent(event);
+                            mDirectChannelBufferLock.unlock();
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -315,6 +502,39 @@ const ::stm::core::STMSensor *SensorsSubHalBase<SubHalClass>::getSTMSensor(int32
     }
 
     return nullptr;
+}
+
+template <class SubHalClass>
+Return<int> SensorsSubHalBase<SubHalClass>::updateSensorsRequests(int32_t sensorHandle,
+                                                int32_t channelHandle,
+                                                int64_t samplingPeriodNs,
+                                                int64_t maxReportLatencyNs)
+{
+    int err = mSensorProxyMngr.configureSensorInChannel(sensorHandle, channelHandle, samplingPeriodNs);
+
+    if (err < 0) {
+        return -ENODEV;
+    }
+
+    int64_t maxPollrateNs = mSensorProxyMngr.getMaxPollrateNs(sensorHandle);
+
+    if (maxPollrateNs) {
+        // This is a power-on request or a pollrate change request
+        if (int32_t ret = sensorsCore.setRate(sensorHandle, maxPollrateNs, maxReportLatencyNs)) {
+            return -1;
+        }
+
+        if (int32_t ret = sensorsCore.activate(sensorHandle, true)) {
+            return -1;
+        }
+    } else {
+        // This is a power-off request
+        if (sensorsCore.activate(sensorHandle, false)) {
+            return -1;
+        }
+    }
+
+    return 0;
 }
 
 }  // namespace multihal

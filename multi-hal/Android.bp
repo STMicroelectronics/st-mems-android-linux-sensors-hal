@@ -24,7 +24,8 @@ cc_defaults {
         "SensorsSubHal.cpp",
         "IConsole.cpp",
         "Convert.cpp",
-        "IUtils.cpp"
+        "IUtils.cpp",
+	"DirectChannel.cpp"
     ],
     header_libs: [
         "android.hardware.sensors@2.0-multihal.header",
@@ -60,6 +61,7 @@ cc_defaults {
     cflags: [
         "-std=gnu99",
         "-std=c++20",
+        "-DHAL_ENABLE_DIRECT_REPORT_CHANNEL=1",
         "-DHAL_PRIVATE_DATA_PATH=\"/data/vendor/stm-sensors-multihal\""
     ]
 }
