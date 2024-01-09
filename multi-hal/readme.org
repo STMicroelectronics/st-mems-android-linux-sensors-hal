@@ -63,7 +63,16 @@ PRODUCT_COPY_FILES += \
 /vendor/bin/hw/android\.hardware\.sensors@2\.1-service\.multihal  u:object_r:hal_sensors_default_exec:s0
 #+end_src
 
-6> modify the uevent rules file (i.e. device/<vendor>/<board>/ueventd.rc) by adding these lines:
+6> modify the sepolicy hal_sensors.te file (i.e. device/<vendor>/<board>/sepolicy/hal_sensors.te) by adding these lines:
+
+#+begin_src conf
+# allow access to sysfs device iio
+allow hal_sensors_default sysfs:dir { open read };
+allow hal_sensors_default sysfs:file { open read write getattr };
+allow hal_sensors_default sensors_device:chr_file rw_file_perms;
+#+end_src
+
+7> modify the uevent rules file (i.e. device/<vendor>/<board>/ueventd.rc) by adding these lines:
 
 #+begin_src conf
 #common iio char devices
@@ -116,4 +125,4 @@ PRODUCT_COPY_FILES += \
 /sys/bus/iio/devices/iio:device* scan_elements/in_gesture_en 0666 system system
 #+end_src
 
-7> build aosp as described into [[https://source.android.com/setup/build/building][official documentation]].
+8> build aosp as described into [[https://source.android.com/setup/build/building][official documentation]].
