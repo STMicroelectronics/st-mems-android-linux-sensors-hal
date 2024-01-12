@@ -23,11 +23,13 @@
 
 #include <ISTMSensorsHAL.h>
 #include <IConsole.h>
+#include <IUtils.h>
 #include <PropertiesManager.h>
 
 #include "DirectChannel.h"
 #include "SensorsDataProxyManager.h"
 #include "HalProxyCallbackWrapper.h"
+#include "AdditionalInfoManager.h"
 
 namespace android {
 namespace hardware {
@@ -107,6 +109,11 @@ private:
     const ::stm::core::STMSensor *getSTMSensor(int32_t sensorHandle) const;
 
     PropertiesManager& propertiesManager;
+
+    /**
+     * Sensors additional info manager
+     */
+    std::unique_ptr<AdditionalInfoManager> addInfoMng;
 
     /**
      * Last used channel handle for direct report channel

@@ -21,6 +21,7 @@ cc_defaults {
     proprietary: true,
     enabled: false,
     srcs: [
+        "AdditionalInfoManager.cpp",
         "SensorsSubHal.cpp",
         "IConsole.cpp",
         "Convert.cpp",
@@ -62,6 +63,7 @@ cc_defaults {
         "-std=gnu99",
         "-std=c++20",
         "-DHAL_ENABLE_DIRECT_REPORT_CHANNEL=1",
+        "-DHAL_ENABLE_SENSOR_ADDITIONAL_INFO=1",
         "-DHAL_PRIVATE_DATA_PATH=\"/data/vendor/stm-sensors-multihal\""
     ]
 }

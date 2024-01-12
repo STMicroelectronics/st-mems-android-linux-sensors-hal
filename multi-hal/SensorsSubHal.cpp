@@ -76,9 +76,13 @@ Return<void> SensorsSubHalBase<SubHalClass>::getSensorsList_(V2_1::ISensors::get
     size_t n= 0, count = list.size();
 
     sensorsList.resize(count);
+    addInfoMng = std::make_unique<AdditionalInfoManager>(sensorsCore.getSensorsList());
 
     for (size_t i = 0; i < count; i++) {
         if (convertFromSTMSensor(list.at(i), &sensorsList[n])) {
+            if (addInfoMng->isSupported(sensorsList[n].sensorHandle)) {
+                sensorsList[n].flags |= V1_0::SensorFlagBits::ADDITIONAL_INFO;
+            }
             sensorFlags[sensorsList[n].sensorHandle] = sensorsList[n].flags;
 
             n++;
@@ -403,6 +407,11 @@ void SensorsSubHalBase<SubHalClass>::onNewSensorsData(const std::vector<ISTMSens
 
         if (sdata.getSensorType() == ::stm::core::SensorType::META_DATA) {
             eventsList.push_back(event);
+
+            auto addInfoEvents = addInfoMng->getPayload(sdata.getSensorHandle(), event.timestamp);
+            for (auto &el : addInfoEvents) {
+                eventsList.push_back(el);
+            }
         } else {
             const ::stm::core::STMSensor *sensor = getSTMSensor(sdata.getSensorHandle());
             if (sensor == nullptr) continue;
@@ -526,6 +535,12 @@ Return<int> SensorsSubHalBase<SubHalClass>::updateSensorsRequests(int32_t sensor
 
         if (int32_t ret = sensorsCore.activate(sensorHandle, true)) {
             return -1;
+        }
+
+        const ::stm::core::IUtils &utils = ::stm::core::IUtils::getInstance();
+        auto addInfoEvents = addInfoMng->getPayload(sensorHandle, utils.getTime());
+        if (addInfoEvents.size()) {
+            postEvents(addInfoEvents, false);
         }
     } else {
         // This is a power-off request
