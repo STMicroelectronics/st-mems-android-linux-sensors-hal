@@ -70,7 +70,31 @@ SensorsSupported SensorsSupported::RelativeHumidity(const std::string &d_name, c
     return SensorsSupported(d_name, STMSensorType(SensorType::RELATIVE_HUMIDITY), DEVICE_IIO_HUMIDITYRELATIVE, a_name, power);
 }
 
-const std::array<struct SensorsSupported, 166> sensorsSupportedList = {
+const std::array<struct SensorsSupported, 202> sensorsSupportedList = {
+    /* ISM330IS */
+    SensorsSupported::Accel("ism330is_accel", "ISM330IS Accelerometer Sensor", 0.0f),
+    SensorsSupported::Magn("ism330is_magn", "ISM330IS Magnetometer Sensor", 0.0f),
+    SensorsSupported::Gyro("ism330is_gyro", "ISM330IS Gyroscope Sensor", 0.0f),
+    SensorsSupported::Pressure("ism330is_press", "ISM330IS Pressure Sensor", 0.0f),
+
+    /* ISM330DHCX */
+    SensorsSupported::Accel("ism330dhcx_accel", "ISM330DHCX Accelerometer Sensor", 0.0f),
+    SensorsSupported::Magn("ism330dhcx_magn", "ISM330DHCX Magnetometer Sensor", 0.0f),
+    SensorsSupported::Gyro("ism330dhcx_gyro", "ISM330DHCX Gyroscope Sensor", 0.0f),
+    SensorsSupported::Pressure("ism330dhcx_press", "ISM330DHCX Pressure Sensor", 0.0f),
+
+    /* LSM6DSV16B */
+    SensorsSupported::Accel("lsm6dsv16b_accel", "LSM6DSV16B Accelerometer Sensor", 0.0f),
+    SensorsSupported::Magn("lsm6dsv16b_magn", "LSM6DSV16B Magnetometer Sensor", 0.0f),
+    SensorsSupported::Gyro("lsm6dsv16b_gyro", "LSM6DSV16B Gyroscope Sensor", 0.0f),
+    SensorsSupported::Pressure("lsm6dsv16b_press", "LSM6DSV16B Pressure Sensor", 0.0f),
+
+    /* LSM6DSV16BX */
+    SensorsSupported::Accel("lsm6dsv16bx_accel", "LSM6DSV16BX Accelerometer Sensor", 0.0f),
+    SensorsSupported::Magn("lsm6dsv16bx_magn", "LSM6DSV16BX Magnetometer Sensor", 0.0f),
+    SensorsSupported::Gyro("lsm6dsv16bx_gyro", "LSM6DSV16BX Gyroscope Sensor", 0.0f),
+    SensorsSupported::Pressure("lsm6dsv16bx_press", "LSM6DSV16BX Pressure Sensor", 0.0f),
+
     /* LSM6DSV16X */
     SensorsSupported::Accel("lsm6dsv16x_accel", "LSM6DSV16X Accelerometer Sensor", 0.0f),
     SensorsSupported::Magn("lsm6dsv16x_magn", "LSM6DSV16X Magnetometer Sensor", 0.0f),
@@ -134,6 +158,21 @@ const std::array<struct SensorsSupported, 166> sensorsSupportedList = {
     SensorsSupported::SignMotion("lsm6dso32_sign_motion", "LSM6DSO32 Significant Motion Sensor", 0.0f),
     SensorsSupported::Pressure("lsm6dso32_press", "LSM6DSO32 Pressure Sensor", 0.0f),
 
+    /* LSM6DSO32X */
+    SensorsSupported::Accel("lsm6dso32x_accel", "LSM6DSO32X Accelerometer Sensor", 240E-3f),
+    SensorsSupported::Magn("lsm6dso32x_magn", "LSM6DSO32X Magnetometer Sensor", 0.0f),
+    SensorsSupported::Gyro("lsm6dso32x_gyro", "LSM6DSO32X Gyroscope Sensor", 0.0f),
+    SensorsSupported::StepDetector("lsm6dso32x_step_d", "LSM6DSO32X Step Detector Sensor", 0.0f),
+    SensorsSupported::StepCounter("lsm6dso32x_step_c", "LSM6DSO32X Step Counter Sensor", 0.0f),
+    SensorsSupported::SignMotion("lsm6dso32x_sign_motion", "LSM6DSO32X Significant Motion Sensor", 0.0f),
+    SensorsSupported::Pressure("lsm6dso32x_press", "LSM6DSO32X Pressure Sensor", 0.0f),
+
+    /* LSM6DSO16IS */
+    SensorsSupported::Accel("lsm6dso16is_accel", "LSM6DSO16IS Accelerometer Sensor", 240E-3f),
+    SensorsSupported::Magn("lsm6dso16is_magn", "LSM6DSO16IS Magnetometer Sensor", 0.0f),
+    SensorsSupported::Gyro("lsm6dso16is_gyro", "LSM6DSO16IS Gyroscope Sensor", 0.0f),
+    SensorsSupported::Pressure("lsm6dso16is_press", "LSM6DSO16IS Pressure Sensor", 0.0f),
+
     /* LSM6DS3H */
     SensorsSupported::Accel("lsm6ds3h_accel", "LSM6DS3H Accelerometer Sensor", 240E-3f),
     SensorsSupported::Magn("lsm6ds3h_magn", "LSM6DS3H Magnetometer Sensor", 0.0f),
@@ -178,6 +217,11 @@ const std::array<struct SensorsSupported, 166> sensorsSupportedList = {
     SensorsSupported::Accel("asm330lhh_accel", "ASM330LHH Accelerometer Sensor", 0.0f),
     SensorsSupported::Gyro("asm330lhh_gyro", "ASM330LHH Gyroscope Sensor", 0.0f),
     SensorsSupported::InternalTemperature("asm330lhh_temp", "ASM330LHH Temperature Sensor", 0.0f),
+
+    /* ASM330LHB */
+    SensorsSupported::Accel("asm330lhb_accel", "ASM330LHB Accelerometer Sensor", 0.0f),
+    SensorsSupported::Gyro("asm330lhb_gyro", "ASM330LHB Gyroscope Sensor", 0.0f),
+    SensorsSupported::InternalTemperature("asm330lhb_temp", "ASM330LHB Temperature Sensor", 0.0f),
 
     /* ASM330LHHX */
     SensorsSupported::Accel("asm330lhhx_accel", "ASM330LHHX Accelerometer Sensor", 0.0f),
@@ -250,6 +294,12 @@ const std::array<struct SensorsSupported, 166> sensorsSupportedList = {
     SensorsSupported::Accel("lsm303agr_accel", "LSM303AGR Accelerometer Sensor", 0.0f),
     SensorsSupported::Magn("lsm303agr_magn", "LSM303AGR Magnetometer Sensor", 0.0f),
 
+    /* H3LIS331DL */
+    SensorsSupported::Accel("h3lis331dl", "H3LIS331DL Accelerometer Sensor", 0.0f),
+
+    /* IIS2DLPC */
+    SensorsSupported::Accel("iis2dlpc_accel", "IIS2DLPC Accelerometer Sensor", 0.0f),
+
     /* LIS2DS12 */
     SensorsSupported::Accel("lis2ds12_accel", "LIS2DS12 Accelerometer Sensor", 0.0f),
     SensorsSupported::StepDetector("lis2ds12_step_d", "LIS2DS12 Step Detector Sensor", 0.0f),
@@ -316,6 +366,12 @@ const std::array<struct SensorsSupported, 166> sensorsSupportedList = {
     /* LSM9DS0 */
     SensorsSupported::Gyro("lsm9ds0_gyro", "LSM9DS0 Gyroscope Sensor", 0.0f),
 
+    /* ILPS28QSW */
+    SensorsSupported::Pressure("ilps28qsw", "ILPS28QSW Pressure Sensor", 0.0f),
+
+    /* ILPS22QS */
+    SensorsSupported::Pressure("ilps22qs", "ILPS22QS Pressure Sensor", 0.0f),
+
     /* LPS331AP */
     SensorsSupported::Pressure("lps331ap", "LPS331AP Pressure Sensor", 0.0f),
 
@@ -337,6 +393,10 @@ const std::array<struct SensorsSupported, 166> sensorsSupportedList = {
     /* LPS22DF */
     SensorsSupported::Pressure("lps22df_press", "LPS22DF Pressure Sensor", 0.0f),
     SensorsSupported::AmbientTemperature("lps22df_temp", "LPS22DF Temperature Sensor", 0.0f),
+
+    /* LPS28DFW */
+    SensorsSupported::Pressure("lps28dfw_press", "LPS28DFW Pressure Sensor", 0.0f),
+    SensorsSupported::AmbientTemperature("lps28dfw_temp", "LPS28DFW Temperature Sensor", 0.0f),
 
     /* LPS22HD */
     SensorsSupported::Pressure("lps22hd_press", "LPS22HD Pressure Sensor", 0.0f),
