@@ -194,8 +194,8 @@ const std::array<struct SensorsSupported, 166> sensorsSupportedList = {
     SensorsSupported::Magn("ism330dlc_magn", "ISM330DLC Magnetometer Sensor", 0.0f),
     SensorsSupported::Gyro("ism330dlc_gyro", "ISM330DLC Gyroscope Sensor", 0.0f),
 
-    /* ISM330DAC */
-    SensorsSupported::Accel("ism330dac", "ISM330DAC Accelerometer Sensor", 0.0f),
+    /* ISM303DAC */
+    SensorsSupported::Accel("ism303dac_accel", "ISM303DAC Accelerometer Sensor", 0.0f),
     SensorsSupported::Magn("ism303dac_magn", "ISM303DAC Magnetometer Sensor", 0.0f),
 
     /* LSM6DS0 */
