@@ -20,18 +20,22 @@
 #include <signal.h>
 #include <cmath>
 
-#include "Gyroscope.h"
+#include "GyroscopeLimitedAxes.h"
 
 namespace stm {
 namespace core {
 
-Gyroscope::Gyroscope(HWSensorBaseCommonData *data, const char *name,
+GyroscopeLimitedAxes::GyroscopeLimitedAxes(HWSensorBaseCommonData *data, const char *name,
                      struct device_iio_sampling_freqs *sfa, int handle,
                      unsigned int hw_fifo_len, float power_consumption,
-                     bool wakeup, int module)
+                     bool wakeup, int module,
+                     bool x_is_supp = true,
+                     bool y_is_supp = true,
+                     bool z_is_supp = true)
     : HWSensorBaseWithPollrate(data, name, sfa, handle,
-                               GyroSensorType,
-                               hw_fifo_len, power_consumption, module),
+                               GyroSensorLimitedAxisType,
+                               hw_fifo_len, power_consumption, module,
+                               x_is_supp, y_is_supp, z_is_supp),
       bias_last_pollrate(0),
       gyroCalibration(STMGyroCalibration::getInstance())
 {
@@ -43,14 +47,15 @@ Gyroscope::Gyroscope(HWSensorBaseCommonData *data, const char *name,
     sensor_t_data.resolution = data->channels[0].scale;
     sensor_t_data.maxRange = sensor_t_data.resolution * (std::pow(2, data->channels[0].bits_used - 1) - 1);
 
-    sensor_event.data.dataLen = 4;
+    /* limited axes sensors include supported axes flag in the event payload */
+    sensor_event.data.dataLen = 7;
 
     if (HAL_ENABLE_GYRO_CALIBRATION != 0) {
-        dependencies_type_list.push_back(AccelSensorType);
+        dependencies_type_list.push_back(AccelSensorLimitedAxisType);
     }
 }
 
-int Gyroscope::libsInit(void)
+int GyroscopeLimitedAxes::libsInit(void)
 {
     std::string libVersionMsg { "gyro calibration library: " };
 
@@ -71,12 +76,12 @@ int Gyroscope::libsInit(void)
     return 0;
 }
 
-void Gyroscope::postSetup(void)
+void GyroscopeLimitedAxes::postSetup(void)
 {
     loadBiasValues();
 }
 
-int Gyroscope::Enable(int handle, bool enable, bool lock_en_mutex)
+int GyroscopeLimitedAxes::Enable(int handle, bool enable, bool lock_en_mutex)
 {
     if (HAL_ENABLE_GYRO_CALIBRATION != 0) {
         bool old_status;
@@ -112,7 +117,7 @@ int Gyroscope::Enable(int handle, bool enable, bool lock_en_mutex)
     return HWSensorBaseWithPollrate::Enable(handle, enable, lock_en_mutex);
 }
 
-void Gyroscope::saveBiasValues(void) const
+void GyroscopeLimitedAxes::saveBiasValues(void) const
 {
     Matrix<4, 3, float> bias;
 
@@ -125,7 +130,7 @@ void Gyroscope::saveBiasValues(void) const
     }
 }
 
-void Gyroscope::loadBiasValues(void)
+void GyroscopeLimitedAxes::loadBiasValues(void)
 {
     Matrix<4, 3, float> bias;
 
@@ -140,11 +145,15 @@ void Gyroscope::loadBiasValues(void)
     gyroCalibration.reset(bias);
 }
 
-void Gyroscope::ProcessData(SensorBaseData *data)
+void GyroscopeLimitedAxes::ProcessData(SensorBaseData *data)
 {
     std::array<float, 3> gyroTmp;
+    int ret;
 
-    memcpy(gyroTmp.data(), data->raw, SENSOR_DATA_3AXIS * sizeof(float));
+    ret = copyAxesData(gyroTmp, data);
+    if (ret)
+        return;
+
     gyroTmp = rotMatrix * gyroTmp;
     memcpy(data->raw, gyroTmp.data(), SENSOR_DATA_3AXIS * sizeof(float));
 
@@ -154,7 +163,8 @@ void Gyroscope::ProcessData(SensorBaseData *data)
         int err, nomaxdata = 10;
 
         do {
-            err = GetLatestValidDataFromDependency(SENSOR_DEPENDENCY_ID_0, &accel_data, data->timestamp);
+            err = GetLatestValidDataFromDependency(SENSOR_DEPENDENCY_ID_0,
+                                                   &accel_data, data->timestamp);
             if (err < 0) {
                 nomaxdata--;
                 std::this_thread::sleep_for(std::chrono::microseconds(10));
@@ -194,6 +204,10 @@ void Gyroscope::ProcessData(SensorBaseData *data)
     sensor_event.data.data2[1] = data->processed[1];
     sensor_event.data.data2[2] = data->processed[2];
     sensor_event.data.data2[3] = (float)data->accuracy;
+
+    sensor_event.data.data2[4] = (float)isXSupported();
+    sensor_event.data.data2[5] = (float)isYSupported();
+    sensor_event.data.data2[6] = (float)isZSupported();
 
     sensor_event.timestamp = data->timestamp;
 

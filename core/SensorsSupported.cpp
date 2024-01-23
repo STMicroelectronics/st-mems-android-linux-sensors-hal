@@ -20,54 +20,54 @@
 namespace stm {
 namespace core {
 
-SensorsSupported SensorsSupported::Accel(const std::string &d_name, const std::string &a_name, float power)
+SensorsSupported SensorsSupported::Accel(const std::string &d_name, const std::string &a_name, float power, limitedaxis lim_axis = xyz)
 {
-    return SensorsSupported(d_name, AccelSensorType, DEVICE_IIO_ACC, a_name, power);
+    return SensorsSupported(d_name, AccelSensorType, DEVICE_IIO_ACC, a_name, power, lim_axis);
 }
 
 SensorsSupported SensorsSupported::Magn(const std::string &d_name, const std::string &a_name, float power)
 {
-    return SensorsSupported(d_name, MagnSensorType, DEVICE_IIO_MAGN, a_name, power);
+    return SensorsSupported(d_name, MagnSensorType, DEVICE_IIO_MAGN, a_name, power, xyz);
 }
 
-SensorsSupported SensorsSupported::Gyro(const std::string &d_name, const std::string &a_name, float power)
+SensorsSupported SensorsSupported::Gyro(const std::string &d_name, const std::string &a_name, float power, limitedaxis lim_axis = xyz)
 {
-    return SensorsSupported(d_name, GyroSensorType, DEVICE_IIO_GYRO, a_name, power);
+    return SensorsSupported(d_name, GyroSensorType, DEVICE_IIO_GYRO, a_name, power, lim_axis);
 }
 
 SensorsSupported SensorsSupported::StepDetector(const std::string &d_name, const std::string &a_name, float power)
 {
-    return SensorsSupported(d_name, STMSensorType(SensorType::STEP_DETECTOR), DEVICE_IIO_STEP_DETECTOR, a_name, power);
+    return SensorsSupported(d_name, STMSensorType(SensorType::STEP_DETECTOR), DEVICE_IIO_STEP_DETECTOR, a_name, power, x);
 }
 
 SensorsSupported SensorsSupported::StepCounter(const std::string &d_name, const std::string &a_name, float power)
 {
-    return SensorsSupported(d_name, STMSensorType(SensorType::STEP_COUNTER), DEVICE_IIO_STEP_COUNTER, a_name, power);
+    return SensorsSupported(d_name, STMSensorType(SensorType::STEP_COUNTER), DEVICE_IIO_STEP_COUNTER, a_name, power, x);
 }
 
 SensorsSupported SensorsSupported::SignMotion(const std::string &d_name, const std::string &a_name, float power)
 {
-    return SensorsSupported(d_name, STMSensorType(SensorType::SIGNIFICANT_MOTION), DEVICE_IIO_SIGN_MOTION, a_name, power);
+    return SensorsSupported(d_name, STMSensorType(SensorType::SIGNIFICANT_MOTION), DEVICE_IIO_SIGN_MOTION, a_name, power, x);
 }
 
 SensorsSupported SensorsSupported::Pressure(const std::string &d_name, const std::string &a_name, float power)
 {
-    return SensorsSupported(d_name, STMSensorType(SensorType::PRESSURE), DEVICE_IIO_PRESSURE, a_name, power);
+    return SensorsSupported(d_name, STMSensorType(SensorType::PRESSURE), DEVICE_IIO_PRESSURE, a_name, power, x);
 }
 
 SensorsSupported SensorsSupported::AmbientTemperature(const std::string &d_name, const std::string &a_name, float power)
 {
-    return SensorsSupported(d_name, STMSensorType(SensorType::AMBIENT_TEMPERATURE), DEVICE_IIO_TEMP, a_name, power);
+    return SensorsSupported(d_name, STMSensorType(SensorType::AMBIENT_TEMPERATURE), DEVICE_IIO_TEMP, a_name, power, x);
 }
 
 SensorsSupported SensorsSupported::InternalTemperature(const std::string &d_name, const std::string &a_name, float power)
 {
-    return SensorsSupported(d_name, STMSensorType(SensorType::INTERNAL_TEMPERATURE), DEVICE_IIO_TEMP, a_name, power);
+    return SensorsSupported(d_name, STMSensorType(SensorType::INTERNAL_TEMPERATURE), DEVICE_IIO_TEMP, a_name, power, x);
 }
 
 SensorsSupported SensorsSupported::RelativeHumidity(const std::string &d_name, const std::string &a_name, float power)
 {
-    return SensorsSupported(d_name, STMSensorType(SensorType::RELATIVE_HUMIDITY), DEVICE_IIO_HUMIDITYRELATIVE, a_name, power);
+    return SensorsSupported(d_name, STMSensorType(SensorType::RELATIVE_HUMIDITY), DEVICE_IIO_HUMIDITYRELATIVE, a_name, power, x);
 }
 
 const std::array<struct SensorsSupported, 202> sensorsSupportedList = {

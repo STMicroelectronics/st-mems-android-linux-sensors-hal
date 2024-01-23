@@ -44,6 +44,7 @@ Accelerometer::Accelerometer(HWSensorBaseCommonData *data,
 
     sensor_t_data.resolution = data->channels[0].scale;
     sensor_t_data.maxRange = sensor_t_data.resolution * (std::pow(2, data->channels[0].bits_used - 1) - 1);
+
     sensor_event.data.dataLen = 4;
 }
 
@@ -175,6 +176,7 @@ void Accelerometer::ProcessData(SensorBaseData *data)
     sensor_event.data.data2[1] = data->processed[1];
     sensor_event.data.data2[2] = data->processed[2];
     sensor_event.data.data2[3] = (float)data->accuracy;
+
     sensor_event.timestamp = data->timestamp;
 
     HWSensorBaseWithPollrate::WriteDataToPipe(data->pollrate_ns);

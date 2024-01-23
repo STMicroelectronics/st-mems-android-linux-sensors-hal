@@ -67,12 +67,14 @@ LOCAL_SRC_FILES := \
     STMSensorsCallbackData.cpp \
     SensorsSupported.cpp \
     Accelerometer.cpp \
+    AccelerometerLimitedAxes.cpp \
     ChangeODRTimestampStack.cpp \
     CircularBuffer.cpp \
     DeviceOrientation.cpp \
     FlushBufferStack.cpp \
     Gesture.cpp \
     Gyroscope.cpp \
+    GyroscopeLimitedAxes.cpp \
     HWSensorBase.cpp \
     Magnetometer.cpp \
     Pressure.cpp \

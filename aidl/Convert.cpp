@@ -151,6 +151,12 @@ static bool convertFromSTMSensorType(const stm::core::SensorType &type,
     case stm::core::SensorType::ACCELEROMETER_UNCALIBRATED:
         sensorType = SensorType::ACCELEROMETER_UNCALIBRATED;
         break;
+    case stm::core::SensorType::ACCELEROMETER_LIMITED_AXES:
+        sensorType = SensorType::ACCELEROMETER_LIMITED_AXES;
+        break;
+    case stm::core::SensorType::GYROSCOPE_LIMITED_AXES:
+        sensorType = SensorType::GYROSCOPE_LIMITED_AXES;
+        break;
     default:
         isPartOfSensorList = false;
         return false;
@@ -352,6 +358,19 @@ void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorDa
         event.payload.set<Event::EventPayload::meta>(meta);
         break;
     }
+    case SensorType::ACCELEROMETER_LIMITED_AXES:
+    case SensorType::GYROSCOPE_LIMITED_AXES: {
+        Event::EventPayload::LimitedAxesImu limitedAxesImu;
+        limitedAxesImu.x = sensorData.getData().at(0);
+        limitedAxesImu.y = sensorData.getData().at(1);
+        limitedAxesImu.z = sensorData.getData().at(2);
+        /* in case of limited axes the event contains the supported state */
+        limitedAxesImu.xSupported = sensorData.getData().at(4);
+        limitedAxesImu.ySupported = sensorData.getData().at(5);
+        limitedAxesImu.zSupported = sensorData.getData().at(6);
+        event.payload.set<Event::EventPayload::Tag::limitedAxesImu>(limitedAxesImu);
+        break;
+        }
     default:
         break;
     }

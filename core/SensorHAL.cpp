@@ -34,8 +34,10 @@
 
 #include "SensorHAL.h"
 #include "Accelerometer.h"
+#include "AccelerometerLimitedAxes.h"
 #include "Magnetometer.h"
 #include "Gyroscope.h"
+#include "GyroscopeLimitedAxes.h"
 #include "StepDetector.h"
 #include "StepCounter.h"
 #include "SignificantMotion.h"
@@ -78,6 +80,7 @@ static IConsole &console = IConsole::getInstance();
  * @sa: scale factors available.
  * @hw_fifo_len: hw FIFO length.
  * @power_consumption: sensor power consumption in mA.
+ * @limitedaxis: For sensor with limited axis support.
  * @sfa: sampling frequency available.
  */
 struct STSensorHAL_iio_devices_data {
@@ -97,6 +100,7 @@ struct STSensorHAL_iio_devices_data {
 
     unsigned int hw_fifo_len;
     float power_consumption;
+    int limitedaxis;
 
     struct device_iio_sampling_freqs sfa;
 } typedef STSensorHAL_iio_devices_data;
@@ -199,6 +203,37 @@ static std::shared_ptr<SensorBase> st_hal_create_virtual_class_sensor(const STMS
 }
 
 /*
+ * check_supported_axis() - Check for limited supported axis sensors
+ * @limitedaxis: possible values enum limitedaxis:int { xy, xz, yz, xyz, x }.
+ * @x, @y, @z: return if supported.
+ *
+ * Return value: 0 OK, -1 invalid limitedaxis value.
+ */static int check_supported_axis(int limitedaxis, bool &x, bool &y, bool &z)
+{
+    switch (limitedaxis) {
+    case xyz:
+        x = y = z = true;
+        break;
+    case xy:
+        x = y = true;
+        z = false;
+        break;
+    case xz:
+        x = z = true;
+        y = false;
+        break;
+    case yz:
+        x = false;
+        y = z = true;
+        break;
+    default:
+        return -1;
+    }
+
+    return 0;
+}
+
+/*
  * st_hal_create_class_sensor() - Istance hardware sensor class
  * @data: iio:device data.
  * @handle: Android handle number.
@@ -206,11 +241,11 @@ static std::shared_ptr<SensorBase> st_hal_create_virtual_class_sensor(const STMS
  * Return value: sensor class pointer on success, NULL pointer on fail.
  */
 static std::shared_ptr<SensorBase> st_hal_create_class_sensor(STSensorHAL_iio_devices_data *data,
-                                                              int sensorId,
-                                                              int moduleId)
+                                                              int sensorId, int moduleId)
 {
     struct HWSensorBaseCommonData class_data;
     std::shared_ptr<SensorBase> sensor = nullptr;
+    bool x_is_supp, y_is_supp, z_is_supp;
 
     if ((strlen(data->iio_sysfs_path.c_str()) + 1 > HW_SENSOR_BASE_IIO_SYSFS_PATH_MAX) ||
         (strlen(data->deviceName.c_str()) + 1 > HW_SENSOR_BASE_IIO_DEVICE_NAME_MAX) ||
@@ -227,12 +262,25 @@ static std::shared_ptr<SensorBase> st_hal_create_class_sensor(STSensorHAL_iio_de
     class_data.num_channels = data->num_channels;
 
     if (data->sensor_type == AccelSensorType) {
-        sensor = std::make_shared<Accelerometer>(&class_data,
-                                                 data->androidName.c_str(), &data->sfa,
-                                                 sensorId, data->hw_fifo_len,
-                                                 data->power_consumption,
-                                                 data->wake_up_sensor,
-                                                 moduleId);
+        if (check_supported_axis(data->limitedaxis, x_is_supp, y_is_supp, z_is_supp))
+            return nullptr;
+
+        if (x_is_supp && y_is_supp && z_is_supp) {
+            sensor = std::make_shared<Accelerometer>(&class_data,
+                                                     data->androidName.c_str(), &data->sfa,
+                                                     sensorId, data->hw_fifo_len,
+                                                     data->power_consumption,
+                                                     data->wake_up_sensor,
+                                                     moduleId);
+        } else {
+            sensor = std::make_shared<AccelerometerLimitedAxes>(&class_data,
+                                                     data->androidName.c_str(), &data->sfa,
+                                                     sensorId, data->hw_fifo_len,
+                                                     data->power_consumption,
+                                                     data->wake_up_sensor,
+                                                     moduleId,
+                                                     x_is_supp, y_is_supp, z_is_supp);
+        }
     } else if (data->sensor_type == MagnSensorType) {
         sensor = std::make_shared<Magnetometer>(&class_data,
                                                 data->androidName.c_str(), &data->sfa,
@@ -241,12 +289,25 @@ static std::shared_ptr<SensorBase> st_hal_create_class_sensor(STSensorHAL_iio_de
                                                 data->wake_up_sensor,
                                                 moduleId);
     } else if (data->sensor_type == GyroSensorType) {
-        sensor = std::make_shared<Gyroscope>(&class_data,
-                                             data->androidName.c_str(), &data->sfa,
-                                             sensorId, data->hw_fifo_len,
-                                             data->power_consumption,
-                                             data->wake_up_sensor,
-                                             moduleId);
+        if (check_supported_axis(data->limitedaxis, x_is_supp, y_is_supp, z_is_supp))
+            return nullptr;
+
+        if (x_is_supp && y_is_supp && z_is_supp) {
+            sensor = std::make_shared<Gyroscope>(&class_data,
+                                                 data->androidName.c_str(), &data->sfa,
+                                                 sensorId, data->hw_fifo_len,
+                                                 data->power_consumption,
+                                                 data->wake_up_sensor,
+                                                 moduleId);
+        } else {
+            sensor = std::make_shared<GyroscopeLimitedAxes>(&class_data,
+                                                 data->androidName.c_str(), &data->sfa,
+                                                 sensorId, data->hw_fifo_len,
+                                                 data->power_consumption,
+                                                 data->wake_up_sensor,
+                                                 moduleId,
+                                                 x_is_supp, y_is_supp, z_is_supp);
+        }
     } else if (data->sensor_type == StepDetectorSensorType) {
         sensor = std::make_shared<StepDetector>(&class_data,
                                                 data->androidName.c_str(),
@@ -450,6 +511,7 @@ static int loadIIODevices(std::vector<STSensorHAL_iio_devices_data> &iioDeviceDa
 
         data.iio_sysfs_path = std::string(device_iio_dir) + "iio:device" + std::to_string(iio_devices[i].num);
         data.power_consumption = sensor->power_consumption;
+        data.limitedaxis = sensor->limited_axis;
 
         err = device_iio_utils::scan_channel(data.iio_sysfs_path.c_str(), &data.channels, &data.num_channels);
         if (err < 0 && err != -ENOENT) {

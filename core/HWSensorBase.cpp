@@ -856,6 +856,82 @@ HWSensorBaseWithPollrate::HWSensorBaseWithPollrate(HWSensorBaseCommonData *data,
     sensor_t_data.minRateHz = min_sampling_frequency;
 }
 
+HWSensorBaseWithPollrate::HWSensorBaseWithPollrate(HWSensorBaseCommonData *data,
+                                                   const char *name, struct device_iio_sampling_freqs *sfa,
+                                                   int handle, const STMSensorType &sensor_type, unsigned int hw_fifo_len,
+                                                   float power_consumption, int module,
+                                                   bool x_is_supp, bool y_is_supp, bool z_is_supp)
+    : HWSensorBaseWithPollrate(data, name, sfa, handle, sensor_type, hw_fifo_len, power_consumption, module)
+{
+    xSupported = x_is_supp;
+    ySupported = y_is_supp;
+    zSupported = z_is_supp;
+}
+
+bool HWSensorBaseWithPollrate::isXSupported(void)
+{
+    return xSupported;
+}
+
+bool HWSensorBaseWithPollrate::isYSupported(void)
+{
+    return ySupported;
+}
+
+bool HWSensorBaseWithPollrate::isZSupported(void)
+{
+    return zSupported;
+}
+
+int HWSensorBaseWithPollrate::copyAxesData(std::array<float, 3> &axesdata, SensorBaseData *data)
+{
+   int axis_bitmask = xSupported | (ySupported << 1) | (zSupported << 2);
+
+    switch (axis_bitmask) {
+    case 1:
+        /* only x supported */
+        axesdata.at(0) = data->raw[0];
+        axesdata.at(1) = 0;
+        axesdata.at(2) = 0;
+        break;
+    case 2:
+        /* only y supported */
+        axesdata.at(0) = 0;
+        axesdata.at(1) = data->raw[0];
+        axesdata.at(2) = 0;
+        break;
+    case 3:
+        /* only xy supported */
+        axesdata.at(0) = data->raw[0];
+        axesdata.at(1) = data->raw[1];
+        axesdata.at(2) = 0;
+        break;
+    case 4:
+        /* only z supported */
+        axesdata.at(0) = 0;
+        axesdata.at(1) = 0;
+        axesdata.at(2) = data->raw[0];
+        break;
+    case 5:
+        /* only xz supported */
+        axesdata.at(0) = data->raw[0];
+        axesdata.at(1) = 0;
+        axesdata.at(2) = data->raw[1];
+        break;
+    case 6:
+        /* only yz supported */
+        axesdata.at(0) = 0;
+        axesdata.at(1) = data->raw[0];
+        axesdata.at(2) = data->raw[1];
+        break;
+    default:
+        console.error("invalid axes configuration");
+        return -1;
+    }
+
+    return 0;
+}
+
 HWSensorBaseWithPollrate::~HWSensorBaseWithPollrate()
 {
 

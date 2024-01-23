@@ -20,49 +20,48 @@
 #include <signal.h>
 #include <cmath>
 
-#include "Gyroscope.h"
+#include "AccelerometerLimitedAxes.h"
 
 namespace stm {
 namespace core {
 
-Gyroscope::Gyroscope(HWSensorBaseCommonData *data, const char *name,
-                     struct device_iio_sampling_freqs *sfa, int handle,
-                     unsigned int hw_fifo_len, float power_consumption,
-                     bool wakeup, int module)
+AccelerometerLimitedAxes::AccelerometerLimitedAxes(HWSensorBaseCommonData *data,
+                             const char *name,
+                             struct device_iio_sampling_freqs *sfa,
+                             int handle,
+                             unsigned int hw_fifo_len,
+                             float power_consumption, bool wakeup, int module,
+                             bool x_is_supp = true,
+                             bool y_is_supp = true,
+                             bool z_is_supp = true)
     : HWSensorBaseWithPollrate(data, name, sfa, handle,
-                               GyroSensorType,
-                               hw_fifo_len, power_consumption, module),
+                               AccelSensorLimitedAxisType,
+                               hw_fifo_len, power_consumption, module,
+                               x_is_supp, y_is_supp, z_is_supp),
       bias_last_pollrate(0),
-      gyroCalibration(STMGyroCalibration::getInstance())
+      accelCalibration(STMAccelCalibration::getInstance())
 {
     (void) wakeup;
 
-    rotMatrix = propertiesManager.getRotationMatrix(GyroSensorType);
-    biasFileName = std::string("gyro_bias_") + std::to_string(moduleId) + std::string(".dat");
+    rotMatrix = propertiesManager.getRotationMatrix(AccelSensorType);
+    biasFileName = std::string("accel_bias_") + std::to_string(moduleId) + std::string(".dat");
 
     sensor_t_data.resolution = data->channels[0].scale;
     sensor_t_data.maxRange = sensor_t_data.resolution * (std::pow(2, data->channels[0].bits_used - 1) - 1);
 
-    sensor_event.data.dataLen = 4;
-
-    if (HAL_ENABLE_GYRO_CALIBRATION != 0) {
-        dependencies_type_list.push_back(AccelSensorType);
-    }
+    /* limited axes sensors include supported axes flag in the event payload */
+    sensor_event.data.dataLen = 7;
 }
 
-int Gyroscope::libsInit(void)
+int AccelerometerLimitedAxes::libsInit(void)
 {
-    std::string libVersionMsg { "gyro calibration library: " };
+    std::string libVersionMsg { "accel calibration library: " };
 
-    if (HAL_ENABLE_GYRO_CALIBRATION != 0) {
-        libVersionMsg += gyroCalibration.getLibVersion();
+    if (HAL_ENABLE_ACCEL_CALIBRATION != 0) {
+        libVersionMsg += accelCalibration.getLibVersion();
         console.info(libVersionMsg);
 
-        // TODO fix the values used as parameters
-        return gyroCalibration.init(1.0f,
-                                    1.0f,
-                                    20.0f,
-                                    sensor_t_data.maxRange);
+        return accelCalibration.init(sensor_t_data.maxRange);
     } else {
         libVersionMsg += std::string("not enabled!");
         console.info(libVersionMsg);
@@ -71,14 +70,14 @@ int Gyroscope::libsInit(void)
     return 0;
 }
 
-void Gyroscope::postSetup(void)
+void AccelerometerLimitedAxes::postSetup(void)
 {
     loadBiasValues();
 }
 
-int Gyroscope::Enable(int handle, bool enable, bool lock_en_mutex)
+int AccelerometerLimitedAxes::Enable(int handle, bool enable, bool lock_en_mutex)
 {
-    if (HAL_ENABLE_GYRO_CALIBRATION != 0) {
+    if (HAL_ENABLE_ACCEL_CALIBRATION != 0) {
         bool old_status;
         int err;
 
@@ -112,69 +111,61 @@ int Gyroscope::Enable(int handle, bool enable, bool lock_en_mutex)
     return HWSensorBaseWithPollrate::Enable(handle, enable, lock_en_mutex);
 }
 
-void Gyroscope::saveBiasValues(void) const
+void AccelerometerLimitedAxes::saveBiasValues(void) const
 {
     Matrix<4, 3, float> bias;
 
-    gyroCalibration.getBias(bias);
+    accelCalibration.getBias(bias);
 
     if (sensorsCallback != nullptr) {
         if (sensorsCallback->onSaveDataRequest(biasFileName, &bias, sizeof(bias)) <= 0) {
-            console.warning("failed to save gyro bias");
+            console.warning("failed to save accel bias");
         }
     }
 }
 
-void Gyroscope::loadBiasValues(void)
+void AccelerometerLimitedAxes::loadBiasValues(void)
 {
     Matrix<4, 3, float> bias;
 
-    gyroCalibration.resetBiasMatrix(bias);
+    accelCalibration.resetBiasMatrix(bias);
 
     if (sensorsCallback != nullptr) {
         if (sensorsCallback->onLoadDataRequest(biasFileName, &bias, sizeof(bias)) <= 0) {
-            console.warning("failed to load gyro bias");
+            console.warning("failed to load accel bias");
         }
     }
 
-    gyroCalibration.reset(bias);
+    accelCalibration.reset(bias);
 }
 
-void Gyroscope::ProcessData(SensorBaseData *data)
+void AccelerometerLimitedAxes::ProcessData(SensorBaseData *data)
 {
-    std::array<float, 3> gyroTmp;
+    std::array<float, 3> accelTmp;
+    int ret;
 
-    memcpy(gyroTmp.data(), data->raw, SENSOR_DATA_3AXIS * sizeof(float));
-    gyroTmp = rotMatrix * gyroTmp;
-    memcpy(data->raw, gyroTmp.data(), SENSOR_DATA_3AXIS * sizeof(float));
+    ret = copyAxesData(accelTmp, data);
+    if (ret)
+        return;
 
-    if (HAL_ENABLE_GYRO_CALIBRATION != 0 &&
-        dependencies_type_list.size() > 0) {
-        SensorBaseData accel_data;
-        int err, nomaxdata = 10;
+    accelTmp = rotMatrix * accelTmp;
+    memcpy(data->raw, accelTmp.data(), SENSOR_DATA_3AXIS * sizeof(float));
 
-        do {
-            err = GetLatestValidDataFromDependency(SENSOR_DEPENDENCY_ID_0, &accel_data, data->timestamp);
-            if (err < 0) {
-                nomaxdata--;
-                std::this_thread::sleep_for(std::chrono::microseconds(10));
-                continue;
-            }
-        } while ((nomaxdata >= 0) && (err < 0));
+    data->accuracy = SENSOR_STATUS_UNRELIABLE;
 
-        if (nomaxdata > 0) {
-            if (bias_last_pollrate != data->pollrate_ns) {
-                bias_last_pollrate = data->pollrate_ns;
-                gyroCalibration.setFrequency(NS_TO_FREQUENCY(data->pollrate_ns));
-            }
+    if (HAL_ENABLE_ACCEL_CALIBRATION != 0) {
+        std::array<float, 3> accelData;
+        Matrix<4, 3, float> bias;
 
-            std::array<float, 3> accelData({ accel_data.raw[0], accel_data.raw[1], accel_data.raw[2] });
-            std::array<float, 3> gyroData({ data->raw[0], data->raw[1], data->raw[2] });
-            gyroCalibration.run(accelData, gyroData, data->timestamp);
+        memcpy(accelData.data(), data->raw, 3 * sizeof(float));
+
+        if (bias_last_pollrate != data->pollrate_ns) {
+            bias_last_pollrate = data->pollrate_ns;
+            accelCalibration.setFrequency(NS_TO_FREQUENCY(data->pollrate_ns));
         }
 
-        Matrix<4, 3, float> bias;
-        gyroCalibration.getBias(bias);
+        accelCalibration.run(accelData, data->timestamp);
+        accelCalibration.getBias(bias);
 
         data->offset[0] = bias[3][0];
         data->offset[1] = bias[3][1];
@@ -194,6 +185,10 @@ void Gyroscope::ProcessData(SensorBaseData *data)
     sensor_event.data.data2[1] = data->processed[1];
     sensor_event.data.data2[2] = data->processed[2];
     sensor_event.data.data2[3] = (float)data->accuracy;
+
+    sensor_event.data.data2[4] = (float)isXSupported();
+    sensor_event.data.data2[5] = (float)isYSupported();
+    sensor_event.data.data2[6] = (float)isZSupported();
 
     sensor_event.timestamp = data->timestamp;
 

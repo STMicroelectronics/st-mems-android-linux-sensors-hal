@@ -65,6 +65,8 @@ enum class SensorType : uint16_t {
     LOW_LATENCY_OFFBODY_DETECT,     /* dimensionless */
     ACCELEROMETER_UNCALIBRATED,     /* m/s^2 */
     ODR_SWITCH_INFO,                /* dimensionless */
+    ACCELEROMETER_LIMITED_AXES,     /* m/s^2 */
+    GYROSCOPE_LIMITED_AXES,         /* rad/s */
 };
 
 const std::unordered_map<SensorType, std::string> sensorTypeToString = {

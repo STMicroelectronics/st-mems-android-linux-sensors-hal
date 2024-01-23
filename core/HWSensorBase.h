@@ -126,6 +126,9 @@ public:
 class HWSensorBaseWithPollrate : public HWSensorBase {
 private:
     struct device_iio_sampling_freqs sampling_frequency_available;
+    bool xSupported;
+    bool ySupported;
+    bool zSupported;
 
 public:
     HWSensorBaseWithPollrate(HWSensorBaseCommonData *data, const char *name,
@@ -133,12 +136,22 @@ public:
                              const STMSensorType &sensor_type,
                              unsigned int hw_fifo_len, float power_consumption,
                              int module);
+    HWSensorBaseWithPollrate(HWSensorBaseCommonData *data, const char *name,
+                             struct device_iio_sampling_freqs *sfa, int handle,
+                             const STMSensorType &sensor_type,
+                             unsigned int hw_fifo_len, float power_consumption,
+                             int module,
+                             bool x_is_supp, bool y_is_supp, bool z_is_supp);
     virtual ~HWSensorBaseWithPollrate();
 
     virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout,
                          bool lock_en_mute) override;
     virtual int flushRequest(int handle, bool lock_en_mute) override;
     virtual void WriteDataToPipe(int64_t hw_pollrate) override;
+    bool isXSupported(void);
+    bool isYSupported(void);
+    bool isZSupported(void);
+    int copyAxesData(std::array<float, 3> &axesdata, SensorBaseData *data);
 };
 
 } // namespace core

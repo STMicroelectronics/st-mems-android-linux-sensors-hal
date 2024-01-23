@@ -27,27 +27,36 @@
 namespace stm {
 namespace core {
 
+/*
+ * indicate the axes actually supported by the hardware sensor (for accel and
+ * gyro only)
+ */
+enum limitedaxis:int { x, y, z, xy, xz, yz, xyz };
+
 struct SensorsSupported {
     SensorsSupported(const std::string &d_name,
                      STMSensorType type,
                      device_iio_chan_type_t c_type,
                      const std::string &a_name,
-                     float power)
+                     float power,
+                     limitedaxis lim_axis)
     : driver_name(d_name),
       android_name(a_name),
       android_sensor_type(type),
       iio_sensor_type(c_type),
-      power_consumption(power) {}
+      power_consumption(power),
+      limited_axis(lim_axis) {}
 
     const std::string driver_name;
     const std::string android_name;
     const STMSensorType android_sensor_type;
     const device_iio_chan_type_t iio_sensor_type;
     const float power_consumption;
+    const limitedaxis limited_axis;
 
-    static SensorsSupported Accel(const std::string &d_name, const std::string &a_name, float power);
+    static SensorsSupported Accel(const std::string &d_name, const std::string &a_name, float power, limitedaxis lim_axis);
     static SensorsSupported Magn(const std::string &d_name, const std::string &a_name, float power);
-    static SensorsSupported Gyro(const std::string &d_name, const std::string &a_name, float power);
+    static SensorsSupported Gyro(const std::string &d_name, const std::string &a_name, float power, limitedaxis lim_axis);
     static SensorsSupported StepDetector(const std::string &d_name, const std::string &a_name, float power);
     static SensorsSupported StepCounter(const std::string &d_name, const std::string &a_name, float power);
     static SensorsSupported SignMotion(const std::string &d_name, const std::string &a_name, float power);
