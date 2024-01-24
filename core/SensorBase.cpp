@@ -45,8 +45,8 @@ SensorBase::SensorBase(const char *name, int handle, const STMSensorType &type, 
     }
 
     valid_class = true;
-    memset(&push_data, 0, sizeof(dependencies_t));
-    memset(&dependencies, 0, sizeof(push_data_t));
+    memset(&push_data, 0, sizeof(push_data_t));
+    memset(&dependencies, 0, sizeof(dependencies_t));
     //memset(&sensor_t_data, 0, sizeof(struct sensor_t));
     // memset(&sensor_event, 0, sizeof(sensors_event_t));
     memset(sensors_pollrates, 0, ST_HAL_IIO_MAX_DEVICES * sizeof(int64_t));
