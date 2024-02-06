@@ -426,7 +426,7 @@ const std::array<struct SensorsSupported, 204> sensorsSupportedList = {
     SensorsSupported::AmbientTemperature("stts22h", "STTS22H Temperature Sensor", 0.0f),
 };
 
-const std::array<struct SWSensorsSupported, 10> sensorsSWSupportedList = {
+const std::array<struct SWSensorsSupported, 12> sensorsSWSupportedList = {
     SWSensorsSupported(STMSensorType(SensorType::ACCELEROMETER_UNCALIBRATED)),
     SWSensorsSupported(STMSensorType(SensorType::MAGNETOMETER_UNCALIBRATED)),
     SWSensorsSupported(STMSensorType(SensorType::GYROSCOPE_UNCALIBRATED)),
@@ -437,6 +437,8 @@ const std::array<struct SWSensorsSupported, 10> sensorsSWSupportedList = {
     SWSensorsSupported(STMSensorType(SensorType::ORIENTATION)),
     SWSensorsSupported(STMSensorType(SensorType::GRAVITY)),
     SWSensorsSupported(STMSensorType(SensorType::LINEAR_ACCELERATION)),
+    SWSensorsSupported(STMSensorType(SensorType::ACCELEROMETER_LIMITED_AXES_UNCALIBRATED)),
+    SWSensorsSupported(STMSensorType(SensorType::GYROSCOPE_LIMITED_AXES_UNCALIBRATED)),
 };
 
 } // namespace core

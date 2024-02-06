@@ -90,8 +90,10 @@ LOCAL_SRC_FILES := \
     WristTiltGesture.cpp \
     SWSensorBase.cpp \
     SWAccelerometerUncalibrated.cpp \
+    SWAccelerometerLimitedAxesUncalibrated.cpp \
     SWMagnetometerUncalibrated.cpp \
     SWGyroscopeUncalibrated.cpp \
+    SWGyroLimitedAxesUncalibrated.cpp \
     SWAccelGyroFusion6X.cpp \
     SWAccelMagnGyroFusion9X.cpp \
     SWGameRotationVector.cpp \

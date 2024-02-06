@@ -932,6 +932,11 @@ int HWSensorBaseWithPollrate::copyAxesData(std::array<float, 3> &axesdata, Senso
     return 0;
 }
 
+int HWSensorBaseWithPollrate::getSupportedAxes(void)
+{
+     return xSupported | (ySupported << 1) | (zSupported << 2);
+}
+
 HWSensorBaseWithPollrate::~HWSensorBaseWithPollrate()
 {
 

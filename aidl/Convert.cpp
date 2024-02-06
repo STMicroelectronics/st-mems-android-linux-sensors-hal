@@ -157,6 +157,12 @@ static bool convertFromSTMSensorType(const stm::core::SensorType &type,
     case stm::core::SensorType::GYROSCOPE_LIMITED_AXES:
         sensorType = SensorType::GYROSCOPE_LIMITED_AXES;
         break;
+    case stm::core::SensorType::ACCELEROMETER_LIMITED_AXES_UNCALIBRATED:
+        sensorType = SensorType::ACCELEROMETER_LIMITED_AXES_UNCALIBRATED;
+        break;
+    case stm::core::SensorType::GYROSCOPE_LIMITED_AXES_UNCALIBRATED:
+        sensorType = SensorType::GYROSCOPE_LIMITED_AXES_UNCALIBRATED;
+        break;
     default:
         isPartOfSensorList = false;
         return false;
@@ -369,6 +375,22 @@ void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorDa
         limitedAxesImu.ySupported = sensorData.getData().at(5);
         limitedAxesImu.zSupported = sensorData.getData().at(6);
         event.payload.set<Event::EventPayload::Tag::limitedAxesImu>(limitedAxesImu);
+        break;
+        }
+    case SensorType::ACCELEROMETER_LIMITED_AXES_UNCALIBRATED:
+    case SensorType::GYROSCOPE_LIMITED_AXES_UNCALIBRATED: {
+        Event::EventPayload::LimitedAxesImuUncal limitedAxesImuUncal;
+        limitedAxesImuUncal.x = sensorData.getData().at(0);
+        limitedAxesImuUncal.y = sensorData.getData().at(1);
+        limitedAxesImuUncal.z = sensorData.getData().at(2);
+        limitedAxesImuUncal.xBias = sensorData.getData().at(3);
+        limitedAxesImuUncal.yBias = sensorData.getData().at(4);
+        limitedAxesImuUncal.zBias = sensorData.getData().at(5);
+        /* in case of limited axes the event contains the supported state */
+        limitedAxesImuUncal.xSupported = sensorData.getData().at(6);
+        limitedAxesImuUncal.ySupported = sensorData.getData().at(7);
+        limitedAxesImuUncal.zSupported = sensorData.getData().at(8);
+        event.payload.set<Event::EventPayload::Tag::limitedAxesImuUncal>(limitedAxesImuUncal);
         break;
         }
     default:

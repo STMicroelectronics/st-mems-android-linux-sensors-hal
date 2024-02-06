@@ -67,6 +67,8 @@ enum class SensorType : uint16_t {
     ODR_SWITCH_INFO,                /* dimensionless */
     ACCELEROMETER_LIMITED_AXES,     /* m/s^2 */
     GYROSCOPE_LIMITED_AXES,         /* rad/s */
+    ACCELEROMETER_LIMITED_AXES_UNCALIBRATED,     /* m/s^2 */
+    GYROSCOPE_LIMITED_AXES_UNCALIBRATED,         /* rad/s */
 };
 
 const std::unordered_map<SensorType, std::string> sensorTypeToString = {

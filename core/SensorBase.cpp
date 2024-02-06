@@ -729,5 +729,10 @@ int SensorBase::getHandleOfMyTrigger(void) const
     return -1;
 }
 
+int SensorBase::getSupportedAxes(void)
+{
+    return dependencies.sb[0]->getSupportedAxes();
+}
+
 } // namespace core
 } // namespace stm

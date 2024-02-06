@@ -233,6 +233,7 @@ public:
     virtual int getHandleOfMyTrigger(void) const;
 
     int getModuleId(void) const { return moduleId; };
+    virtual int getSupportedAxes(void);
 };
 
 } // namespace core

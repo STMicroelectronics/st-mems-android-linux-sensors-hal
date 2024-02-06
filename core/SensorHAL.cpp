@@ -45,6 +45,8 @@
 #include "SWMagnetometerUncalibrated.h"
 #include "SWGyroscopeUncalibrated.h"
 #include "SWAccelerometerUncalibrated.h"
+#include "SWGyroLimitedAxesUncalibrated.h"
+#include "SWAccelerometerLimitedAxesUncalibrated.h"
 #include "Pressure.h"
 #include "RHumidity.h"
 #include "Temp.h"
@@ -192,6 +194,10 @@ static std::shared_ptr<SensorBase> st_hal_create_virtual_class_sensor(const STMS
             sensor = std::make_shared<SWGravity>("iNemoEngine Gravity Sensor", handle, moduleId);
         } else if (sensor_type == LinearAccelSensorType) {
             sensor = std::make_shared<SWLinearAccel>("iNemoEngine Linear Acceleration Sensor", handle, moduleId);
+        } else if (sensor_type == AccelSensorLimitedAxisUncalibratedType) {
+            sensor = std::make_shared<SWAccelerometerLimitedAxesUncalibrated>("Accelerometer Uncalibrated Limited Axes Sensor", handle, moduleId);
+        } else if (sensor_type == GyroSensorLimitedAxisUncalibratedType) {
+            sensor = std::make_shared<SWGyroLimitedAxesUncalibrated>("Gyroscope Uncalibrated Limited Axes Sensor", handle, moduleId);
         }
     }
 

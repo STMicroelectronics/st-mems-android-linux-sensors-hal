@@ -83,6 +83,8 @@ const STMSensorType LowLatencyOffbodyDetectSensorType(SensorType::LOW_LATENCY_OF
 const STMSensorType AccelUncalibSensorType(SensorType::ACCELEROMETER_UNCALIBRATED);
 const STMSensorType AccelSensorLimitedAxisType(SensorType::ACCELEROMETER_LIMITED_AXES);
 const STMSensorType GyroSensorLimitedAxisType(SensorType::GYROSCOPE_LIMITED_AXES);
+const STMSensorType AccelSensorLimitedAxisUncalibratedType(SensorType::ACCELEROMETER_LIMITED_AXES_UNCALIBRATED);
+const STMSensorType GyroSensorLimitedAxisUncalibratedType(SensorType::GYROSCOPE_LIMITED_AXES_UNCALIBRATED);
 
 const STMSensorType AccelGyroFusion6XSensorType(SensorTypeInternal::ACCEL_GYRO_FUSION_6X);
 const STMSensorType AccelMagnGyroFusion9XSensorType(SensorTypeInternal::ACCEL_MAGN_GYRO_FUSION_9X);

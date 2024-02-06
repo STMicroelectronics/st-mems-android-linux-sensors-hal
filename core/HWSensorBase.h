@@ -152,6 +152,7 @@ public:
     bool isYSupported(void);
     bool isZSupported(void);
     int copyAxesData(std::array<float, 3> &axesdata, SensorBaseData *data);
+    virtual int getSupportedAxes(void);
 };
 
 } // namespace core

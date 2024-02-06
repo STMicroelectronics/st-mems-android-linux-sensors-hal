@@ -74,7 +74,7 @@ struct SWSensorsSupported {
     const STMSensorType type;
 };
 
-extern const std::array<struct SWSensorsSupported, 10> sensorsSWSupportedList;
+extern const std::array<struct SWSensorsSupported, 12> sensorsSWSupportedList;
 
 } // namespace core
 } // namespace stm
