@@ -26,10 +26,10 @@ cc_library_static {
         "IUtils.cpp",
     ],
     header_libs: [
-        "stmicroelectronics-sensors-commons",
+        "stmicroelectronics-sensors-common-includes",
     ],
     shared_libs: [
-	"libcutils",
+        "libcutils",
         "liblog",
         "libutils",
         "libbase",

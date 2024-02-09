@@ -15,7 +15,7 @@
  */
 
 cc_library_headers {
-    name: "stmicroelectronics-sensors-commons",
+    name: "stmicroelectronics-sensors-common-includes",
     vendor_available: true,
     export_include_dirs: ["."],
 }

@@ -28,6 +28,7 @@ cc_library_static {
         "libutils",
         "libc",
     ],
+    header_libs: [ "stmicroelectronics-sensors-common-includes"],
     cflags: [
         "-Wall",
         "-Wextra",

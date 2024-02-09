@@ -19,8 +19,7 @@
 
 #include <array>
 #include <string>
-
-#include "../Matrix.h"
+#include <Matrix.h>
 
 struct STMGyroCalibration {
     static STMGyroCalibration& getInstance(void);

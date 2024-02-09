@@ -37,7 +37,7 @@ cc_binary {
         "stmicroelectronics-sensors.commons",
     ],
     static_libs: [
-	"stmicroelectronics-sensors.commons",
+        "stmicroelectronics-sensors.commons",
         "stmicroelectronics-sensors-core",
         "libstm-accel-calibration",
         "libstm-gyro-calibration",

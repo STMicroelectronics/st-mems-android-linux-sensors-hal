@@ -20,7 +20,7 @@
 #include <array>
 #include <string>
 
-#include "../Matrix.h"
+#include <Matrix.h>
 
 struct STMAccelCalibration {
     static STMAccelCalibration& getInstance(void);

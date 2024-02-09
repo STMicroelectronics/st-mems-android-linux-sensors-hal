@@ -16,6 +16,7 @@
  */
 
 #include "STMGyroCalibration.h"
+#include <Utils.h>
 
 static const int minFrequencyHz = 1;
 static const int maxFrequencyHz = 200;

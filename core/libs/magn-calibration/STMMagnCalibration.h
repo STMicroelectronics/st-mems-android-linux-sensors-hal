@@ -20,7 +20,7 @@
 #include <array>
 #include <string>
 
-#include "../Matrix.h"
+#include <Matrix.h>
 
 struct STMMagnCalibration {
     static STMMagnCalibration& getInstance(void);

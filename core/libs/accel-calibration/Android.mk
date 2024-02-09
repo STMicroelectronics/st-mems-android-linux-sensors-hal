@@ -34,6 +34,7 @@ LOCAL_CFLAGS += \
 
 LOCAL_SRC_FILES := \
     STMAccelCalibration.cpp
+LOCAL_HEADER_LIBRARIES := stmicroelectronics-sensors-common-includes
 
 LOCAL_MODULE_TAGS := optional
 

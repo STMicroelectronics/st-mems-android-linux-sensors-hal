@@ -23,7 +23,7 @@
 
 #include <IConsole.h>
 #include <SensorType.h>
-#include "../libs/Matrix.h"
+#include <Matrix.h>
 
 namespace stm {
 namespace core {
