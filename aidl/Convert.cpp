@@ -356,7 +356,6 @@ void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorDa
         event.sensorHandle = (int32_t)sensorData.getSensorHandle();
 
         stm::core::IConsole& console = stm::core::IConsole::getInstance();
-        console.error("Received META_DATA from handle " + std::to_string(event.sensorHandle));
 
         event.sensorType = ::aidl::android::hardware::sensors::SensorType::META_DATA;
         Event::EventPayload::MetaData meta = {
