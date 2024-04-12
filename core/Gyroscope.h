@@ -20,6 +20,7 @@
 #include "HWSensorBase.h"
 
 #include <STMGyroCalibration.h>
+#include <STMGyroTempCalibration.h>
 
 namespace stm {
 namespace core {
@@ -43,6 +44,7 @@ public:
 
 private:
     STMGyroCalibration& gyroCalibration;
+    STMGyroTempCalibration& gyroTempCalibration;
 
     void saveBiasValues(void) const;
 
@@ -51,6 +53,10 @@ private:
     Matrix<3, 3, float> rotMatrix;
 
     std::string biasFileName;
+    std::string biasTFileName;
+
+    /* for motion-gt */
+    int gyro_decimator;
 };
 
 } // namespace core

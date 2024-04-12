@@ -937,6 +937,11 @@ int HWSensorBaseWithPollrate::getSupportedAxes(void)
      return xSupported | (ySupported << 1) | (zSupported << 2);
 }
 
+float HWSensorBaseWithPollrate::getHWSamplingRate(void)
+{
+    return hw_sampling_frequency;
+}
+
 HWSensorBaseWithPollrate::~HWSensorBaseWithPollrate()
 {
 
@@ -1044,8 +1049,9 @@ int HWSensorBaseWithPollrate::SetDelay(int handle, int64_t period_ns,
     }
 
     if (message) {
+        hw_sampling_frequency = NS_TO_FREQUENCY((float)(uint64_t)min_pollrate_ns);
         const std::string msg = ": changed pollrate to " +
-            std::to_string(NS_TO_FREQUENCY((float)(uint64_t)min_pollrate_ns)) + "Hz, timeout=" +
+            std::to_string(hw_sampling_frequency) + "Hz, timeout=" +
             std::to_string((uint64_t)NS_TO_MS((uint64_t)min_timeout_ns)) + "ms";
 
         console.debug(GetName() +  msg);

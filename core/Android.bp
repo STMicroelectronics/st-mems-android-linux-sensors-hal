@@ -71,9 +71,18 @@ cc_library_static {
         "include",
         "libs/accel-calibration",
         "libs/gyro-calibration",
+        "libs/gyro-temperature-calibration",
         "libs/magn-calibration",
         "libs/sensors-fusion",
         "libs/timesync"
+    ],
+    static_libs: [
+	    "libstm-gyro-temperature-calibration",
+	    "libstm-gyro-calibration",
+	    "libstm-timesync",
+	    "libstm-sensors-fusion",
+	    "libstm-accel-calibration",
+	    "libstm-magn-calibration"
     ],
     shared_libs: [
         "libcutils",
@@ -91,6 +100,7 @@ cc_library_static {
         "-Wpedantic",
         "-DHAL_ENABLE_ACCEL_CALIBRATION=1",
         "-DHAL_ENABLE_GYRO_CALIBRATION=1",
+        "-DHAL_ENABLE_GYRO_TEMPERATURE_CALIBRATION=0",
         "-DHAL_ENABLE_MAGN_CALIBRATION=1",
         "-DHAL_ENABLE_SENSORS_FUSION=1",
         "-DHAL_ENABLE_TIMESYNC=1",

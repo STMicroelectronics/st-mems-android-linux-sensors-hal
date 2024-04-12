@@ -52,6 +52,7 @@ cc_defaults {
         "stmicroelectronics-sensors.commons",
         "libstm-accel-calibration",
         "libstm-gyro-calibration",
+        "libstm-gyro-temperature-calibration",
         "libstm-magn-calibration",
         "libstm-sensors-fusion",
         "libstm-timesync"

@@ -35,6 +35,7 @@ LOCAL_C_INCLUDES := \
     $(LOCAL_PATH)/include \
     $(LOCAL_PATH)/libs/accel-calibration \
     $(LOCAL_PATH)/libs/gyro-calibration \
+    $(LOCAL_PATH)/libs/gyro-temperature-calibration \
     $(LOCAL_PATH)/libs/magn-calibration \
     $(LOCAL_PATH)/libs/sensors-fusion \
     $(LOCAL_PATH)/libs/timesync
@@ -44,6 +45,7 @@ LOCAL_CFLAGS += \
     -Wextra \
     -DHAL_ENABLE_ACCEL_CALIBRATION=1 \
     -DHAL_ENABLE_GYRO_CALIBRATION=1 \
+    -DHAL_ENABLE_GYRO_TEMPERATURE_CALIBRATION=0 \
     -DHAL_ENABLE_MAGN_CALIBRATION=1 \
     -DHAL_ENABLE_SENSORS_FUSION=1 \
     -DHAL_ENABLE_TIMESYNC=1 \
@@ -119,6 +121,14 @@ LOCAL_SHARED_LIBRARIES := \
     libdl \
     libc
 
+LOCAL_STATIC_LIBRARIES := \
+    libstm-gyro-temperature-calibration-legacy \
+    libstm-gyro-calibration-legacy \
+    libstm-timesync-legacy \
+    libstm-sensors-fusion-legacy \
+    libstm-accel-calibration-legacy \
+    libstm-magn-calibration-legacy
+
 LOCAL_HEADER_LIBRARIES := \
     libhardware_headers
 
@@ -127,6 +137,8 @@ include $(BUILD_STATIC_LIBRARY)
 include $(LOCAL_PATH)/libs/accel-calibration/Android.mk
 LOCAL_PATH := $(LOCAL_PATH_BAK)
 include $(LOCAL_PATH)/libs/gyro-calibration/Android.mk
+LOCAL_PATH := $(LOCAL_PATH_BAK)
+include $(LOCAL_PATH)/libs/gyro-temperature-calibration/Android.mk
 LOCAL_PATH := $(LOCAL_PATH_BAK)
 include $(LOCAL_PATH)/libs/magn-calibration/Android.mk
 LOCAL_PATH := $(LOCAL_PATH_BAK)

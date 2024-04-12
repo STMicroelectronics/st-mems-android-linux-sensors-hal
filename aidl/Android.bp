@@ -41,6 +41,7 @@ cc_binary {
         "stmicroelectronics-sensors-core",
         "libstm-accel-calibration",
         "libstm-gyro-calibration",
+        "libstm-gyro-temperature-calibration",
         "libstm-magn-calibration",
         "libstm-sensors-fusion",
         "libstm-timesync",

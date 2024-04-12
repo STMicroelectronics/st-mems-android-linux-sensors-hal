@@ -33,12 +33,14 @@ Gyroscope::Gyroscope(HWSensorBaseCommonData *data, const char *name,
                                GyroSensorType,
                                hw_fifo_len, power_consumption, module),
       bias_last_pollrate(0),
-      gyroCalibration(STMGyroCalibration::getInstance())
+      gyroCalibration(STMGyroCalibration::getInstance()),
+      gyroTempCalibration(STMGyroTempCalibration::getInstance())
 {
     (void) wakeup;
 
     rotMatrix = propertiesManager.getRotationMatrix(GyroSensorType);
     biasFileName = std::string("gyro_bias_") + std::to_string(moduleId) + std::string(".dat");
+    biasTFileName = std::string("gyro_bias_temperature_") + std::to_string(moduleId) + std::string(".dat");
 
     sensor_t_data.resolution = data->channels[0].scale;
     sensor_t_data.maxRange = sensor_t_data.resolution * (std::pow(2, data->channels[0].bits_used - 1) - 1);
@@ -47,28 +49,53 @@ Gyroscope::Gyroscope(HWSensorBaseCommonData *data, const char *name,
 
     if (HAL_ENABLE_GYRO_CALIBRATION != 0) {
         dependencies_type_list.push_back(AccelSensorType);
+
+        if (HAL_ENABLE_GYRO_TEMPERATURE_CALIBRATION != 0)
+            dependencies_type_list.push_back(AmbTemperatureSensorType);
     }
 }
 
 int Gyroscope::libsInit(void)
 {
-    std::string libVersionMsg { "gyro calibration library: " };
+    std::string libVersionGTMsg { "gyro temperature calibration library: " };
+    std::string libVersionGCMsg { "gyro calibration library: " };
+    int ret = 0;
 
     if (HAL_ENABLE_GYRO_CALIBRATION != 0) {
-        libVersionMsg += gyroCalibration.getLibVersion();
-        console.info(libVersionMsg);
+        ret = gyroCalibration.init(1.0f,
+                                   1.0f,
+                                   20.0f,
+                                   sensor_t_data.maxRange);
+        if (ret < 0) {
+            console.error("Gyro calibration library init error " + std::to_string(ret));
 
-        // TODO fix the values used as parameters
-        return gyroCalibration.init(1.0f,
-                                    1.0f,
-                                    20.0f,
-                                    sensor_t_data.maxRange);
+            return ret;
+        }
+
+        libVersionGCMsg += gyroCalibration.getLibVersion();
+        console.info(libVersionGCMsg);
+
+        /* Gyro temperature calibration requests Gyro calibration */
+        if (HAL_ENABLE_GYRO_TEMPERATURE_CALIBRATION != 0) {
+            ret = gyroTempCalibration.initialize();
+            if (ret < 0) {
+                console.error("Gyro temperature calibration library init error " + std::to_string(ret));
+
+                return ret;
+            }
+
+            libVersionGTMsg += gyroTempCalibration.getLibVersion();
+            console.info(libVersionGTMsg);
+        } else {
+            libVersionGTMsg += std::string("not enabled!");
+            console.info(libVersionGTMsg);
+        }
     } else {
-        libVersionMsg += std::string("not enabled!");
-        console.info(libVersionMsg);
+        libVersionGCMsg += std::string("not enabled!");
+        console.info(libVersionGCMsg);
     }
 
-    return 0;
+    return ret;
 }
 
 void Gyroscope::postSetup(void)
@@ -123,6 +150,18 @@ void Gyroscope::saveBiasValues(void) const
             console.warning("failed to save gyro bias");
         }
     }
+
+    if (HAL_ENABLE_GYRO_TEMPERATURE_CALIBRATION != 0) {
+        std::array<unsigned char, STMGyroTempCalibration::STMGyroTempCalibrationStateSize> state = { 0 };
+
+        gyroTempCalibration.getState((void *)&state);
+
+        if (sensorsCallback != nullptr) {
+            if (sensorsCallback->onSaveDataRequest(biasTFileName, &state, sizeof(state)) <= 0) {
+                console.warning("failed to save temperature-based gyro bias");
+            }
+        }
+    }
 }
 
 void Gyroscope::loadBiasValues(void)
@@ -138,15 +177,38 @@ void Gyroscope::loadBiasValues(void)
     }
 
     gyroCalibration.reset(bias);
+
+    if (HAL_ENABLE_GYRO_TEMPERATURE_CALIBRATION != 0) {
+        std::array<unsigned char, STMGyroTempCalibration::STMGyroTempCalibrationStateSize> state = { 0 };
+
+        if (sensorsCallback != nullptr) {
+            if (sensorsCallback->onLoadDataRequest(biasTFileName, &state, sizeof(state)) <= 0) {
+                console.warning("failed to load temperature-based gyro bias");
+            }
+
+            gyroTempCalibration.setState((void *)&state);
+        }
+    }
 }
 
 void Gyroscope::ProcessData(SensorBaseData *data)
 {
     std::array<float, 3> gyroTmp;
+    int acc_dep_id = SENSOR_DEPENDENCY_ID_0;
+    int temp_dep_id = SENSOR_DEPENDENCY_ID_0;
 
     memcpy(gyroTmp.data(), data->raw, SENSOR_DATA_3AXIS * sizeof(float));
     gyroTmp = rotMatrix * gyroTmp;
     memcpy(data->raw, gyroTmp.data(), SENSOR_DATA_3AXIS * sizeof(float));
+
+    /*
+     * in case both GC and GT libs enabled adjust sensor dependency
+     * list accordingly
+     */
+    if (HAL_ENABLE_GYRO_CALIBRATION != 0 &&
+        HAL_ENABLE_GYRO_TEMPERATURE_CALIBRATION != 0) {
+        acc_dep_id = SENSOR_DEPENDENCY_ID_1;
+    }
 
     if (HAL_ENABLE_GYRO_CALIBRATION != 0 &&
         dependencies_type_list.size() > 0) {
@@ -154,7 +216,7 @@ void Gyroscope::ProcessData(SensorBaseData *data)
         int err, nomaxdata = 10;
 
         do {
-            err = GetLatestValidDataFromDependency(SENSOR_DEPENDENCY_ID_0, &accel_data, data->timestamp);
+            err = GetLatestValidDataFromDependency(acc_dep_id, &accel_data, data->timestamp);
             if (err < 0) {
                 nomaxdata--;
                 std::this_thread::sleep_for(std::chrono::microseconds(10));
@@ -184,6 +246,40 @@ void Gyroscope::ProcessData(SensorBaseData *data)
     } else {
         data->accuracy = SENSOR_STATUS_UNRELIABLE;
         memset(data->offset, 0, 3 * sizeof(float));
+    }
+
+    if (HAL_ENABLE_GYRO_CALIBRATION != 0 &&
+        HAL_ENABLE_GYRO_TEMPERATURE_CALIBRATION != 0 &&
+        dependencies_type_list.size() > 0) {
+        // Run MotionGT @ 1Hz
+        if ((++gyro_decimator) >= ceil(getHWSamplingRate())) {
+            SensorBaseData temperature_data;
+            int err, nomaxdata = 10, update = 0;
+
+            gyro_decimator = 0;
+
+            do {
+                err = GetLatestValidDataFromDependency(temp_dep_id, &temperature_data, data->timestamp);
+                if (err < 0) {
+                    nomaxdata--;
+                    std::this_thread::sleep_for(std::chrono::microseconds(10));
+                    continue;
+                }
+            } while ((nomaxdata >= 0) && (err < 0));
+
+            /* Gyro temperature calibration input data are the offset calculated by gyro calibration */
+            std::array<float, 3> gyroData({ data->offset[0], data->offset[1], data->offset[2] });
+            gyroTempCalibration.run(gyroData, temperature_data.raw[0], data->timestamp, &update);
+
+            if (update) {
+                std::array<float, 3> bias;
+
+                gyroTempCalibration.getBias(&temperature_data.raw[0], bias);
+                data->offset[0] += bias[0];
+                data->offset[1] += bias[1];
+                data->offset[2] += bias[2];
+            }
+        }
     }
 
     data->processed[0] = data->raw[0] - data->offset[0];

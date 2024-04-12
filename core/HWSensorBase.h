@@ -129,6 +129,7 @@ private:
     bool xSupported;
     bool ySupported;
     bool zSupported;
+    float hw_sampling_frequency;
 
 public:
     HWSensorBaseWithPollrate(HWSensorBaseCommonData *data, const char *name,
@@ -153,6 +154,7 @@ public:
     bool isZSupported(void);
     int copyAxesData(std::array<float, 3> &axesdata, SensorBaseData *data);
     virtual int getSupportedAxes(void);
+    float getHWSamplingRate(void);
 };
 
 } // namespace core

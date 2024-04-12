@@ -14,6 +14,14 @@
 static constexpr float GRAVITY_EARTH = 9.80665f;
 
 struct Conversion {
+    static constexpr float mdegC_to_degC(float mdegC) {
+        return mdegC / 1000.0f;
+    }
+
+    static constexpr float ns_to_ms(float ns) {
+        return ns / 1000000.0f;
+    }
+
     static constexpr float ms2_to_millig(float ms2) {
         return (ms2 * 1000.0f) / GRAVITY_EARTH;
     }

@@ -56,3 +56,4 @@ Enable/Disable libraries (by default mock libraries):
 - HAL_ENABLE_MAGN_CALIBRATION :: [possible values: 0 (disabled) or not 0 (enabled)]
 - HAL_ENABLE_SENSORS_FUSION :: [possible values: 0 (disabled) or not 0 (enabled)]
 - HAL_ENABLE_TIMESYNC :: [possible values: 0 (disabled) or not 0 (enabled)]
+- HAL_ENABLE_GYRO_TEMPERATURE_CALIBRATION :: [possible values: 0 (disabled) or not 0 (enabled)]

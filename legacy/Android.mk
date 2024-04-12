@@ -33,6 +33,7 @@ LOCAL_STATIC_LIBRARIES := \
     stmicroelectronics-sensors-core-legacy \
     libstm-accel-calibration-legacy \
     libstm-gyro-calibration-legacy \
+    libstm-gyro-temperature-calibration-legacy \
     libstm-magn-calibration-legacy \
     libstm-sensors-fusion-legacy \
     libstm-timesync-legacy
