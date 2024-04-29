@@ -324,11 +324,16 @@ void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorDa
     case SensorType::RELATIVE_HUMIDITY:
     case SensorType::SIGNIFICANT_MOTION:
     case SensorType::STEP_DETECTOR:
-    case SensorType::AMBIENT_TEMPERATURE:
         if (sensorData.getData().size() < 1) {
             return;
         }
         event.u.scalar = sensorData.getData().at(0);
+        break;
+    case SensorType::AMBIENT_TEMPERATURE:
+        if (sensorData.getData().size() < 1) {
+            return;
+        }
+        event.u.scalar = sensorData.getData().at(0) / 1000.0f;
         break;
     case SensorType::STEP_COUNTER:
         if (sensorData.getData().size() < 1) {
