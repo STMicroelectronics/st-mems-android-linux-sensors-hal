@@ -46,6 +46,18 @@ Add the following line in file in device makefile (device/<vendor>/<board>/devic
 	TARGET_VENDOR_PROP += device/<vendor>/<board>/stm_sensors_hal.prop
 #+end_src
 
+** Android features
+
+It is possible during the HAL build phase to enable specific features by adding following definitions in the Android.bp file:
+ - HAL_ENABLE_DIRECT_REPORT_CHANNEL :: [possible values: 0 (disabled) or not 0 (enabled)]
+ - HAL_ENABLE_SENSOR_ADDITIONAL_INFO :: [possible values: 0 (disabled) or not 0 (enabled)]
+
+To guarantee the persistence of the sensor calibration data, it is also necessary to define a path in which the HAL must be able to create, write and read files.
+This occurs via the Android.bp parameter:
+ HAL_PRIVATE_DATA_PATH :: [data vendor absolute path for persistent data]
+
+To allow access to persistence data files from the HAL, it is necessary to properly configure the SELinux rules and add the creation of the directory via the device-specific mk files.
+
 ** Default settings
 
 Default parameters can alternatively be set at compile time by changing the Android.bp cflags (under core, see core documentation).
