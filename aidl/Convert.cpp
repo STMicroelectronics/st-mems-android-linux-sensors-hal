@@ -232,8 +232,14 @@ bool convertFromSTMSensor(const stm::core::STMSensor &src,
     dst->version = src.getVersion();
     dst->type = (SensorType)sensorType;
     dst->typeAsString = "";
-    dst->maxRange = std::ceil(src.getMaxRange());
-    dst->resolution = src.getResolution();
+    if (sensorType == SensorType::AMBIENT_TEMPERATURE) {
+        dst->maxRange = std::ceil(src.getMaxRange() / 1000.0f);
+        dst->resolution = src.getResolution() / 1000.0f;
+    } else {
+        dst->maxRange = std::ceil(src.getMaxRange());
+        dst->resolution = src.getResolution();
+    }
+
     dst->power = src.getPower();
     dst->flags = 0;
 
@@ -293,6 +299,21 @@ void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorDa
     using stm::core::SensorType;
 
     switch (sensorData.getSensorType()) {
+    case SensorType::AMBIENT_TEMPERATURE:
+        if (sensorData.getData().size() < 1) {
+            return;
+        }
+
+        event.payload.set<Event::EventPayload::Tag::scalar>(sensorData.getData().at(0) / 1000.0f);
+        break;
+    case SensorType::PRESSURE:
+    case SensorType::RELATIVE_HUMIDITY:
+        if (sensorData.getData().size() < 1) {
+            return;
+        }
+
+        event.payload.set<Event::EventPayload::Tag::scalar>(sensorData.getData().at(0));
+        break;
     case SensorType::ACCELEROMETER:
     case SensorType::MAGNETOMETER:
     case SensorType::ORIENTATION:
