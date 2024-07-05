@@ -314,7 +314,7 @@ void SWSensorBase::ThreadDataTask(std::atomic<bool>& threadsRunning)
 
             for (i = 0; i < err / sizeof(SensorBaseData); i++) {
                 pthread_mutex_lock(&sample_in_processing_mutex);
-                if (sensors_tmp_data[i].hasHwTimestamp) {
+                if ((HAL_ENABLE_TIMESYNC != 0) && sensors_tmp_data[i].hasHwTimestamp) {
                     sample_in_processing_timestamp = sensors_tmp_data[i].hwTimestamp;
                 } else {
                     sample_in_processing_timestamp = sensors_tmp_data[i].timestamp;
@@ -326,7 +326,7 @@ void SWSensorBase::ThreadDataTask(std::atomic<bool>& threadsRunning)
                 do {
                     flush_handle = flush_stack.readLastElement(&timestamp_flush);
                     int64_t timestampToCompare = sensors_tmp_data[i].timestamp;
-                    if (sensors_tmp_data[i].hasHwTimestamp) {
+                    if ((HAL_ENABLE_TIMESYNC != 0) && sensors_tmp_data[i].hasHwTimestamp) {
                         timestampToCompare = sensors_tmp_data[i].hwTimestamp;
                     }
 
