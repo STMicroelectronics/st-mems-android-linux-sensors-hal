@@ -1,6 +1,6 @@
 #+TITLE: stm-sensors-hal-iio Android HIDL 2.0
 #+SUBTITLE: notes
-#+AUTHOR: Denis Ciocca
+#+AUTHOR: MEMS Software Solutions Team
 
 * Introduction
 

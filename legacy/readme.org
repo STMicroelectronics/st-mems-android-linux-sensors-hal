@@ -1,6 +1,6 @@
 #+TITLE: stm-sensors-hal-iio Android legacy
 #+SUBTITLE: notes
-#+AUTHOR: Denis Ciocca
+#+AUTHOR: MEMS Software Solutions Team
 
 * Introduction
 

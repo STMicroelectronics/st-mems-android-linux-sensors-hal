@@ -1,6 +1,6 @@
 #+TITLE: stm-sensors-hal-iio Android multi-hal 2.x
 #+SUBTITLE: notes
-#+AUTHOR: Denis Ciocca
+#+AUTHOR: MEMS Software Solutions Team
 
 * Introduction
 

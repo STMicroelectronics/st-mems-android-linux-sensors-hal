@@ -1,6 +1,6 @@
 #+TITLE: sensors-hal-iio Linux
 #+SUBTITLE: notes
-#+AUTHOR: Denis Ciocca
+#+AUTHOR: MEMS Software Solutions Team
 
 * Introduction
 
