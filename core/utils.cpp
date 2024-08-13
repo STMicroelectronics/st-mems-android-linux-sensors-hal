@@ -571,7 +571,9 @@ int device_iio_utils::enable_sensor(const char *device_dir, bool enable)
         return err;
     }
 
-    return enable_events(device_dir, enable);
+    /* avoid manage enable events from sensor */
+    return 0;
+    //return enable_events(device_dir, enable);
 }
 
 int device_iio_utils::get_sampling_frequency_available(const char *device_dir,

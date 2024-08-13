@@ -40,7 +40,8 @@ public:
               float maxRateHz,
               uint32_t fifoRsvdCount,
               uint32_t fifoMaxCount,
-              bool wakeUp);
+              bool wakeUp,
+              int moduleId);
 
     STMSensor(const std::string &name,
               const std::string &vendor,
@@ -51,7 +52,8 @@ public:
               float power,
               uint32_t fifoRsvdCount,
               uint32_t fifoMaxCount,
-              bool wakeUp);
+              bool wakeUp,
+              int moduleId);
 
     const std::string& getName(void) const;
     const std::string& getVendor(void)const;
@@ -68,6 +70,7 @@ public:
     uint32_t getFifoRsvdCount(void) const;
     uint32_t getFifoMaxCount(void) const;
     bool isWakeUp(void) const;
+    int getModuleId(void) const;
 
 private:
     /**
@@ -115,7 +118,7 @@ private:
     /**
      * Sensor minimum rate in Hz
      */
-     const float minRateHz;
+    const float minRateHz;
 
     /**
      * Sensor maximum rate in Hz
@@ -141,6 +144,11 @@ private:
      * True if sensor can wake up the system from suspend
      */
     const bool wakeUp;
+
+    /**
+     * Module instance
+     */
+    const int moduleId;
 };
 
 } // namespace core

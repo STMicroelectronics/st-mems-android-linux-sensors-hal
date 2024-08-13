@@ -31,7 +31,8 @@ STMSensor::STMSensor(const std::string &name,
                      float maxRateHz,
                      uint32_t fifoRsvdCount,
                      uint32_t fifoMaxCount,
-                     bool wakeUp)
+                     bool wakeUp,
+                     int moduleId)
           : name(name),
             vendor(vendor),
             handle(0),
@@ -46,7 +47,8 @@ STMSensor::STMSensor(const std::string &name,
                      (type == SensorType::AMBIENT_TEMPERATURE) )? true : false),
             fifoRsvdCount(fifoRsvdCount),
             fifoMaxCount(fifoMaxCount),
-            wakeUp(wakeUp)
+            wakeUp(wakeUp),
+            moduleId(moduleId)
 {
 }
 
@@ -59,7 +61,8 @@ STMSensor::STMSensor(const std::string &name,
                      float power,
                      uint32_t fifoRsvdCount,
                      uint32_t fifoMaxCount,
-                     bool wakeUp)
+                     bool wakeUp,
+                     int moduleId)
           : name(name),
             vendor(vendor),
             handle(0),
@@ -73,7 +76,8 @@ STMSensor::STMSensor(const std::string &name,
             onChange(true),
             fifoRsvdCount(fifoRsvdCount),
             fifoMaxCount(fifoMaxCount),
-            wakeUp(wakeUp)
+            wakeUp(wakeUp),
+            moduleId(moduleId)
 {
 }
 
@@ -150,6 +154,11 @@ uint32_t STMSensor::getFifoMaxCount(void) const
 bool STMSensor::isWakeUp(void) const
 {
     return wakeUp;
+}
+
+int stm::core::STMSensor::getModuleId() const
+{
+    return moduleId;
 }
 
 } // namespace core

@@ -76,6 +76,7 @@ static IConsole &console = IConsole::getInstance();
  * @android_name: name showed in Android OS.
  * @dev_id: iio:device device id.
  * @sensor_type: Android sensor type.
+ * @moduleId: instance of sensor
  * @wake_up_sensor: is a wake-up sensor.
  * @num_channels: number of channels.
  * @channels: channels data.
@@ -809,6 +810,7 @@ int st_hal_open_sensors(void **pdata, STMSensorsList &sensorsList)
 
     std::unordered_set<int> modulesIdAvailable;
 
+    /* check for two or more sensor device having same type and module id */
     for (auto i = 0U; i < iioDataList.size(); ++i) {
         for (auto j = i + 1; j < iioDataList.size(); ++j) {
             if ((iioDataList[i].moduleId == iioDataList[j].moduleId) &&
@@ -818,6 +820,7 @@ int st_hal_open_sensors(void **pdata, STMSensorsList &sensorsList)
         }
     }
 
+    /* order devices based on module id */
     std::sort(iioDataList.begin(), iioDataList.end(),
               [] (const auto& lhs, const auto& rhs) {
                   return lhs.moduleId > rhs.moduleId;
@@ -834,6 +837,8 @@ int st_hal_open_sensors(void **pdata, STMSensorsList &sensorsList)
 
         if (!sensor->libsInit() && sensor->IsValidClass()) {
             modulesIdAvailable.insert(iioDeviceData.moduleId);
+            struct sensor_t sensorData = sensor->GetSensor_tData();
+            sensorData.moduleId = sensor->getModuleId();
             hal_data->graph.addNode(sensor->GetHandle(), sensor);
             internalSensorId++;
         }
@@ -919,7 +924,8 @@ int st_hal_open_sensors(void **pdata, STMSensorsList &sensorsList)
                                                   sensorData.maxRateHz,
                                                   sensorData.fifoRsvdCount,
                                                   sensorData.fifoMaxEventCount,
-                                                  false);
+                                                  false,
+                                                  node.second.payload->getModuleId());
 
         if (!sensorsList.addSensor(*sensor)) {
             console.error("sensor added is not valid");

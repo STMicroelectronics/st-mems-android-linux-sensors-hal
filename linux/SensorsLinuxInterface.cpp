@@ -23,8 +23,10 @@
 #include "SensorsLinuxInterface.h"
 #include "LinuxPropertiesLoader.h"
 #include <IConsole.h>
+#include <fstream>
 
 static const std::string configFilename = "/etc/stm-sensors-hal/config";
+static std::ofstream logfile("sensorlog.txt");
 
 SensorsLinuxInterface::SensorsLinuxInterface(void)
                       : sensorsCore(ISTMSensorsHAL::getInstance()),
@@ -106,7 +108,15 @@ int SensorsLinuxInterface::setFullScale(uint32_t handle, float fullscale)
 void
 SensorsLinuxInterface::onNewSensorsData(const std::vector<ISTMSensorsCallbackData> &sensorsData)
 {
-    (void) sensorsData;
+    /* just dump sensors data */
+    for (auto& s : sensorsData) {
+            std::vector<float> data = s.getData();
+            console.info("#" + std::to_string(s.getSensorHandle()) + ": " +
+                         std::to_string(data[0]) + ", " +
+                         std::to_string(data[1]) + ", " +
+                         std::to_string(data[2]) + " T " +
+                         std::to_string(s.getTimestamp()));
+    }
 }
 
 /**

@@ -46,7 +46,8 @@ struct sensor_t {
     float maxRateHz;
     int32_t handle;
     const char *name;
-    const char  *vendor;
+    const char *vendor;
+    int moduleId;
 };
 
 struct Triaxial {
