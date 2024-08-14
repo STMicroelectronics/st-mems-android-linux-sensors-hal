@@ -72,10 +72,32 @@ enum class SensorType : uint16_t {
 };
 
 const std::unordered_map<SensorType, std::string> sensorTypeToString = {
+    { SensorType::META_DATA, "meta-data"},
     { SensorType::ACCELEROMETER, "accelerometer"},
-    { SensorType::GYROSCOPE, "gyroscope"},
     { SensorType::MAGNETOMETER, "magnetometer"},
+    { SensorType::ORIENTATION, "orientation"},
+    { SensorType::GYROSCOPE, "gyroscope"},
+    { SensorType::LIGHT, "light"},
     { SensorType::PRESSURE, "pressure"},
+    { SensorType::INTERNAL_TEMPERATURE, "internal temperature"},
+    { SensorType::PROXIMITY, "proximity"},
+    { SensorType::GRAVITY, "gravity"},
+    { SensorType::LINEAR_ACCELERATION, "linear acceleration"},
+    { SensorType::ROTATION_VECTOR, "rotation vector"},
+    { SensorType::RELATIVE_HUMIDITY, "relative humidity"},
+    { SensorType::AMBIENT_TEMPERATURE, "ambient temperature"},
+    { SensorType::MAGNETOMETER_UNCALIBRATED, "magnetometer uncalibrated"},
+    { SensorType::GAME_ROTATION_VECTOR, "game rotation vector"},
+    { SensorType::GYROSCOPE_UNCALIBRATED, "gyroscope uncalibrated"},
+    { SensorType::SIGNIFICANT_MOTION, "significant motion"},
+    { SensorType::STEP_DETECTOR, "step detector"},
+    { SensorType::STEP_COUNTER, "step counter"},
+    { SensorType::GEOMAGNETIC_ROTATION_VECTOR, "geomagnetic rotation vector"},
+    { SensorType::ACCELEROMETER_UNCALIBRATED, "accelerometer uncalibrated"},
+    { SensorType::ACCELEROMETER_LIMITED_AXES, "accelerometer limited axes"},
+    { SensorType::GYROSCOPE_LIMITED_AXES, "gyroscope limited axes"},
+    { SensorType::ACCELEROMETER_LIMITED_AXES_UNCALIBRATED, "accelerometer limited axes uncalibrated"},
+    { SensorType::GYROSCOPE_LIMITED_AXES_UNCALIBRATED, "gyroscope limited axes uncalibrated"},
 };
 
 } // namespace core
