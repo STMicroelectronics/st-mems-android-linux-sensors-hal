@@ -476,6 +476,35 @@ mutex_unlock:
     return err;
 }
 
+int HWSensorBase::SetFullscale(int __attribute__((unused))handle,
+                               float fullscale,
+                               bool __attribute__((unused))lock_en_mute)
+{
+    int err;
+    device_iio_chan_type_t device_iio_sensor_type;
+
+    if (sensor_t_data.type == AccelSensorType) {
+        device_iio_sensor_type = DEVICE_IIO_ACC;
+    } else if (sensor_t_data.type == MagnSensorType) {
+        device_iio_sensor_type = DEVICE_IIO_MAGN;
+    } else if (sensor_t_data.type == GyroSensorType) {
+        device_iio_sensor_type = DEVICE_IIO_GYRO;
+    } else {
+        return -EINVAL;
+    }
+
+    console.warning(std::string("Setting Full Scale to sensor ") + GetName() + " to value " + std::to_string(fullscale));
+    err = device_iio_utils::set_scale(common_data.device_iio_sysfs_path,
+                                      fullscale,
+                                      device_iio_sensor_type);
+
+    /* update fullscale */
+    if (err == 0)
+            common_data.channels[0].scale = fullscale;
+
+    return err;
+}
+
 int HWSensorBase::AddSensorDependency(SensorBase *p)
 {
     int dependency_id, err;

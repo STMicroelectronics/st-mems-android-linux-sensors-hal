@@ -203,6 +203,7 @@ public:
     void SetEnableTimestamp(int handle, bool enable, int64_t timestamp);
 
     virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout, bool lock_en_mutex);
+    virtual int SetFullscale(int handle, float fullscale, bool lock_en_mute);
 
     virtual int flushRequest(int handle, bool lock_en_mutex) = 0;
     virtual void ProcessFlushData(int handle, int64_t timestamp) = 0;

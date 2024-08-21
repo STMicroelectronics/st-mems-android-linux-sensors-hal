@@ -404,6 +404,15 @@ int SensorBase::SetDelay(int handle, int64_t period_ns, int64_t timeout, bool lo
     return err;
 }
 
+int SensorBase::SetFullscale(int handle, float fullscale, bool lock_en_mute)
+{
+    (void)handle;
+    (void)fullscale;
+    (void)lock_en_mute;
+
+    return 0;
+}
+
 const std::vector<STMSensorType>& SensorBase::GetDepenciesTypeList(void) const
 {
     return dependencies_type_list;

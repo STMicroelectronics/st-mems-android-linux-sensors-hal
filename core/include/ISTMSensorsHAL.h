@@ -87,6 +87,14 @@ public:
      * Return value: 0 on success, else a negative error code.
      */
     virtual int32_t flushData(uint32_t handle) = 0;
+
+    /**
+     * setFullScale:
+     * @handle: sensor handle ID (retrieved from sensors list).
+     *
+     * Return value: 0 on success, else a negative error code.
+     */
+    virtual int32_t setFullScale(uint32_t handle, float fullscale) = 0;
 };
 
 } // namespace core

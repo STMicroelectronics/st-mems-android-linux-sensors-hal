@@ -630,6 +630,27 @@ int st_hal_dev_flush(void *data, uint32_t handle)
 }
 
 /**
+ * st_hal_dev_set_fullscale() - Sensor set full scale
+ * @dev: sensors device.
+ * @handle: Android sensor handle.
+ *
+ * Return value: 0 on success, negative number on fail.
+ */
+int st_hal_dev_set_fullscale(void *data, uint32_t handle, float fullscale)
+{
+    STSensorHAL_data *hal_data = (STSensorHAL_data *)data;
+
+    auto nodeId = hal_data->handleToNodeId_.find(handle);
+
+    auto sensor = hal_data->graph[nodeId->second];
+    if (sensor != nullptr) {
+        return sensor->SetFullscale(sensor->GetHandle(), fullscale, true);
+    }
+
+    return -EINVAL;
+}
+
+/**
  * st_hal_dev_inject_sensor_data() - Sensor data injection
  * @dev: sensors device.
  * @data: sensor event data to be injected.

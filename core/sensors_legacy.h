@@ -39,6 +39,8 @@ int st_hal_dev_batch(void *data, int handle, int64_t period_ns,
 
 int st_hal_dev_flush(void *data, uint32_t handle);
 
+int st_hal_dev_set_fullscale(void *data, uint32_t handle, float fullscale);
+
 int st_hal_dev_poll(void *data, sensors_event_t *sdata, int count);
 
 } // namespace core

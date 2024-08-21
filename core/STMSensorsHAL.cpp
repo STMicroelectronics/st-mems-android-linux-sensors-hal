@@ -165,6 +165,15 @@ int STMSensorsHAL::flushData(uint32_t handle)
     return st_hal_dev_flush(hal_data, handle);
 }
 
+int32_t STMSensorsHAL::setFullScale(uint32_t handle, float fullscale)
+{
+    if (!handleIsValid(handle)) {
+        return -EINVAL;
+    }
+
+    return st_hal_dev_set_fullscale(hal_data, handle, fullscale);
+}
+
 /**
  * handleIsValid: check if given handle is valid or not
  * @handle: sensor handle to check

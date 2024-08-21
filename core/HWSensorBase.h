@@ -101,6 +101,7 @@ public:
 
     virtual int Enable(int handle, bool enable, bool lock_en_mute) override;
     virtual int SetDelay(int handle, int64_t period_ns, int64_t timeout, bool lock_en_mute) override;
+    virtual int SetFullscale(int handle, float fullscale, bool lock_en_mute);
 
     virtual int AddSensorDependency(SensorBase *p) override;
     virtual void RemoveSensorDependency(SensorBase *p) override;

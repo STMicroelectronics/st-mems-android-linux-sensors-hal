@@ -89,6 +89,17 @@ int SensorsLinuxInterface::setRate(uint32_t handle,
 }
 
 /**
+ * setFullScale:
+ * @handle: sensor handle ID (retrieved from sensors list).
+ *
+ * Return value: 0 on success, else a negative error code.
+ */
+int SensorsLinuxInterface::setFullScale(uint32_t handle, float fullscale)
+{
+    return sensorsCore.setFullScale(handle, fullscale);
+}
+
+/**
  * onNewSensorsData: receive data from STMSensorsHAL,
  *                   reference: ISTMSensorsCallbackData class
  */

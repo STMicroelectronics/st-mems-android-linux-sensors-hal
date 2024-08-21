@@ -45,6 +45,8 @@ public:
                 int64_t samplingPeriodNanoSec,
                 int64_t maxReportLatencyNanoSec);
 
+    int setFullScale(uint32_t handle, float fullscale);
+
     void onNewSensorsData(const std::vector<ISTMSensorsCallbackData> &sensorsData) override;
 
     int onSaveDataRequest(const std::string& resourceID, const void *data, ssize_t len) override;

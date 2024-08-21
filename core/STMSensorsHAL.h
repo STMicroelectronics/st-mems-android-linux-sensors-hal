@@ -42,6 +42,7 @@ public:
                 int64_t maxReportLatencyNanoSec) final;
 
     int flushData(uint32_t handle) final;
+    int32_t setFullScale(uint32_t handle, float fullscale) final;
 
 private:
     STMSensorsHAL(void);
