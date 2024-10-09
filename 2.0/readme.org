@@ -104,6 +104,10 @@ PRODUCT_COPY_FILES += \
 allow hal_sensors_default sysfs:dir { open read };
 allow hal_sensors_default sysfs:file { open read write getattr };
 allow hal_sensors_default sensors_device:chr_file rw_file_perms;
+allow hal_sensors_default iio_device:chr_file { open read ioctl };
+
+# allow access to save data to vendor data files
+allow hal_sensors_default sensor_vendor_data_file:file { open read write getattr create };
 #+end_src
 
 5> modify the uevent rules file (i.e. device/<vendor>/<board>/ueventd.rc) by adding these lines:
