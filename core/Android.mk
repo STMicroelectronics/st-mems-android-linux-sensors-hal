@@ -87,6 +87,7 @@ LOCAL_SRC_FILES := \
     StepCounter.cpp \
     StepDetector.cpp \
     Temp.cpp \
+    IntTemp.cpp \
     TiltSensor.cpp \
     utils.cpp \
     WristTiltGesture.cpp \

@@ -51,7 +51,7 @@ Gyroscope::Gyroscope(HWSensorBaseCommonData *data, const char *name,
         dependencies_type_list.push_back(AccelSensorType);
 
         if (HAL_ENABLE_GYRO_TEMPERATURE_CALIBRATION != 0)
-            dependencies_type_list.push_back(AmbTemperatureSensorType);
+            dependencies_type_list.push_back(IntTemperatureSensorType);
     }
 }
 

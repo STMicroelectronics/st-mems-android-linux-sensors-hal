@@ -58,6 +58,7 @@ add_library(stmicroelectronics-sensors-core-linux
             StepCounter.cpp
             StepDetector.cpp
             Temp.cpp
+            IntTemp.cpp
             TiltSensor.cpp
             utils.cpp
             WristTiltGesture.cpp

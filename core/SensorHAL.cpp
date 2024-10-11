@@ -50,6 +50,7 @@
 #include "Pressure.h"
 #include "RHumidity.h"
 #include "Temp.h"
+#include "IntTemp.h"
 #include "SWAccelGyroFusion6X.h"
 #include "SWGameRotationVector.h"
 #include "SWAccelMagnGyroFusion9X.h"
@@ -381,6 +382,13 @@ static std::shared_ptr<SensorBase> st_hal_create_class_sensor(STSensorHAL_iio_de
                                         data->power_consumption,
                                         data->wake_up_sensor,
                                         moduleId);
+    } else if (data->sensor_type == IntTemperatureSensorType) {
+        sensor = std::make_shared<IntTemp>(&class_data,
+                                        data->androidName.c_str(), &data->sfa,
+                                        sensorId, data->hw_fifo_len,
+                                        data->power_consumption,
+                                        data->wake_up_sensor,
+                                        moduleId);
     } else {
         return nullptr;
     }
@@ -426,7 +434,8 @@ static int st_hal_set_fullscale(const char *iio_sysfs_path,
         iio_sensor_type = DEVICE_IIO_GYRO;
     } else if (sensor_type == PressureSensorType) {
         iio_sensor_type = DEVICE_IIO_PRESSURE;
-    } else if (sensor_type == AmbTemperatureSensorType) {
+    } else if ((sensor_type == AmbTemperatureSensorType) ||
+               (sensor_type == IntTemperatureSensorType)) {
         /*
          * temperature sensors generally do not support change full scale
          * in case of in_temp_scale_available is not available
@@ -928,7 +937,11 @@ int st_hal_open_sensors(void **pdata, STMSensorsList &sensorsList)
                                                   node.second.payload->getModuleId());
 
         if (!sensorsList.addSensor(*sensor)) {
-            console.error("sensor added is not valid");
+            SensorType sType(sensorData.type);
+
+            console.error(std::string("sensor added is not valid ") +
+                          std::string(sensorData.name) + " " +
+                          std::to_string((uint16_t)sType));
             continue;
         }
 
