@@ -242,6 +242,12 @@ ScopedAStatus SensorsAidlInterface::configDirectReport(int32_t in_sensorHandle,
                                           ISensors::RateLevel in_rate,
                                           int32_t* _aidl_return)
 {
+    if (in_channelHandle <= 0) {
+        *_aidl_return = EX_ILLEGAL_ARGUMENT;
+
+        return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
+    }
+
     if (in_sensorHandle == -1) {
         if (in_rate == ISensors::RateLevel::STOP) {
             // stop all active sensors in that particular channel handle
@@ -253,7 +259,7 @@ ScopedAStatus SensorsAidlInterface::configDirectReport(int32_t in_sensorHandle,
             *_aidl_return = in_sensorHandle;
             return ScopedAStatus::ok();
         } else {
-            *_aidl_return = 0;
+            *_aidl_return = EX_ILLEGAL_ARGUMENT;
 
             return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
         }
@@ -261,13 +267,13 @@ ScopedAStatus SensorsAidlInterface::configDirectReport(int32_t in_sensorHandle,
 
     const stm::core::STMSensor *sensor = getSTMSensor(in_sensorHandle);
     if (sensor == nullptr) {
-        *_aidl_return = 0;
+        *_aidl_return = EX_ILLEGAL_ARGUMENT;
 
         return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
 
     if (!(sensorFlags[in_sensorHandle] &
-          (SensorInfo::SENSOR_FLAG_BITS_DIRECT_CHANNEL_ASHMEM | SensorInfo::SENSOR_FLAG_BITS_DIRECT_CHANNEL_GRALLOC))) {
+          SensorInfo::SENSOR_FLAG_BITS_DIRECT_CHANNEL_ASHMEM)) {
         *_aidl_return = 0;
 
         return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
@@ -287,7 +293,7 @@ ScopedAStatus SensorsAidlInterface::configDirectReport(int32_t in_sensorHandle,
         break;
     case ISensors::RateLevel::FAST:
         if (supportedMaxRate < static_cast<int32_t>(ISensors::RateLevel::FAST)) {
-            *_aidl_return = 0;
+            *_aidl_return = EX_ILLEGAL_ARGUMENT;
 
             return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
         }
@@ -295,14 +301,14 @@ ScopedAStatus SensorsAidlInterface::configDirectReport(int32_t in_sensorHandle,
         break;
     case ISensors::RateLevel::VERY_FAST:
         if (supportedMaxRate < static_cast<int32_t>(ISensors::RateLevel::VERY_FAST)) {
-            *_aidl_return = 0;
+            *_aidl_return = EX_ILLEGAL_ARGUMENT;
 
             return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
         }
         rateInNs = hzToNs(800);
         break;
     default:
-        *_aidl_return = 0;
+        *_aidl_return = EX_ILLEGAL_ARGUMENT;
 
         return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
@@ -312,7 +318,7 @@ ScopedAStatus SensorsAidlInterface::configDirectReport(int32_t in_sensorHandle,
 
     if (updateSensorsRequests(in_sensorHandle, in_channelHandle, rateInNs, 0)) {
         mSensorProxyMngr.unregisterSensorFromChannel(in_sensorHandle, in_channelHandle);
-         *_aidl_return = 0;
+         *_aidl_return = EX_ILLEGAL_ARGUMENT;
 
         return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
@@ -335,27 +341,27 @@ ScopedAStatus SensorsAidlInterface::registerDirectChannel(const ISensors::Shared
     case ISensors::SharedMemInfo::SharedMemType::ASHMEM:
         directChannelBuffer = std::make_unique<AshmemDirectChannelBuffer>(in_mem);
         break;
-    case ISensors::SharedMemInfo::SharedMemType::GRALLOC:
-        directChannelBuffer = std::make_unique<GrallocDirectChannelBuffer>(in_mem);
-        break;
+    //case ISensors::SharedMemInfo::SharedMemType::GRALLOC:
+    //    directChannelBuffer = std::make_unique<GrallocDirectChannelBuffer>(in_mem);
+    //    break;
     default:
-        *_aidl_return = EX_ILLEGAL_ARGUMENT;
+        *_aidl_return = -1;
         return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
 
     if (directChannelBuffer == nullptr) {
-        *_aidl_return = EX_NULL_POINTER;
+        *_aidl_return = -1;
         return ScopedAStatus::fromExceptionCode(EX_NULL_POINTER);
     }
     if (!directChannelBuffer->isValid()) {
-        *_aidl_return = EX_ILLEGAL_ARGUMENT;
+        *_aidl_return = -1;
         return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
 
     int32_t channelHandle = lastDirectChannelHandle + 1;
 
     if (mSensorProxyMngr.addChannel(channelHandle)) {
-        *_aidl_return = EX_ILLEGAL_ARGUMENT;
+        *_aidl_return = -1;
         return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
 
