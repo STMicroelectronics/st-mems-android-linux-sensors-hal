@@ -36,7 +36,8 @@ int AndroidPropertiesLoader::readInt(PropertyId property) const
 }
 
 std::string AndroidPropertiesLoader::readString(SensorPropertyId property,
-                                                SensorType sensorType) const
+                                                SensorType sensorType,
+                                                uint32_t index) const
 {
     static const std::string emptyString = "";
     std::string propName;
@@ -60,13 +61,13 @@ std::string AndroidPropertiesLoader::readString(SensorPropertyId property,
 
     switch (sensorType) {
     case SensorType::ACCELEROMETER:
-        propName += "accel";
+        propName += "accel-" + std::to_string(index);
         break;
     case SensorType::MAGNETOMETER:
-        propName += "magn";
+        propName += "magn-" + std::to_string(index);
         break;
     case SensorType::GYROSCOPE:
-        propName += "gyro";
+        propName += "gyro-" + std::to_string(index);
         break;
     default:
         return emptyString;

@@ -28,11 +28,11 @@ static const std::unordered_map<std::string, PropertyId> configsRegex = {
 };
 
 static const std::unordered_map<std::string, SensorPropertyId> sensorsConfigsRegex = {
-    { initialSpacesRegex + "max-range.(accel|gyro|magn)[ \t\r\f]*=.*", SensorPropertyId::MAX_RANGE },
-    { initialSpacesRegex + "rot-matrix-1.(accel|gyro|magn)[ \t\r\f]*=.*", SensorPropertyId::ROTATION_MATRIX_1 },
-    { initialSpacesRegex + "rot-matrix-2.(accel|gyro|magn)[ \t\r\f]*=.*", SensorPropertyId::ROTATION_MATRIX_2 },
-    { initialSpacesRegex + "placement-1.(accel|gyro|magn)[ \t\r\f]*=.*", SensorPropertyId::SENSOR_PLACEMENT_1 },
-    { initialSpacesRegex + "placement-2.(accel|gyro|magn)[ \t\r\f]*=.*", SensorPropertyId::SENSOR_PLACEMENT_2 },
+    { initialSpacesRegex + "max-range.(accel|gyro|magn)-\\d+[ \t\r\f]*=.*", SensorPropertyId::MAX_RANGE },
+    { initialSpacesRegex + "rot-matrix-1.(accel|gyro|magn)-\\d+[ \t\r\f]*=.*", SensorPropertyId::ROTATION_MATRIX_1 },
+    { initialSpacesRegex + "rot-matrix-2.(accel|gyro|magn)-\\d+[ \t\r\f]*=.*", SensorPropertyId::ROTATION_MATRIX_2 },
+    { initialSpacesRegex + "placement-1.(accel|gyro|magn)-\\d+[ \t\r\f]*=.*", SensorPropertyId::SENSOR_PLACEMENT_1 },
+    { initialSpacesRegex + "placement-2.(accel|gyro|magn)-\\d+[ \t\r\f]*=.*", SensorPropertyId::SENSOR_PLACEMENT_2 },
 };
 
 SensorType LinuxPropertiesLoader::getSensorTypeForProperty(const std::string& line)
@@ -107,8 +107,11 @@ int LinuxPropertiesLoader::readInt(PropertyId property) const
 }
 
 std::string LinuxPropertiesLoader::readString(SensorPropertyId property,
-                                              SensorType sensorType) const
+                                              SensorType sensorType,
+                                              uint32_t index) const
 {
+    (void)index;
+
     auto itr = sensorProperties.find(property);
     if (itr != sensorProperties.end()) {
         auto itr_2 = itr->second.find(sensorType);

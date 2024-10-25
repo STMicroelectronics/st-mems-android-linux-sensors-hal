@@ -22,8 +22,6 @@
 #include "SensorsSubHal.h"
 #include "Convert.h"
 
-#include <AndroidPropertiesLoader.h>
-
 #ifdef HAL_MULTIHAL_2_0
 ::android::hardware::sensors::V2_0::implementation::ISensorsSubHal* sensorsHalGetSubHal(uint32_t *version)
 {
@@ -59,8 +57,7 @@ SensorsSubHalBase<SubHalClass>::SensorsSubHalBase()
       initializedOnce(false),
       propertiesManager(PropertiesManager::getInstance())
 {
-    AndroidPropertiesLoader androidPropertiesLoader;
-    propertiesManager.load(androidPropertiesLoader);
+    propertiesManager.getMaxRanges(androidPropertiesLoader);
 }
 
 template <class SubHalClass>
@@ -71,9 +68,12 @@ Return<void> SensorsSubHalBase<SubHalClass>::getSensorsList_(V2_1::ISensors::get
         return Void();
     }
 
+    /* load must be called after sensor core initialization because needs sensor list */
+    propertiesManager.load(androidPropertiesLoader, sensorsCore.getSensorsList());
+
     const std::vector<::stm::core::STMSensor> &list = sensorsCore.getSensorsList().getList();
     hidl_vec<V2_1::SensorInfo> sensorsList(list.size());
-    size_t n= 0, count = list.size();
+    size_t n = 0, count = list.size();
 
     sensorsList.resize(count);
     addInfoMng = std::make_unique<AdditionalInfoManager>(sensorsCore.getSensorsList());

@@ -200,6 +200,7 @@ bool convertFromSTMSensor(const stm::core::STMSensor &src,
 {
     V1_0::SensorType sensorType;
     bool isPartOfSensorList;
+    int modId;
 
     if (!convertFromSTMSensorType(src.getType(), sensorType, isPartOfSensorList) ||
         !isPartOfSensorList) {
@@ -207,7 +208,15 @@ bool convertFromSTMSensor(const stm::core::STMSensor &src,
     }
 
     dst->sensorHandle = src.getHandle();
-    dst->name = src.getName();
+
+    modId = src.getModuleId();
+    if (modId == 0)
+        return false;
+    else if (modId == 1)
+        dst->name = src.getName();
+    else
+        dst->name = src.getName() + " " + std::to_string(modId - 1);
+
     dst->vendor = src.getVendor();
     dst->version = src.getVersion();
     dst->type = sensorType;

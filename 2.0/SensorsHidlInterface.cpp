@@ -159,13 +159,15 @@ SensorsHidlInterface::initialize(const MQDescriptorSync<Event>& eventQueueDescri
     sensorCurrentPollrateNs.clear();
 
     AndroidPropertiesLoader propertiesLoader;
-    propertiesManager.load(propertiesLoader);
+    propertiesManager.getMaxRanges(propertiesLoader);
 
     if (sensorsCore.initialize(*dynamic_cast<ISTMSensorsCallback *>(this))) {
         console.error("failed to initialize the core library");
         return Result::BAD_VALUE;
     }
 
+    /* load must be called after sensor core initialization because needs sensor list */
+    propertiesManager.load(propertiesLoader, sensorsCore.getSensorsList());
     addInfoMng = std::make_unique<AdditionalInfoManager>(sensorsCore.getSensorsList());
 
     mSensorProxyMngr.reset();

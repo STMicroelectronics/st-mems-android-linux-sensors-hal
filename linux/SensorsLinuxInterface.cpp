@@ -42,11 +42,13 @@ SensorsLinuxInterface::SensorsLinuxInterface(void)
  */
 int SensorsLinuxInterface::initialize(void)
 {
+    int ret;
+
     LinuxPropertiesLoader linuxPropertiesLoader;
 
-    if (!linuxPropertiesLoader.loadFromConfigFile(configFilename)) {
-        propertiesManager.load(linuxPropertiesLoader);
-    }
+    ret = linuxPropertiesLoader.loadFromConfigFile(configFilename);
+    if (!ret)
+        propertiesManager.getMaxRanges(linuxPropertiesLoader);
 
     sensorsCore.initialize(*dynamic_cast<ISTMSensorsCallback *>(this));
 

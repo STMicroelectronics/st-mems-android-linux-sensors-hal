@@ -71,6 +71,8 @@ enum class SensorType : uint16_t {
     GYROSCOPE_LIMITED_AXES_UNCALIBRATED,         /* rad/s */
 };
 
+using SensorHandle = uint32_t;
+
 const std::unordered_map<SensorType, std::string> sensorTypeToString = {
     { SensorType::META_DATA, "meta-data"},
     { SensorType::ACCELEROMETER, "accelerometer"},

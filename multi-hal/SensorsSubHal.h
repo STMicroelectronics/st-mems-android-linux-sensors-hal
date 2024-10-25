@@ -30,6 +30,7 @@
 #include "SensorsDataProxyManager.h"
 #include "HalProxyCallbackWrapper.h"
 #include "AdditionalInfoManager.h"
+#include <AndroidPropertiesLoader.h>
 
 namespace android {
 namespace hardware {
@@ -92,6 +93,8 @@ public:
     int onSaveDataRequest(const std::string& resourceID, const void *data, ssize_t len) override;
 
     int onLoadDataRequest(const std::string& resourceID, void *data, ssize_t len) override;
+
+    AndroidPropertiesLoader androidPropertiesLoader;
 
 private:
     ISTMSensorsHAL& sensorsCore;

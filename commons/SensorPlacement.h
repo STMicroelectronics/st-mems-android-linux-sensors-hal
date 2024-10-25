@@ -30,7 +30,7 @@ public:
 
     const std::array<float, 12> &getPayload(void) const;
 
-    void loadFromProp(stm::core::SensorType sensorType);
+    void loadFromProp(stm::core::SensorType sensorType, stm::core::SensorHandle sensorHandle);
 
 private:
     bool invertRotationMatrix(Matrix<3, 3, float>& matrix);

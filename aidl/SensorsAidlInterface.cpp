@@ -180,13 +180,15 @@ ScopedAStatus SensorsAidlInterface::initialize(
     sensorCurrentPollrateNs.clear();
 
     AndroidPropertiesLoader propertiesLoader;
-    propertiesManager.load(propertiesLoader);
+    propertiesManager.getMaxRanges(propertiesLoader);
 
     if (sensorsCore.initialize(*dynamic_cast<ISTMSensorsCallback *>(this))) {
         console.error("failed to initialize the core library");
         return ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
 
+    /* load must be called after sensor core initialization because needs sensor list */
+    propertiesManager.load(propertiesLoader, sensorsCore.getSensorsList());
     addInfoMng = std::make_unique<AdditionalInfoManager>(sensorsCore.getSensorsList());
 
     mSensorProxyMngr.reset();

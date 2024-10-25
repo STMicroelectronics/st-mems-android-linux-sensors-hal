@@ -7,6 +7,50 @@
 This is the documentation page for the Android multi-hal 2.x components of the sensors-hal iio.
 
 * Configuration
+** Android properties
+
+Android [[system https://source.android.com/devices/architecture/configuration/add-system-properties][system properties]] can be used to configure at run-time some parameters.
+If a parameter is set by using system properties, default value for that property will be discarded.
+
+- persist.vendor.stm.sensors.max-odr
+- persist.vendor.stm.sensors.max-range.SENSORTYPE
+- persist.vendor.stm.sensors.rot-matrix-1.SENSORTYPE-INSTANCE
+- persist.vendor.stm.sensors.rot-matrix-2.SENSORTYPE-INSTANCE
+- persist.vendor.stm.sensors.placement-1.SENSORTYPE-INSTANCE
+- persist.vendor.stm.sensors.placement-2.SENSORTYPE-INSTANCE
+
+where SENSORTYPE can be one of these values:
+
+- accel
+- magn
+- gyro
+
+and INSTANCE is an index which identifies the instance of that sensor (if mono instantiating the index will be 0)
+
+The max-odr property is common to all hardware sensor
+The max-range is shared between all sensors of the same type
+
+Example of properties usage, for inizializig them at Android boot,
+create a file as follow with properties settings (i.e. device/<vendor>/<board>/stm_sensors_hal.prop),
+containing:
+
+#+begin_src conf
+persist.vendor.stm.sensors.max-odr = 250 #max odr that can be used is 250Hz for all sensors
+
+persist.vendor.stm.sensors.rot-matrix-1.accel-0 = "1,0,0,0,1,0,0,0,1" #rotation matrix for acel index 0
+persist.vendor.stm.sensors.placement-1.accel-0 = "10,20,30"           #position in cm for accel index 0
+
+persist.vendor.stm.sensors.max-range.accel = 70 #accel full-scale to support reading of at least 70m/s^2
+persist.vendor.stm.sensors.max-range.magn = 2000 #magn full-scale to support reading of at least 2000uT
+persist.vendor.stm.sensors.max-range.gyro = 8 #gyro full-scale to support reading of at least 8rad/s
+#+end_src
+
+Add the following line in file in device makefile (device/<vendor>/<board>/device.mk) by adding these lines:
+
+#+begin_src makefile
+	TARGET_VENDOR_PROP += device/<vendor>/<board>/stm_sensors_hal.prop
+#+end_src
+
 ** Default settings
 
 Default parameters can be set at compile time by changing the Android.bp cflags (under core, see core documentation).

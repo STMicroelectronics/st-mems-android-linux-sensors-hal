@@ -43,7 +43,8 @@ bool STMSensorsList::addSensor(STMSensor &sensor)
 
     for (auto &elem : list) {
         if (elem.getType() == sensor.getType()) {
-            if (std::strcmp(elem.getName().c_str(), sensor.getName().c_str()) == 0) {
+            if ((std::strcmp(elem.getName().c_str(), sensor.getName().c_str()) == 0) &&
+                elem.getModuleId() == sensor.getModuleId()) {
                 return false;
             }
         }

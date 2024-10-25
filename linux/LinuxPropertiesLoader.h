@@ -43,7 +43,8 @@ public:
     virtual int readInt(PropertyId property) const override;
 
     virtual std::string readString(SensorPropertyId property,
-                                   SensorType sensorType) const override;
+                                   SensorType sensorType,
+                                   uint32_t index) const override;
 
     virtual int readInt(SensorPropertyId property,
                         SensorType sensorType) const override;

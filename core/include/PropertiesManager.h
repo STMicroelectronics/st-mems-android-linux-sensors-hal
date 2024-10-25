@@ -24,6 +24,7 @@
 #include <IConsole.h>
 #include <SensorType.h>
 #include <Matrix.h>
+#include "STMSensorsList.h"
 
 namespace stm {
 namespace core {
@@ -44,10 +45,11 @@ struct PropertiesLoader {
     virtual int readInt(PropertyId property) const;
 
     virtual std::string readString(SensorPropertyId property,
-                                   SensorType sensorType) const;
+                                   SensorType sensorType,
+                                   uint32_t index) const;
 
     virtual int readInt(SensorPropertyId property,
-                     SensorType sensorType) const;
+                        SensorType sensorType) const;
 
     virtual ~PropertiesLoader() = default;
 };
@@ -57,11 +59,13 @@ public:
     static PropertiesManager& getInstance(void);
     ~PropertiesManager(void) = default;
 
-    int load(const PropertiesLoader& loader);
+    int getMaxRanges(const PropertiesLoader& loader);
 
-    const Matrix<3, 3, float>& getRotationMatrix(SensorType sensorType) const;
+    int load(const PropertiesLoader& loader, const STMSensorsList& sensorList);
 
-    const std::array<float, 3> getSensorPlacement(SensorType sensorType) const;
+    const Matrix<3, 3, float>& getRotationMatrix(SensorHandle sensorHandle) const;
+
+    const std::array<float, 3> getSensorPlacement(SensorHandle sensorHandle) const;
 
     float getMaxRangeOfMeasurements(SensorType sensorType) const;
 
@@ -75,6 +79,8 @@ private:
 
     PropertiesManager(void);
 
+    void loadUniqueSensorMap(const STMSensorsList& sensorList);
+
     void loadRotationMatrices(const PropertiesLoader& loader, PropertyNum propNum);
 
     void loadSensorsPlacement(const PropertiesLoader& loader, PropertyNum propNum);
@@ -87,19 +93,27 @@ private:
 
     void calculateFinalSensorsPlacement();
 
+    bool isSupported(SensorType sensorType);
+
+    int getSensorInstance(SensorType typeSensor);
+
     Matrix<3, 3, float> createIdentityMatrix() const;
 
-    std::unordered_map<SensorType, Matrix<3, 3, float>> rotationMatrices;
+    std::unordered_map<SensorHandle, SensorType> uniqueSensorMap;
 
-    std::unordered_map<SensorType, std::array<float, 3>> sensorsPlacement;
+    std::unordered_map<SensorHandle, int> uniqueSensorInstance;
 
-    std::unordered_map<SensorType, Matrix<3, 3, float>> rotationMatrices_1;
+    std::unordered_map<SensorHandle, Matrix<3, 3, float>> rotationMatrices;
 
-    std::unordered_map<SensorType, std::array<float, 3>> sensorsPlacement_1;
+    std::unordered_map<SensorHandle, std::array<float, 3>> sensorsPlacement;
 
-    std::unordered_map<SensorType, Matrix<3, 3, float>> rotationMatrices_2;
+    std::unordered_map<SensorHandle, Matrix<3, 3, float>> rotationMatrices_1;
 
-    std::unordered_map<SensorType, std::array<float, 3>> sensorsPlacement_2;
+    std::unordered_map<SensorHandle, std::array<float, 3>> sensorsPlacement_1;
+
+    std::unordered_map<SensorHandle, Matrix<3, 3, float>> rotationMatrices_2;
+
+    std::unordered_map<SensorHandle, std::array<float, 3>> sensorsPlacement_2;
 
     std::unordered_map<SensorType, float> maxRanges;
 

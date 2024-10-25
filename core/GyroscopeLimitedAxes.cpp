@@ -41,7 +41,7 @@ GyroscopeLimitedAxes::GyroscopeLimitedAxes(HWSensorBaseCommonData *data, const c
 {
     (void) wakeup;
 
-    rotMatrix = propertiesManager.getRotationMatrix(GyroSensorType);
+    rotMatrix = propertiesManager.getRotationMatrix(handle);
     biasFileName = std::string("gyro_bias_") + std::to_string(moduleId) + std::string(".dat");
 
     sensor_t_data.resolution = data->channels[0].scale;

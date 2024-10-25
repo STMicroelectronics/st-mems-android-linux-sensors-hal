@@ -31,10 +31,12 @@ int PropertiesLoader::readInt(PropertyId property) const
 }
 
 std::string PropertiesLoader::readString(SensorPropertyId property,
-                                         SensorType sensorType) const
+                                         SensorType sensorType,
+                                         uint32_t index) const
 {
     (void)property;
     (void)sensorType;
+    (void)index;
 
     return "";
 }
@@ -87,14 +89,42 @@ Matrix<3, 3, float> PropertiesManager::createIdentityMatrix() const
     return matrix;
 }
 
-int PropertiesManager::load(const PropertiesLoader& loader)
+bool PropertiesManager::isSupported(SensorType sensorType)
 {
+    std::vector<SensorType> sensorsSupported = {
+        SensorType::ACCELEROMETER,
+        SensorType::MAGNETOMETER,
+        SensorType::GYROSCOPE,
+        SensorType::PRESSURE
+    };
+    bool found = false;
+
+    for (auto &sensor : sensorsSupported) {
+        if (sensorType == sensor) {
+                found = true;
+            }
+        }
+
+    return found;
+}
+
+int PropertiesManager::getMaxRanges(const PropertiesLoader& loader)
+{
+    loadMaxRanges(loader);
+    loadMaxOdrs(loader);
+
+    return 0;
+}
+
+int PropertiesManager::load(const PropertiesLoader& loader,
+                            const STMSensorsList& sensorList)
+{
+    loadUniqueSensorMap(sensorList);
+
     loadRotationMatrices(loader, PropertyNum::ONE);
     loadSensorsPlacement(loader, PropertyNum::ONE);
     loadRotationMatrices(loader, PropertyNum::TWO);
     loadSensorsPlacement(loader, PropertyNum::TWO);
-    loadMaxRanges(loader);
-    loadMaxOdrs(loader);
 
     calculateFinalRotationMatrices();
     calculateFinalSensorsPlacement();
@@ -102,19 +132,39 @@ int PropertiesManager::load(const PropertiesLoader& loader)
     return 0;
 }
 
+int PropertiesManager::getSensorInstance(SensorType typeSensor)
+{
+    int count = -1;
+
+    for (const auto& [sensorHandle, sensorType] : uniqueSensorMap) {
+        if (typeSensor == sensorType)
+            count++;
+    }
+
+    return (count <= 0) ? 0 : count;
+}
+
+void PropertiesManager::loadUniqueSensorMap(const STMSensorsList& sensorsList)
+{
+    for (const auto &sensor : sensorsList.getList()) {
+        if (!isSupported(sensor.getType()))
+            continue;
+
+        uniqueSensorMap[sensor.getHandle()] = sensor.getType();
+        uniqueSensorInstance[sensor.getHandle()] = getSensorInstance(sensor.getType());
+    }
+}
+
 void PropertiesManager::loadRotationMatrices(const PropertiesLoader &loader,
                                              PropertyNum prop)
 {
-    std::vector<SensorType> sensorsSupported = {
-        SensorType::ACCELEROMETER,
-        SensorType::MAGNETOMETER,
-        SensorType::GYROSCOPE,
-    };
-
-    for (auto &sensor : sensorsSupported) {
-        std::unordered_map<SensorType, Matrix<3, 3, float>> *rotMatrix;
+    for (const auto& [sensorHandle, sensorType] : uniqueSensorMap) {
+        std::unordered_map<SensorHandle, Matrix<3, 3, float>> *rotMatrix;
         SensorPropertyId propertyId;
         std::string text;
+
+        if (!isSupported(sensorType))
+            continue;
 
         switch (prop) {
         case PropertyNum::ONE:
@@ -130,16 +180,18 @@ void PropertiesManager::loadRotationMatrices(const PropertiesLoader &loader,
         }
 
         PropertiesParser rotMatrixParser =
-            PropertiesParser::makeRotationMatrixParser(loader.readString(propertyId, sensor));
+            PropertiesParser::makeRotationMatrixParser(
+                loader.readString(propertyId, sensorType, uniqueSensorInstance[sensorHandle]));
+
         if (rotMatrixParser.isValid()) {
             for (auto i = 0U; i < rotMatrixParser.getData().size(); ++i) {
                 int row = i / 3;
                 int col = i % 3;
 
-                ((*rotMatrix)[sensor])[row][col] = rotMatrixParser.getData()[i];
+                (*rotMatrix)[sensorHandle][row][col] = rotMatrixParser.getData()[i];
             }
         } else if (prop == PropertyNum::ONE) {
-            ((*rotMatrix)[sensor]) = identityMatrix;
+            ((*rotMatrix)[sensorHandle]) = identityMatrix;
         }
     }
 }
@@ -147,17 +199,13 @@ void PropertiesManager::loadRotationMatrices(const PropertiesLoader &loader,
 void PropertiesManager::loadSensorsPlacement(const PropertiesLoader& loader,
                                              PropertyNum prop)
 {
-    std::vector<SensorType> sensorsSupported = {
-        SensorType::ACCELEROMETER,
-        SensorType::MAGNETOMETER,
-        SensorType::GYROSCOPE,
-        SensorType::PRESSURE
-    };
-
-    for (auto& sensor : sensorsSupported) {
-        std::unordered_map<SensorType, std::array<float, 3>> *placement;
+    for (const auto& [sensorHandle, sensorType] : uniqueSensorMap) {
+        std::unordered_map<SensorHandle, std::array<float, 3>> *placement;
         SensorPropertyId propertyId;
         std::string text;
+
+        if (!isSupported(sensorType))
+            continue;
 
         switch (prop) {
         case PropertyNum::ONE:
@@ -173,13 +221,15 @@ void PropertiesManager::loadSensorsPlacement(const PropertiesLoader& loader,
         }
 
         PropertiesParser placementParser =
-            PropertiesParser::makeSensorPlacementParser(loader.readString(propertyId, sensor));
+            PropertiesParser::makeSensorPlacementParser(
+                loader.readString(propertyId, sensorType, uniqueSensorInstance[sensorHandle]));
+
         if (placementParser.isValid()) {
             for (auto i = 0U; i < placementParser.getData().size(); ++i) {
-                (*placement)[sensor][i] = placementParser.getData()[i];
+                 (*placement)[sensorHandle][i] = placementParser.getData()[i];
             }
         } else if (prop == PropertyNum::ONE) {
-            (*placement)[sensor] = { 0, 0, 0 };
+            (*placement)[sensorHandle] = { 0, 0, 0 };
         }
     }
 }
@@ -213,21 +263,21 @@ void PropertiesManager::loadMaxOdrs(const PropertiesLoader& loader)
 
 void PropertiesManager::calculateFinalRotationMatrices()
 {
-    for (auto& rotMatrix_1 : rotationMatrices_1) {
-        auto itrRotMatrix_2 = rotationMatrices_2.find(rotMatrix_1.first);
+    for (const auto& [sensorHandle, rotMatrix_1] : rotationMatrices_1) {
+        auto itrRotMatrix_2 = rotationMatrices_2.find(sensorHandle);
         if (itrRotMatrix_2 != rotationMatrices_2.end()) {
-            rotationMatrices[rotMatrix_1.first] = itrRotMatrix_2->second * rotMatrix_1.second;
+            rotationMatrices[sensorHandle] = itrRotMatrix_2->second * rotMatrix_1;
         } else {
-            rotationMatrices[rotMatrix_1.first] = rotMatrix_1.second;
+            rotationMatrices[sensorHandle] = rotMatrix_1;
         }
 
         std::string sensorName = "sensor";
-        auto itrSensorName = sensorTypeToString.find(rotMatrix_1.first);
+        auto itrSensorName = sensorTypeToString.find(uniqueSensorMap.at(sensorHandle));
         if (itrSensorName != sensorTypeToString.end()) {
             sensorName = itrSensorName->second;
         }
         std::string msg = sensorName + std::string(" rotation matrix: ") +
-            (std::string)rotationMatrices[rotMatrix_1.first];
+            (std::string)rotationMatrices[sensorHandle];
 
         console.info(msg);
     }
@@ -235,34 +285,34 @@ void PropertiesManager::calculateFinalRotationMatrices()
 
 void PropertiesManager::calculateFinalSensorsPlacement()
 {
-    for (auto& placement_1 : sensorsPlacement_1) {
-        auto itrPlacement_2 = sensorsPlacement_2.find(placement_1.first);
+    for (const auto& [sensorHandle, placement_1] : sensorsPlacement_1) {
+        auto itrPlacement_2 = sensorsPlacement_2.find(sensorHandle);
         if (itrPlacement_2 != sensorsPlacement_2.end()) {
-            auto itrRotMatrix_2 = rotationMatrices_2.find(placement_1.first);
+            auto itrRotMatrix_2 = rotationMatrices_2.find(sensorHandle);
             if (itrRotMatrix_2 != rotationMatrices_2.end()) {
-                std::array<float, 3> placementRemmaped = itrRotMatrix_2->second *
-                    placement_1.second;
+                std::array<float, 3> placementRemmaped =
+                    itrRotMatrix_2->second * placement_1;
 
                 for (auto i = 0U; i < placementRemmaped.size(); ++i) {
-                    sensorsPlacement[placement_1.first][i] =
+                    sensorsPlacement[sensorHandle][i] =
                         placementRemmaped[i] + itrPlacement_2->second[i];
                 }
             } else {
-                sensorsPlacement[placement_1.first] = placement_1.second;
+                sensorsPlacement[sensorHandle] = placement_1;
             }
         } else {
-            sensorsPlacement[placement_1.first] = placement_1.second;
+            sensorsPlacement[sensorHandle] = placement_1;
         }
 
         std::string sensorName = "sensor";
-        auto itrSensorName = sensorTypeToString.find(placement_1.first);
+        auto itrSensorName = sensorTypeToString.find(uniqueSensorMap.at(sensorHandle));
         if (itrSensorName != sensorTypeToString.end()) {
             sensorName = itrSensorName->second;
         }
         std::string msg = sensorName + std::string(" placement: ");
-        for (auto i = 0U; i < sensorsPlacement[placement_1.first].size(); ++i) {
-            msg += std::to_string(sensorsPlacement[placement_1.first][i]);
-            if (i < sensorsPlacement[placement_1.first].size() - 1) {
+        for (auto i = 0U; i < sensorsPlacement[sensorHandle].size(); ++i) {
+            msg += std::to_string(sensorsPlacement[sensorHandle][i]);
+            if (i < sensorsPlacement[sensorHandle].size() - 1) {
                 msg += ", ";
             }
         }
@@ -271,9 +321,9 @@ void PropertiesManager::calculateFinalSensorsPlacement()
     }
 }
 
-const Matrix<3, 3, float>& PropertiesManager::getRotationMatrix(SensorType sensorType) const
+const Matrix<3, 3, float>& PropertiesManager::getRotationMatrix(SensorHandle sensorHandle) const
 {
-    auto itr = rotationMatrices.find(sensorType);
+    auto itr = rotationMatrices.find(sensorHandle);
     if (itr == rotationMatrices.end()) {
         return identityMatrix;
     }
@@ -281,9 +331,9 @@ const Matrix<3, 3, float>& PropertiesManager::getRotationMatrix(SensorType senso
     return itr->second;
 }
 
-const std::array<float, 3> PropertiesManager::getSensorPlacement(SensorType sensorType) const
+const std::array<float, 3> PropertiesManager::getSensorPlacement(SensorHandle sensorHandle) const
 {
-    auto itr = sensorsPlacement.find(sensorType);
+    auto itr = sensorsPlacement.find(sensorHandle);
     if (itr == sensorsPlacement.end()) {
         return std::array<float, 3> { 0 };
     }

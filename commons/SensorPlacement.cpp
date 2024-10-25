@@ -20,6 +20,8 @@
 #include <IConsole.h>
 #include "SensorPlacement.h"
 
+using namespace stm::core;
+
 SensorPlacement::SensorPlacement(void)
     : data({ 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f })
 {
@@ -40,38 +42,30 @@ SensorPlacement::SensorPlacement(void)
  * loadFromProp: load the sensor placement data from system properties
  * @sensorType: sensor type.
  */
-void SensorPlacement::loadFromProp(stm::core::SensorType sensorType)
+void SensorPlacement::loadFromProp(stm::core::SensorType sensorType,
+                                   stm::core::SensorHandle sensorHandle)
 {
-    stm::core::PropertiesManager& propertiesManager = stm::core::PropertiesManager::getInstance();
+    stm::core::PropertiesManager& propertiesManager =
+        stm::core::PropertiesManager::getInstance();
     std::array<float, 3> sensorPosition;
     Matrix<3, 3, float> rotMatrix;
-    using stm::core::SensorType;
 
     switch (sensorType) {
     case SensorType::ACCELEROMETER:
     case SensorType::ACCELEROMETER_UNCALIBRATED:
     case SensorType::GRAVITY:
     case SensorType::LINEAR_ACCELERATION:
-        rotMatrix = propertiesManager.getRotationMatrix(SensorType::ACCELEROMETER);
-        sensorPosition = propertiesManager.getSensorPlacement(SensorType::ACCELEROMETER);
-        break;
     case SensorType::MAGNETOMETER:
     case SensorType::MAGNETOMETER_UNCALIBRATED:
     case SensorType::GEOMAGNETIC_ROTATION_VECTOR:
-        rotMatrix = propertiesManager.getRotationMatrix(SensorType::MAGNETOMETER);
-        sensorPosition = propertiesManager.getSensorPlacement(SensorType::MAGNETOMETER);
-        break;
     case SensorType::GYROSCOPE:
     case SensorType::GYROSCOPE_UNCALIBRATED:
     case SensorType::ORIENTATION:
     case SensorType::ROTATION_VECTOR:
     case SensorType::GAME_ROTATION_VECTOR:
-        rotMatrix = propertiesManager.getRotationMatrix(SensorType::GYROSCOPE);
-        sensorPosition = propertiesManager.getSensorPlacement(SensorType::GYROSCOPE);
-        break;
     case SensorType::PRESSURE:
-        rotMatrix = propertiesManager.getRotationMatrix(sensorType);
-        sensorPosition = propertiesManager.getSensorPlacement(sensorType);
+        rotMatrix = propertiesManager.getRotationMatrix(sensorHandle);
+        sensorPosition = propertiesManager.getSensorPlacement(sensorHandle);
         break;
     default:
         return;

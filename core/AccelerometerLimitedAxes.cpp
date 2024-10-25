@@ -43,7 +43,7 @@ AccelerometerLimitedAxes::AccelerometerLimitedAxes(HWSensorBaseCommonData *data,
 {
     (void) wakeup;
 
-    rotMatrix = propertiesManager.getRotationMatrix(AccelSensorType);
+    rotMatrix = propertiesManager.getRotationMatrix(handle);
     biasFileName = std::string("accel_bias_") + std::to_string(moduleId) + std::string(".dat");
 
     sensor_t_data.resolution = data->channels[0].scale;

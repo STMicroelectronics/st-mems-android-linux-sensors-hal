@@ -42,7 +42,7 @@ AdditionalInfoManager::AdditionalInfoManager(const STMSensorsList &list)
         case SensorType::GEOMAGNETIC_ROTATION_VECTOR:
         case SensorType::ACCELEROMETER_UNCALIBRATED:
             supported[sensor.getHandle()] = true;
-            placements[sensor.getHandle()].loadFromProp(sensor.getType());
+            placements[sensor.getHandle()].loadFromProp(sensor.getType(), sensor.getHandle());
             break;
         default:
             break;
