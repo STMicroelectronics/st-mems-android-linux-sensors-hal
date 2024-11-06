@@ -53,10 +53,13 @@ int Accelerometer::libsInit(void)
     std::string libVersionMsg { "accel calibration library: " };
 
     if (HAL_ENABLE_ACCEL_CALIBRATION != 0) {
+        int ret;
+
+        ret = accelCalibration.init(sensor_t_data.maxRange);
         libVersionMsg += accelCalibration.getLibVersion();
         console.info(libVersionMsg);
 
-        return accelCalibration.init(sensor_t_data.maxRange);
+        return ret;
     } else {
         libVersionMsg += std::string("not enabled!");
         console.info(libVersionMsg);
