@@ -18,6 +18,7 @@
 #include <cmath>
 
 #include "Convert.h"
+#include "Utils.h"
 
 namespace android {
 namespace hardware {
@@ -270,8 +271,15 @@ void convertFromSTMSensorData(const ::stm::core::ISTMSensorsCallbackData& sensor
     using ::stm::core::SensorType;
 
     switch (sensorData.getSensorType()) {
-    case SensorType::ACCELEROMETER:
     case SensorType::MAGNETOMETER:
+        if (sensorData.getData().size() < 3) {
+            return;
+        }
+        event.u.vec3.x = Conversion::G_to_uTesla(sensorData.getData().at(0));
+        event.u.vec3.y = Conversion::G_to_uTesla(sensorData.getData().at(1));
+        event.u.vec3.z = Conversion::G_to_uTesla(sensorData.getData().at(2));
+        break;
+    case SensorType::ACCELEROMETER:
     case SensorType::ORIENTATION:
     case SensorType::GYROSCOPE:
     case SensorType::GRAVITY:
@@ -304,6 +312,16 @@ void convertFromSTMSensorData(const ::stm::core::ISTMSensorsCallbackData& sensor
         event.u.data[4] = -1;
         break;
     case SensorType::MAGNETOMETER_UNCALIBRATED:
+        if (sensorData.getData().size() < 6) {
+            return;
+        }
+        event.u.uncal.x = Conversion::G_to_uTesla(sensorData.getData().at(0));
+        event.u.uncal.y = Conversion::G_to_uTesla(sensorData.getData().at(1));
+        event.u.uncal.z = Conversion::G_to_uTesla(sensorData.getData().at(2));
+        event.u.uncal.x_bias = Conversion::G_to_uTesla(sensorData.getData().at(3));
+        event.u.uncal.y_bias = Conversion::G_to_uTesla(sensorData.getData().at(4));
+        event.u.uncal.z_bias = Conversion::G_to_uTesla(sensorData.getData().at(5));
+        break;
     case SensorType::GYROSCOPE_UNCALIBRATED:
     case SensorType::ACCELEROMETER_UNCALIBRATED:
         if (sensorData.getData().size() < 6) {

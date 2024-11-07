@@ -19,6 +19,7 @@
 #include <IConsole.h>
 
 #include "Convert.h"
+#include "Utils.h"
 
 namespace android {
 namespace hardware {
@@ -314,8 +315,22 @@ void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorDa
 
         event.payload.set<Event::EventPayload::Tag::scalar>(sensorData.getData().at(0));
         break;
+    case SensorType::MAGNETOMETER: {
+        if (sensorData.getData().size() < 3) {
+            return;
+        }
+
+        Event::EventPayload::Vec3 vec3;
+
+        vec3.x = Conversion::G_to_uTesla(sensorData.getData().at(0));
+        vec3.y = Conversion::G_to_uTesla(sensorData.getData().at(1));
+        vec3.z = Conversion::G_to_uTesla(sensorData.getData().at(2));
+        vec3.status = SensorStatus::ACCURACY_HIGH;
+
+        event.payload.set<Event::EventPayload::Tag::vec3>(vec3);
+        break;
+    }
     case SensorType::ACCELEROMETER:
-    case SensorType::MAGNETOMETER:
     case SensorType::ORIENTATION:
     case SensorType::GYROSCOPE:
     case SensorType::GRAVITY:
@@ -360,7 +375,20 @@ void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorDa
         event.payload.set<Event::EventPayload::Tag::data>(data);
         break;
     }
-    case SensorType::MAGNETOMETER_UNCALIBRATED:
+    case SensorType::MAGNETOMETER_UNCALIBRATED: {
+        if (sensorData.getData().size() < 6)
+            return;
+
+        Event::EventPayload::Uncal uncal;
+        uncal.x = Conversion::G_to_uTesla(sensorData.getData().at(0));
+        uncal.y = Conversion::G_to_uTesla(sensorData.getData().at(1));
+        uncal.z = Conversion::G_to_uTesla(sensorData.getData().at(2));
+        uncal.xBias = Conversion::G_to_uTesla(sensorData.getData().at(3));
+        uncal.yBias = Conversion::G_to_uTesla(sensorData.getData().at(4));
+        uncal.zBias = Conversion::G_to_uTesla(sensorData.getData().at(5));
+        event.payload.set<Event::EventPayload::Tag::uncal>(uncal);
+        break;
+    }
     case SensorType::GYROSCOPE_UNCALIBRATED:
     case SensorType::ACCELEROMETER_UNCALIBRATED: {
         if (sensorData.getData().size() < 6)
