@@ -55,10 +55,13 @@ int Magnetometer::libsInit(void)
     std::string libVersionMsg { "magn calibration library: " };
 
     if (HAL_ENABLE_MAGN_CALIBRATION != 0) {
+        int ret;
+
+        ret = magnCalibration.init(sensor_t_data.maxRange);
         libVersionMsg += magnCalibration.getLibVersion();
         console.info(libVersionMsg);
 
-        return magnCalibration.init(sensor_t_data.maxRange);
+        return ret;
     } else {
         libVersionMsg += std::string("not enabled!");
         console.info(libVersionMsg);
