@@ -90,6 +90,7 @@ int device_iio_utils::sysfs_opendir(const char *name, DIR **dp)
 
 int device_iio_utils::sysfs_write_int(char *file, int val)
 {
+    int ret = 0;
     FILE *fp;
 
     fp = fopen(file, "w");
@@ -97,14 +98,15 @@ int device_iio_utils::sysfs_write_int(char *file, int val)
         return -errno;
     }
 
-    fprintf(fp, "%d", val);
+    ret = fprintf(fp, "%d", val);
     fclose(fp);
 
-    return 0;
+    return ret < 0 ? ret : 0;
 }
 
 int device_iio_utils::sysfs_write_uint(char *file, unsigned int val)
 {
+    int ret = 0;
     FILE *fp;
 
     fp = fopen(file, "r+");
@@ -112,14 +114,15 @@ int device_iio_utils::sysfs_write_uint(char *file, unsigned int val)
         return -errno;
     }
 
-    fprintf(fp, "%u", val);
+    ret = fprintf(fp, "%u", val);
     fclose(fp);
 
-    return 0;
+    return ret < 0 ? ret : 0;
 }
 
 int device_iio_utils::sysfs_write_float(char *file, float val)
 {
+    int ret = 0;
     FILE *fp;
 
     fp = fopen(file, "w");
@@ -127,14 +130,15 @@ int device_iio_utils::sysfs_write_float(char *file, float val)
         return -errno;
     }
 
-    fprintf(fp, "%.*f", DBL_DIG - 1, val);
+    ret = fprintf(fp, "%.*f", DBL_DIG - 1, val);
     fclose(fp);
 
-    return 0;
+    return ret < 0 ? ret : 0;
 }
 
 int device_iio_utils::sysfs_write_str(char *file, char *str)
 {
+    int ret = 0;
     FILE *fp;
 
     fp = fopen(file, "w");
@@ -142,10 +146,10 @@ int device_iio_utils::sysfs_write_str(char *file, char *str)
         return -errno;
     }
 
-    fprintf(fp, "%s", str);
+    ret = fprintf(fp, "%s", str);
     fclose(fp);
 
-    return 0;
+    return ret < 0 ? ret : 0;
 }
 
 int device_iio_utils::sysfs_read_int(char *file, int *val)
