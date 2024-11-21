@@ -542,23 +542,25 @@ int SensorsAidlInterface::onLoadDataRequest(const std::string& resourceID,
 void SensorsAidlInterface::postEvents(const std::vector<Event> &events, bool wakeup)
 {
     std::lock_guard<std::mutex> lock(mWriteLock);
-
-    size_t numToWrite = events.size();
+    size_t numCanWrite, numLeft = 0, written = 0, eventSize = events.size();
 
     do {
-        if (mEventQueue->write(events.data(), events.size())) {
+        numCanWrite = std::min(eventSize - written, mEventQueue->availableToWrite());
+        numLeft = eventSize - written - numCanWrite;
+        std::vector<Event> eventCanWrite(events.begin() + written, events.end() - numLeft);
+
+        if (mEventQueue->write(eventCanWrite.data(), numCanWrite)) {
             mEventQueueFlag->wake(static_cast<uint32_t>(BnSensors::EVENT_QUEUE_FLAG_BITS_READ_AND_PROCESS));
 
             if (wakeup) {
-               updateWakeLock(events.size(), 0);
+               updateWakeLock(eventCanWrite.size(), 0);
             }
+        } else {
+            numCanWrite = 0;
         }
 
-        if (events.size() > mEventQueue->availableToWrite())
-            numToWrite = events.size() - mEventQueue->availableToWrite();
-        else
-            numToWrite = 0;
-    } while (numToWrite > 0);
+        written += numCanWrite;
+    } while (numLeft > 0);
 }
 
 /**
