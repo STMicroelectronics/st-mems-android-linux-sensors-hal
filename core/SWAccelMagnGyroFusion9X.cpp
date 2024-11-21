@@ -57,9 +57,8 @@ int SWAccelMagnGyroFusion9X::libsInit(void)
     int err = 0;
 
     if (HAL_ENABLE_SENSORS_FUSION != 0) {
-        libVersionMsg += sensorsFusion.getLibVersion();
-
         err = sensorsFusion.init();
+        libVersionMsg += sensorsFusion.getLibVersion();
     } else {
         libVersionMsg += std::string("not enabled!");
     }
