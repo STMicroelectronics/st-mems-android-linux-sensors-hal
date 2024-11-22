@@ -9,7 +9,7 @@ This is the documentation page for the Android AIDL components of the sensors-ha
 * Configuration
 ** Android properties
 
-Android [[system https://source.android.com/devices/architecture/configuration/add-system-properties][system properties]] can be used to configure at run-time some parameters.
+Android allows properties to be configured both at run-time [[system https://source.android.com/devices/architecture/configuration/add-system-properties][system properties]], and using a properties file at build time..
 If a parameter is set by using system properties, default value for that property will be discarded.
 
 - persist.vendor.stm.sensors.max-odr
@@ -48,7 +48,19 @@ persist.vendor.stm.sensors.max-range.gyro = 8 #gyro full-scale to support readin
 Add the following line in file in device makefile (device/<vendor>/<board>/device.mk) by adding these lines:
 
 #+begin_src makefile
-	TARGET_VENDOR_PROP += device/<vendor>/<board>/stm_sensors_hal.prop
+        TARGET_VENDOR_PROP += device/<vendor>/<board>/stm_sensors_hal.prop
+#+end_src
+
+Example of Android properties usage when inizializig them at run-time:
+
+#+begin_src shell
+setprop persist.vendor.stm.sensors.max-odr 250
+setprop persist.vendor.stm.sensors.rot-matrix-1.accel-0 "1,0,0,0,1,0,0,0,1"
+setprop persist.vendor.stm.sensors.placement-1.accel-0 "10,20,30"
+
+setprop persist.vendor.stm.sensors.max-range.accel 70
+setprop persist.vendor.stm.sensors.max-range.magn 2000
+setprop persist.vendor.stm.sensors.max-range.gyro 8
 #+end_src
 
 ** Android features
