@@ -290,6 +290,12 @@ Return<void> SensorsSubHalBase<SubHalClass>::configDirectReport(int32_t sensorHa
                                                                 V1_0::RateLevel rate,
                                                                 V2_0::ISensors::configDirectReport_cb _hidl_cb)
 {
+    if (channelHandle <= 0) {
+        _hidl_cb(Result::BAD_VALUE, 0);
+
+        return Void();
+    }
+
     if (sensorHandle == -1) {
         if (rate == V1_0::RateLevel::STOP) {
             // stop all active sensors in that particular channel handle
