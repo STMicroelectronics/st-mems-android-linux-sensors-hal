@@ -536,7 +536,12 @@ int device_iio_utils::enable_events(const char *device_dir, bool enable)
 
             sysfsfp = fopen(filename, "r+");
             if (!sysfsfp) {
-                err = -errno;
+                if ((errno == ENOENT) || (errno == EACCES)) {
+                    err = 0;
+                } else {
+                    err = -errno;
+                }
+
                 goto error_close_dir;
             }
 
