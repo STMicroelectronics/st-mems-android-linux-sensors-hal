@@ -34,6 +34,7 @@ SWAccelMagnGyroFusion9X::SWAccelMagnGyroFusion9X(const char *name, int handle, i
     sensor_t_data.resolution = ST_SENSOR_FUSION_RESOLUTION(1.0f);
     sensor_t_data.maxRange = 1.0f;
 
+    CustomInit();
     dependencies_type_list.push_back(AccelSensorType);
     dependencies_type_list.push_back(MagnSensorType);
     dependencies_type_list.push_back(GyroSensorType);

@@ -35,6 +35,7 @@ SWAccelGyroFusion6X::SWAccelGyroFusion6X(const char *name, int handle, int modul
     sensor_t_data.resolution = ST_SENSOR_FUSION_RESOLUTION(1.0f);
     sensor_t_data.maxRange = 1.0f;
 
+    CustomInit();
     dependencies_type_list.push_back(AccelSensorType);
     dependencies_type_list.push_back(GyroSensorType);
     id_sensor_trigger = SENSOR_DEPENDENCY_ID_1;
