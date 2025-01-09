@@ -35,7 +35,7 @@ sensor hal library, the values of the custom types will be assigned maintaining
 backward compatibility with the past, but the new drivers will not
 take advantage of some of the features implemented in this custom types.
 
-* Configuration
+* Core Library Configuration
 
 Configuration is performed at compile time using CFLAGS.
 Depending on which 'wrapper' you are building, changes have to be made in the correspondent Makefile (Android.bp, Android.mk, CMakeLists.txt)
@@ -49,6 +49,10 @@ List of general parameters:
 
 The just listed parameters can also be changed dynamically at run-time. Check wrappers documentation for details.
 
+* Composite Sensors Configuration
+
+The core library is responsible for supporting composite sensors that are realized through algorithms within proprietary ST libraries.
+The release of ST proprietary libraries is subject to acceptance of a License User Agreement (LUA); for further information, please contact an STMicroelectronics sales office or representative.
 Enable/Disable libraries (by default mock libraries):
 
 - HAL_ENABLE_ACCEL_CALIBRATION :: [possible values: 0 (disabled) or not 0 (enabled)]
@@ -58,6 +62,9 @@ Enable/Disable libraries (by default mock libraries):
 - HAL_ENABLE_TIMESYNC (*) :: [possible values: 0 (disabled) or not 0 (enabled)]
 - HAL_ENABLE_GYRO_TEMPERATURE_CALIBRATION :: [possible values: 0 (disabled) or not 0 (enabled)]
 - HAL_ENABLE_GEOMAG_FUSION :: [possible values: 0 (disabled) or not 0 (enabled)]
+
+In the public GitHub project, these libraries are replaced by mock libraries for compilation needs.
+To replace the mock libraries with the ST proprietary libraries ones you need to run the self-extracting file inside the path where the sensor hal is installed that will install the archive library in the appropriate path for the specific core library, after the installation it will be necessary to recompile the entire sensor hal.
 
 (*) NOTE: The HAL_ENABLE_TIMESYNC configuration entry enables sensor sample timestamp estimation feature, which to properly work requests on turn ASYNC_HW_TIMESTAMP functionality of the IIO Linux drivers to be configured as enabled (=y) in the Linux kernel driver module.
 Hence, if HAL_ENABLE_TIMESYNC is enabled, it also MUST be enabled the corresponding ASYNC_HW_TIMESTAMP feature for the drivers being served by the HAL.
