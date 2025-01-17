@@ -35,8 +35,8 @@ SWAccelMagnGyroFusion9X::SWAccelMagnGyroFusion9X(const char *name, int handle, i
     sensor_t_data.maxRange = 1.0f;
 
     CustomInit();
-    dependencies_type_list.push_back(AccelSensorType);
     dependencies_type_list.push_back(MagnSensorType);
+    dependencies_type_list.push_back(AccelSensorType);
     dependencies_type_list.push_back(GyroSensorType);
     id_sensor_trigger = SENSOR_DEPENDENCY_ID_2;
 }
@@ -146,7 +146,7 @@ void SWAccelMagnGyroFusion9X::ProcessData(SensorBaseData *data)
         int err, nomaxdata_accel = 10, nomaxdata_magn = 10;
 
         do {
-            err = GetLatestValidDataFromDependency(SENSOR_DEPENDENCY_ID_0, &accel_data, data->timestamp);
+            err = GetLatestValidDataFromDependency(SENSOR_DEPENDENCY_ID_1, &accel_data, data->timestamp);
             if (err < 0) {
                 std::this_thread::sleep_for(std::chrono::microseconds(10));
                 nomaxdata_accel--;
@@ -155,7 +155,7 @@ void SWAccelMagnGyroFusion9X::ProcessData(SensorBaseData *data)
         } while ((nomaxdata_accel >= 0) && (err < 0));
 
         do {
-            err = GetLatestValidDataFromDependency(SENSOR_DEPENDENCY_ID_1, &magn_data, data->timestamp);
+            err = GetLatestValidDataFromDependency(SENSOR_DEPENDENCY_ID_0, &magn_data, data->timestamp);
             if (err < 0) {
                 std::this_thread::sleep_for(std::chrono::microseconds(10));
                 nomaxdata_magn--;
