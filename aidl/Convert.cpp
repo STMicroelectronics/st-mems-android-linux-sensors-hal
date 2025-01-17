@@ -316,13 +316,27 @@ void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorDa
     case SensorType::GAME_ROTATION_VECTOR: {
         if (sensorData.getData().size() < 4)
             return;
- 
+
         Event::EventPayload::Vec4 vec4;
         vec4.x = sensorData.getData().at(0);
         vec4.y = sensorData.getData().at(1);
         vec4.z = sensorData.getData().at(2);
         vec4.w = sensorData.getData().at(3);
         event.payload.set<Event::EventPayload::Tag::vec4>(vec4);
+        break;
+    }
+    case SensorType::ROTATION_VECTOR: {
+        if (sensorData.getData().size() < 4)
+            return;
+
+        Event::EventPayload::Data data;
+        data.values[0] = sensorData.getData().at(0);
+        data.values[1] = sensorData.getData().at(1);
+        data.values[2] = sensorData.getData().at(2);
+        data.values[3] = sensorData.getData().at(3);
+        /* values[4]: estimated heading Accuracy (in radians) (-1 if unavailable) */
+        data.values[4] = -1;
+        event.payload.set<Event::EventPayload::Tag::data>(data);
         break;
     }
     case SensorType::MAGNETOMETER_UNCALIBRATED:
@@ -346,7 +360,7 @@ void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorDa
         if (sensorData.getData().size() < 1)
             return;
 
-	event.payload.set<Event::EventPayload::Tag::stepCount>(sensorData.getData().at(0));
+        event.payload.set<Event::EventPayload::Tag::stepCount>(sensorData.getData().at(0));
         break;
     }
     case SensorType::META_DATA: {

@@ -45,6 +45,14 @@ struct Conversion {
     static constexpr float milliG_to_uTesla(int mG) {
         return mG / 10.0f;
     }
+
+    static constexpr float G_to_uTesla(float G) {
+        return G * 100.0f;
+    }
+
+    static constexpr float uTesla_to_G(float uT) {
+        return uT / 100.0f;
+    }
 };
 
 struct MatrixF {

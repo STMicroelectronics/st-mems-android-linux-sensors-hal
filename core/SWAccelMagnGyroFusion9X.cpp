@@ -19,6 +19,7 @@
 #include <assert.h>
 #include <signal.h>
 
+#include "Utils.h"
 #include "SWAccelMagnGyroFusion9X.h"
 
 namespace stm {
@@ -171,6 +172,10 @@ void SWAccelMagnGyroFusion9X::ProcessData(SensorBaseData *data)
             memcpy(accelData.data(), accel_data.raw, 3 * sizeof(float));
             memcpy(magnData.data(), magn_data.raw, 3 * sizeof(float));
             memcpy(gyroData.data(), data->processed, 3 * sizeof(float));
+
+            for (auto i = 0U; i < magnData.size(); ++i) {
+                magnData[i] = Conversion::G_to_uTesla(magnData[i]);
+            }
 
             sensorsFusion.run(accelData, magnData, gyroData, data->timestamp);
         }

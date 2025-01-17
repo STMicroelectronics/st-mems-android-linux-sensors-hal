@@ -292,6 +292,17 @@ void convertFromSTMSensorData(const ::stm::core::ISTMSensorsCallbackData& sensor
         event.u.vec4.z = sensorData.getData().at(2);
         event.u.vec4.w = sensorData.getData().at(3);
         break;
+    case SensorType::ROTATION_VECTOR:
+        if (sensorData.getData().size() < 4) {
+            return;
+        }
+        event.u.data[0] = sensorData.getData().at(0);
+        event.u.data[1] = sensorData.getData().at(1);
+        event.u.data[2] = sensorData.getData().at(2);
+        event.u.data[3] = sensorData.getData().at(3);
+        /* values[4]: estimated heading Accuracy (in radians) (-1 if unavailable) */
+        event.u.data[4] = -1;
+        break;
     case SensorType::MAGNETOMETER_UNCALIBRATED:
     case SensorType::GYROSCOPE_UNCALIBRATED:
     case SensorType::ACCELEROMETER_UNCALIBRATED:

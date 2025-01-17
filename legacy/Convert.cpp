@@ -257,8 +257,15 @@ void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorDa
     using stm::core::SensorType;
 
     switch (sensorData.getSensorType()) {
-    case SensorType::ACCELEROMETER:
     case SensorType::MAGNETOMETER:
+        if (sensorData.getData().size() < 3) {
+            return;
+        }
+        event->magnetic.x = sensorData.getData().at(0);
+        event->magnetic.y = sensorData.getData().at(1);
+        event->magnetic.z = sensorData.getData().at(2);
+        break;
+    case SensorType::ACCELEROMETER:
     case SensorType::ORIENTATION:
     case SensorType::GYROSCOPE:
     case SensorType::GRAVITY:
@@ -279,7 +286,27 @@ void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorDa
         event->data[2] = sensorData.getData().at(2);
         event->data[3] = sensorData.getData().at(3);
         break;
+    case SensorType::ROTATION_VECTOR:
+        if (sensorData.getData().size() < 4) {
+            return;
+        }
+        event->data[0] = sensorData.getData().at(0);
+        event->data[1] = sensorData.getData().at(1);
+        event->data[2] = sensorData.getData().at(2);
+        event->data[3] = sensorData.getData().at(3);
+        event->data[4] = -1;
+        break;
     case SensorType::MAGNETOMETER_UNCALIBRATED:
+        if (sensorData.getData().size() < 6) {
+            return;
+        }
+        event->uncalibrated_magnetic.x_uncalib = sensorData.getData().at(0);
+        event->uncalibrated_magnetic.y_uncalib = sensorData.getData().at(1);
+        event->uncalibrated_magnetic.z_uncalib = sensorData.getData().at(2);
+        event->uncalibrated_magnetic.x_bias = sensorData.getData().at(3);
+        event->uncalibrated_magnetic.y_bias = sensorData.getData().at(4);
+        event->uncalibrated_magnetic.z_bias = sensorData.getData().at(5);
+        break;
     case SensorType::GYROSCOPE_UNCALIBRATED:
     case SensorType::ACCELEROMETER_UNCALIBRATED:
         if (sensorData.getData().size() < 6) {
