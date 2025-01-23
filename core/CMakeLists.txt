@@ -23,8 +23,9 @@ add_compile_options(-DHAL_ENABLE_ACCEL_CALIBRATION=1
                     -DHAL_ENABLE_GYRO_TEMPERATURE_CALIBRATION=0
                     -DHAL_ENABLE_MAGN_CALIBRATION=1
                     -DHAL_ENABLE_SENSORS_FUSION=1
+                    -DHAL_ENABLE_GEOMAG_FUSION=1
                     -DHAL_ENABLE_TIMESYNC=0
-                    -DHAL_MAX_ODR_HZ=110
+                    -DHAL_MAX_ODR_HZ=440
                     -DHAL_ACCEL_MAX_RANGE_MS2=18
                     -DHAL_MAGN_MAX_RANGE_UT=2000
                     -DHAL_GYRO_MAX_RANGE_RPS=17)
@@ -71,6 +72,8 @@ add_library(stmicroelectronics-sensors-core-linux
             SWAccelGyroFusion6X.cpp
             SWAccelMagnGyroFusion9X.cpp
             SWGameRotationVector.cpp
+            SWAccelMagnFusion6X.cpp
+            SWGeoMagRotationVector.cpp
             SWRotationVector.cpp
             SWOrientation.cpp
             SWGravity.cpp
@@ -92,4 +95,5 @@ target_include_directories(stmicroelectronics-sensors-core-linux PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR}/libs/gyro-temperature-calibration
                            ${CMAKE_CURRENT_SOURCE_DIR}/libs/magn-calibration
                            ${CMAKE_CURRENT_SOURCE_DIR}/libs/sensors-fusion
+                           ${CMAKE_CURRENT_SOURCE_DIR}/libs/geomag-fusion
                            ${CMAKE_CURRENT_SOURCE_DIR}/libs/timesync)

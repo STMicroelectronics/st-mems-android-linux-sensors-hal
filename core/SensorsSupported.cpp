@@ -421,12 +421,14 @@ const std::array<struct SensorsSupported, 199> sensorsSupportedList = {
     SensorsSupported::AmbientTemperature("stts22h", "STTS22H Temperature Sensor", 0.0f),
 };
 
-const std::array<struct SWSensorsSupported, 12> sensorsSWSupportedList = {
+const std::array<struct SWSensorsSupported, 14> sensorsSWSupportedList = {
     SWSensorsSupported(STMSensorType(SensorType::ACCELEROMETER_UNCALIBRATED)),
     SWSensorsSupported(STMSensorType(SensorType::MAGNETOMETER_UNCALIBRATED)),
     SWSensorsSupported(STMSensorType(SensorType::GYROSCOPE_UNCALIBRATED)),
+    SWSensorsSupported(STMSensorType(SensorTypeInternal::ACCEL_MAGN_FUSION_6X)),
     SWSensorsSupported(STMSensorType(SensorTypeInternal::ACCEL_GYRO_FUSION_6X)),
     SWSensorsSupported(STMSensorType(SensorTypeInternal::ACCEL_MAGN_GYRO_FUSION_9X)),
+    SWSensorsSupported(STMSensorType(SensorType::GEOMAGNETIC_ROTATION_VECTOR)),
     SWSensorsSupported(STMSensorType(SensorType::GAME_ROTATION_VECTOR)),
     SWSensorsSupported(STMSensorType(SensorType::ROTATION_VECTOR)),
     SWSensorsSupported(STMSensorType(SensorType::ORIENTATION)),

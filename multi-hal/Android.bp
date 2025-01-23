@@ -55,6 +55,7 @@ cc_defaults {
         "libstm-gyro-temperature-calibration",
         "libstm-magn-calibration",
         "libstm-sensors-fusion",
+        "libstm-geomag-fusion",
         "libstm-timesync"
     ],
     export_static_lib_headers: [

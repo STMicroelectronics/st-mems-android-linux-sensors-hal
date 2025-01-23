@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2018 The Android Open Source Project
- * Copyright (C) 2019-2020 STMicroelectronics
+ * Copyright (C) 2015-2016 STMicroelectronics
+ * Author: Denis Ciocca - <denis.ciocca@st.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,16 @@
 
 #pragma once
 
-#include <cstdint>
+#include "SWSensorBase.h"
 
 namespace stm {
 namespace core {
 
-/**
- * Sensors core internal types
- */
-enum class SensorTypeInternal : uint16_t {
-    ACCEL_MAGN_FUSION_6X,           /* ACCEL AND MAGN FUSION */
-    ACCEL_GYRO_FUSION_6X,           /* ACCEL AND GYRO FUSION */
-    ACCEL_MAGN_GYRO_FUSION_9X,      /* ACCEL, MAGN AND GYRO FUSION */
+class SWGeoMagRotationVector : public SWSensorBaseWithPollrate {
+public:
+    SWGeoMagRotationVector(const char *name, int handle, int module);
+
+    virtual void ProcessData(SensorBaseData *data);
 };
 
 } // namespace core

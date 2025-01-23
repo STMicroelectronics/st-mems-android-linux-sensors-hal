@@ -57,6 +57,7 @@ Enable/Disable libraries (by default mock libraries):
 - HAL_ENABLE_SENSORS_FUSION :: [possible values: 0 (disabled) or not 0 (enabled)]
 - HAL_ENABLE_TIMESYNC (*) :: [possible values: 0 (disabled) or not 0 (enabled)]
 - HAL_ENABLE_GYRO_TEMPERATURE_CALIBRATION :: [possible values: 0 (disabled) or not 0 (enabled)]
+- HAL_ENABLE_GEOMAG_FUSION :: [possible values: 0 (disabled) or not 0 (enabled)]
 
 (*) NOTE: The HAL_ENABLE_TIMESYNC configuration entry enables sensor sample timestamp estimation feature, which to properly work requests on turn ASYNC_HW_TIMESTAMP functionality of the IIO Linux drivers to be configured as enabled (=y) in the Linux kernel driver module.
 Hence, if HAL_ENABLE_TIMESYNC is enabled, it also MUST be enabled the corresponding ASYNC_HW_TIMESTAMP feature for the drivers being served by the HAL.

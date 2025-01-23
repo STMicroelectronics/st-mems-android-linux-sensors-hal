@@ -31,6 +31,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../core/libs/gyro-calibration libst
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../core/libs/gyro-temperature-calibration libstm-gyro-temperature-calibration)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../core/libs/magn-calibration libstm-magn-calibration)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../core/libs/sensors-fusion libstm-sensors-fusion)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../core/libs/geomag-fusion libstm-geomag-fusion)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../core/libs/timesync libstm-timesync)
 
 add_compile_options(-Wall -Wextra -pedantic)
@@ -52,6 +53,7 @@ target_link_libraries(${PROJECT_TARGET} PRIVATE stmicroelectronics-sensors-core-
 target_link_libraries(${PROJECT_TARGET} PRIVATE stm-accel-calibration)
 target_link_libraries(${PROJECT_TARGET} PRIVATE stm-gyro-calibration)
 target_link_libraries(${PROJECT_TARGET} PRIVATE stm-gyro-temperature-calibration)
+target_link_libraries(${PROJECT_TARGET} PRIVATE stm-geomag-fusion)
 target_link_libraries(${PROJECT_TARGET} PRIVATE stm-magn-calibration)
 target_link_libraries(${PROJECT_TARGET} PRIVATE stm-sensors-fusion)
 target_link_libraries(${PROJECT_TARGET} PRIVATE stm-timesync)

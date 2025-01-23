@@ -61,6 +61,8 @@ cc_library_static {
         "SWAccelMagnGyroFusion9X.cpp",
         "SWGameRotationVector.cpp",
         "SWRotationVector.cpp",
+        "SWAccelMagnFusion6X.cpp",
+        "SWGeoMagRotationVector.cpp",
         "SWOrientation.cpp",
         "SWGravity.cpp",
         "SWLinearAccel.cpp",
@@ -75,6 +77,7 @@ cc_library_static {
         "libs/gyro-temperature-calibration",
         "libs/magn-calibration",
         "libs/sensors-fusion",
+        "libs/geomag-fusion",
         "libs/timesync"
     ],
     static_libs: [
@@ -83,7 +86,8 @@ cc_library_static {
 	    "libstm-timesync",
 	    "libstm-sensors-fusion",
 	    "libstm-accel-calibration",
-	    "libstm-magn-calibration"
+	    "libstm-magn-calibration",
+	    "libstm-geomag-fusion"
     ],
     shared_libs: [
         "libcutils",
@@ -104,6 +108,7 @@ cc_library_static {
         "-DHAL_ENABLE_GYRO_TEMPERATURE_CALIBRATION=0",
         "-DHAL_ENABLE_MAGN_CALIBRATION=1",
         "-DHAL_ENABLE_SENSORS_FUSION=1",
+        "-DHAL_ENABLE_GEOMAG_FUSION=1",
         "-DHAL_ENABLE_TIMESYNC=0",
         "-DHAL_MAX_ODR_HZ=110",
         "-DHAL_ACCEL_MAX_RANGE_MS2=18",

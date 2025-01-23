@@ -38,6 +38,7 @@ LOCAL_C_INCLUDES := \
     $(LOCAL_PATH)/libs/gyro-temperature-calibration \
     $(LOCAL_PATH)/libs/magn-calibration \
     $(LOCAL_PATH)/libs/sensors-fusion \
+    $(LOCAL_PATH)/libs/geomag-fusion \
     $(LOCAL_PATH)/libs/timesync
 
 LOCAL_CFLAGS += \
@@ -48,6 +49,7 @@ LOCAL_CFLAGS += \
     -DHAL_ENABLE_GYRO_TEMPERATURE_CALIBRATION=0 \
     -DHAL_ENABLE_MAGN_CALIBRATION=1 \
     -DHAL_ENABLE_SENSORS_FUSION=1 \
+    -DHAL_ENABLE_GEOMAG_FUSION=1 \
     -DHAL_ENABLE_TIMESYNC=0 \
     -DHAL_MAX_ODR_HZ=110 \
     -DHAL_ACCEL_MAX_RANGE_MS2=18 \
@@ -101,6 +103,8 @@ LOCAL_SRC_FILES := \
     SWAccelMagnGyroFusion9X.cpp \
     SWGameRotationVector.cpp \
     SWRotationVector.cpp \
+    SWAccelMagnFusion6X.cpp \
+    SWGeoMagRotationVector.cpp \
     SWOrientation.cpp \
     SWGravity.cpp \
     SWLinearAccel.cpp \
@@ -128,7 +132,8 @@ LOCAL_STATIC_LIBRARIES := \
     libstm-timesync-legacy \
     libstm-sensors-fusion-legacy \
     libstm-accel-calibration-legacy \
-    libstm-magn-calibration-legacy
+    libstm-magn-calibration-legacy \
+    libstm-geomag-fusion-legacy
 
 LOCAL_HEADER_LIBRARIES := \
     libhardware_headers
@@ -144,6 +149,8 @@ LOCAL_PATH := $(LOCAL_PATH_BAK)
 include $(LOCAL_PATH)/libs/magn-calibration/Android.mk
 LOCAL_PATH := $(LOCAL_PATH_BAK)
 include $(LOCAL_PATH)/libs/sensors-fusion/Android.mk
+LOCAL_PATH := $(LOCAL_PATH_BAK)
+include $(LOCAL_PATH)/libs/geomag-fusion/Android.mk
 LOCAL_PATH := $(LOCAL_PATH_BAK)
 include $(LOCAL_PATH)/libs/timesync/Android.mk
 

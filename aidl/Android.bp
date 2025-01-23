@@ -44,6 +44,7 @@ cc_binary {
         "libstm-gyro-temperature-calibration",
         "libstm-magn-calibration",
         "libstm-sensors-fusion",
+        "libstm-geomag-fusion",
         "libstm-timesync",
     ],
     srcs: [

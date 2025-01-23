@@ -370,7 +370,8 @@ void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorDa
         event.payload.set<Event::EventPayload::Tag::vec4>(vec4);
         break;
     }
-    case SensorType::ROTATION_VECTOR: {
+    case SensorType::ROTATION_VECTOR:
+    case SensorType::GEOMAGNETIC_ROTATION_VECTOR: {
         if (sensorData.getData().size() < 4)
             return;
 

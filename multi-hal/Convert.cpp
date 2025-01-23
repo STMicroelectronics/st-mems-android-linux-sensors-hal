@@ -316,6 +316,7 @@ void convertFromSTMSensorData(const ::stm::core::ISTMSensorsCallbackData& sensor
         event.u.vec4.w = sensorData.getData().at(3);
         break;
     case SensorType::ROTATION_VECTOR:
+    case SensorType::GEOMAGNETIC_ROTATION_VECTOR:
         if (sensorData.getData().size() < 4) {
             return;
         }

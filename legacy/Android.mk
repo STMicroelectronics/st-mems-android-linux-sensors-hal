@@ -36,6 +36,7 @@ LOCAL_STATIC_LIBRARIES := \
     libstm-gyro-temperature-calibration-legacy \
     libstm-magn-calibration-legacy \
     libstm-sensors-fusion-legacy \
+    libstm-geomag-fusion-legacy \
     libstm-timesync-legacy
 
 LOCAL_HEADER_LIBRARIES := \

@@ -53,7 +53,9 @@
 #include "IntTemp.h"
 #include "SWAccelGyroFusion6X.h"
 #include "SWGameRotationVector.h"
+#include "SWGeoMagRotationVector.h"
 #include "SWAccelMagnGyroFusion9X.h"
+#include "SWAccelMagnFusion6X.h"
 #include "SWRotationVector.h"
 #include "SWOrientation.h"
 #include "SWGravity.h"
@@ -178,6 +180,8 @@ static std::shared_ptr<SensorBase> st_hal_create_virtual_class_sensor(const STMS
             sensor = std::make_shared<SWAccelGyroFusion6X>("Accel-Gyro Fusion 6X", handle, moduleId);
         } else if (sensor_type == AccelMagnGyroFusion9XSensorType) {
             sensor = std::make_shared<SWAccelMagnGyroFusion9X>("Accel-Magn-Gyro Fusion 9X", handle, moduleId);
+        } else if (sensor_type == AccelMagnFusion6XSensorType) {
+            sensor = std::make_shared<SWAccelMagnFusion6X>("Accel-Magn Fusion 6X", handle, moduleId);
         }
     } else {
         if (sensor_type == AccelUncalibSensorType) {
@@ -186,6 +190,8 @@ static std::shared_ptr<SensorBase> st_hal_create_virtual_class_sensor(const STMS
             sensor = std::make_shared<SWMagnetometerUncalibrated>("Magnetometer Uncalibrated Sensor", handle, moduleId);
         } else if (sensor_type == GyroUncalibSensorType) {
             sensor = std::make_shared<SWGyroscopeUncalibrated>("Gyroscope Uncalibrated Sensor", handle, moduleId);
+        } else if (sensor_type == GeoRotationVecSensorType) {
+            sensor = std::make_shared<SWGeoMagRotationVector>("iNemoEngine GeoMag Rotation Vector Sensor", handle, moduleId);
         } else if (sensor_type == GameRotationVecSensorType) {
             sensor = std::make_shared<SWGameRotationVector>("iNemoEngine Game Rotation Vector Sensor", handle, moduleId);
         } else if (sensor_type == RotationVecSensorType) {
