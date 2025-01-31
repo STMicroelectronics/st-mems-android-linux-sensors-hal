@@ -23,29 +23,8 @@
 
 #define CONCATENATE_STRING(x, y)			(x y)
 
-#define ST_HAL_DATA_PATH				"/data/STSensorHAL"
-#define ST_HAL_PRIVATE_DATA_PATH			"/data/STSensorHAL/private_data.dat"
 #define ST_HAL_SELFTEST_DATA_PATH			"/data/STSensorHAL/selftest"
 #define ST_HAL_SELFTEST_CMD_DATA_PATH			"/data/STSensorHAL/selftest/cmd"
 #define ST_HAL_SELFTEST_RESULTS_DATA_PATH		"/data/STSensorHAL/selftest/results"
 
 #define ST_HAL_IIO_MAX_DEVICES				(50)
-
-#define SENSOR_DATA_X(datax, datay, dataz, x1, y1, z1, x2, y2, z2, x3, y3, z3) \
-							((x1 == 1 ? datax : (x1 == -1 ? -datax : 0)) + \
-							(x2 == 1 ? datay : (x2 == -1 ? -datay : 0)) + \
-							(x3 == 1 ? dataz : (x3 == -1 ? -dataz : 0)))
-
-#define SENSOR_DATA_Y(datax, datay, dataz, x1, y1, z1, x2, y2, z2, x3, y3, z3) \
-							((y1 == 1 ? datax : (y1 == -1 ? -datax : 0)) + \
-							(y2 == 1 ? datay : (y2 == -1 ? -datay : 0)) + \
-							(y3 == 1 ? dataz : (y3 == -1 ? -dataz : 0)))
-
-#define SENSOR_DATA_Z(datax, datay, dataz, x1, y1, z1, x2, y2, z2, x3, y3, z3) \
-							((z1 == 1 ? datax : (z1 == -1 ? -datax : 0)) + \
-							(z2 == 1 ? datay : (z2 == -1 ? -datay : 0)) + \
-							(z3 == 1 ? dataz : (z3 == -1 ? -dataz : 0)))
-
-#define SENSOR_X_DATA(...)				SENSOR_DATA_X(__VA_ARGS__)
-#define SENSOR_Y_DATA(...)				SENSOR_DATA_Y(__VA_ARGS__)
-#define SENSOR_Z_DATA(...)				SENSOR_DATA_Z(__VA_ARGS__)

@@ -226,50 +226,6 @@ int device_iio_utils::check_file(const char *filename)
     return stat(filename, &info);
 }
 
-int device_iio_utils::sysfs_enable_channels(const char *device_dir, bool enable)
-{
-    char dir[DEVICE_IIO_MAX_FILENAME_LEN + 1];
-    char filename[2 * DEVICE_IIO_MAX_FILENAME_LEN + 1];
-    const struct dirent *ent;
-    FILE *sysfsfp;
-    DIR *dp;
-    int ret = 0;
-
-    /* check in scan_elements dir entry all enable file flag */
-    if (strlen(device_dir) + strlen("scan_elements") + 1 > DEVICE_IIO_MAX_FILENAME_LEN) {
-        return -ENOMEM;
-    }
-
-    sprintf(dir, "%s/scan_elements", device_dir);
-    ret = sysfs_opendir(dir, &dp);
-    if (ret) {
-        return ret;
-    }
-
-    while (ent = readdir(dp), ent != NULL) {
-        if (strlen(dir) + strlen(ent->d_name) > DEVICE_IIO_MAX_FILENAME_LEN) {
-            continue;
-        }
-
-        if (!strcmp(ent->d_name + strlen(ent->d_name) - strlen("_en"), "_en")) {
-            snprintf(filename, sizeof(filename), "%s/%s", dir, ent->d_name);
-            sysfsfp = fopen(filename, "r+");
-            if (!sysfsfp) {
-                ret = -errno;
-                goto out;
-            }
-
-            fprintf(sysfsfp, "%d", enable);
-            fclose(sysfsfp);
-        }
-    }
-
-out:
-    closedir(dp);
-
-    return ret;
-}
-
 int device_iio_utils::get_device_by_name(const char *name)
 {
     struct dirent *ent;

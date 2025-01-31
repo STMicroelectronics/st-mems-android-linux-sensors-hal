@@ -95,7 +95,6 @@ private:
     static int sysfs_read_float(char *file, float *val);
     static int check_file(const char *filename);
     static int enable_events(const char *device_dir, bool enable);
-    static int sysfs_enable_channels(const char *device_dir, bool enable);
 
 public:
     static int get_device_by_name(const char *name);
