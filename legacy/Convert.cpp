@@ -326,6 +326,24 @@ void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorDa
         event->meta_data.sensor = sensorData.getSensorHandle();
         event->meta_data.what = META_DATA_FLUSH_COMPLETE;
         break;
+    case SensorType::PRESSURE:
+        if (sensorData.getData().size() < 1) {
+            return;
+        }
+        event->pressure = sensorData.getData().at(0);
+        break;
+    case SensorType::AMBIENT_TEMPERATURE:
+        if (sensorData.getData().size() < 1) {
+            return;
+        }
+        event->temperature = sensorData.getData().at(0) / 1000.0f;
+        return false;
+    case SensorType::RELATIVE_HUMIDITY:
+        if (sensorData.getData().size() < 1) {
+            return;
+        }
+        event->relative_humidity = sensorData.getData().at(0);
+        return false;
     default:
         break;
     }
