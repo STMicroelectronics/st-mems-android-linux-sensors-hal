@@ -34,7 +34,8 @@ STMSensor accel(std::string("name"), // name
                 10, // maxRateHz
                 0, // fifoRsvdCount
                 0, // fifoMaxCount
-                false // wakeUp
+                false, // wakeUp
+                0 // moduleId
                 );
 
 STMSensor accelName2(std::string("name_2"), // name
@@ -48,8 +49,9 @@ STMSensor accelName2(std::string("name_2"), // name
                      10, // maxRateHz
                      0, // fifoRsvdCount
                      0, // fifoMaxCount
-                     false // wakeUp
-                     );
+                     false, // wakeUp
+                     0 // moduleId
+                );
 
 STMSensor magnMinRateHzNegative(std::string("name"), // name
                                 std::string("vendor"), // vendor
@@ -62,7 +64,8 @@ STMSensor magnMinRateHzNegative(std::string("name"), // name
                                 10, // maxRateHz
                                 0, // fifoRsvdCount
                                 0, // fifoMaxCount
-                                false // wakeUp
+                                false, // wakeUp
+                                0 // moduleId
                                 );
 
 STMSensor magnMinRateHzBigger(std::string("name"), // name
@@ -76,7 +79,8 @@ STMSensor magnMinRateHzBigger(std::string("name"), // name
                               10, // maxRateHz
                               0, // fifoRsvdCount
                               0, // fifoMaxCount
-                              false // wakeUp
+                              false, // wakeUp
+                              0 // moduleId
                               );
 
 class STMSensorsListTest : public ::testing::Test {
@@ -150,7 +154,8 @@ TEST_F(STMSensorsListTest, addSensor_maxRangeNotZero)
                                       0, // maxRateHz
                                       0, // fifoRsvdCount
                                       0, // fifoMaxCount
-                                      false // wakeUp
+                                      false, // wakeUp
+                                      0 // moduleId
                                       );
 
     ASSERT_FALSE(sensorsList.addSensor(stepCounterMaxRangeZero));
@@ -173,7 +178,8 @@ TEST_F(STMSensorsListTest, addSensor_fifoRsvdAndFifoMax)
                                   100, // maxRateHz
                                   100, // fifoRsvdCount
                                   0, // fifoMaxCount
-                                  false // wakeUp
+                                  false, // wakeUp
+                                  0 // moduleId
                                   );
 
     ASSERT_FALSE(sensorsList.addSensor(accelFifoRsvdBigger));

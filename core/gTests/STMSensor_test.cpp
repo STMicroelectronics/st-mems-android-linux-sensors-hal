@@ -48,7 +48,8 @@ TEST_F(STMSensorTest, verifyParameters)
                     414, // maxRateHz
                     5, // fifoRsvdCount
                     220, // fifoMaxCount
-                    false // wakeUp
+                    false, // wakeUp
+                    0 // moduleId
                     );
 
     ASSERT_STREQ("name", accel.getName().c_str());
@@ -75,7 +76,8 @@ TEST_F(STMSensorTest, verifyParameters)
                          1.0, // power
                          0, // fifoRsvdCount
                          0, // fifoMaxCount
-                         true // wakeUp
+                         true, // wakeUp
+                         0 // moduleId
                          );
 
     ASSERT_STREQ("name_2", signMotion.getName().c_str());
