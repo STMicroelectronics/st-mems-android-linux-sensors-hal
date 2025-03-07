@@ -75,7 +75,7 @@ Default parameters can alternatively be set at compile time by changing the Andr
 git clone https://github.com/STMicroelectronics/st-mems-android-linux-sensors-hal.git hardware/st/sensors-hal
 #+end_src
 
-** Android 11 and above
+** Android 10 and above
 
 2> modify the device makefile (i.e. device/<vendor>/<board>/device.mk) by adding these lines:
 

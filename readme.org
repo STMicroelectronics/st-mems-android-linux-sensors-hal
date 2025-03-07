@@ -16,7 +16,7 @@ Four different components can be identified:
 
 - core :: This is the main component of the HAL. All the adapter components are interacting with the core in order to send commands and receive sensors data and events.
 - android multi-hal (Android 11 and above) :: Android [[https://source.android.com/devices/sensors/sensors-multihal][multi-hal]] adapter.
-- android hidl 2.0 (Android 11 and above) :: Android [[https://source.android.com/devices/architecture/hidl-cpp][HIDL]] 2.0 adapter (full treble).
+- android hidl 2.0 (Android 10 and above) :: Android [[https://source.android.com/devices/architecture/hidl-cpp][HIDL]] 2.0 adapter (full treble).
 - android aidl (Android 13 and above) :: Android [[https://source.android.com/docs/core/architecture/aidl/aidl-hals][AIDL]] AIDL adapter (full treble).
 - android legacy (Android 10 and inferior) :: Android [[https://source.android.com/devices/architecture/hal][legacy]] (pre full treble) adapter.
 - linux :: Linux implementation adapter.
