@@ -215,8 +215,13 @@ bool convertFromSTMSensor(const stm::core::STMSensor &src,
     dst->version = src.getVersion();
     dst->handle = src.getHandle();
     dst->type = sensorType;
-    dst->maxRange = std::ceil(src.getMaxRange());
-    dst->resolution = src.getResolution();
+    if (sensorType == SENSOR_TYPE_AMBIENT_TEMPERATURE) {
+        dst->maxRange = std::ceil(src.getMaxRange()) / 1000;
+        dst->resolution = src.getResolution() / 1000;
+    } else {
+        dst->maxRange = std::ceil(src.getMaxRange());
+        dst->resolution = src.getResolution();
+    }
     dst->power = src.getPower();
 
     if (src.isOnChange()) {

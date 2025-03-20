@@ -200,6 +200,7 @@ static int32_t convertFromHzToUs(float hz)
 bool convertFromSTMSensor(const ::stm::core::STMSensor& src,
                           V2_1::SensorInfo *dst)
 {
+    using ::stm::core::SensorType;
     V2_1::SensorType sensorType;
     bool isPartOfSensorList;
 
@@ -214,8 +215,13 @@ bool convertFromSTMSensor(const ::stm::core::STMSensor& src,
     dst->version = src.getVersion();
     dst->type = sensorType;
     dst->typeAsString = "";
-    dst->maxRange = std::ceil(src.getMaxRange());
-    dst->resolution = src.getResolution();
+    if (src.getType() == SensorType::AMBIENT_TEMPERATURE) {
+        dst->resolution = src.getResolution() / 1000;
+        dst->maxRange = std::ceil(src.getMaxRange()) / 1000;
+    } else {
+        dst->resolution = src.getResolution();
+        dst->maxRange = std::ceil(src.getMaxRange());
+    }
     dst->power = src.getPower();
 
     if (src.isOnChange()) {
