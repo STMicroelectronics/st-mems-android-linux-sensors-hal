@@ -2,12 +2,12 @@
 #+SUBTITLE: notes
 #+AUTHOR: MEMS Software Solutions Team
 
-* Introduction
+# Introduction
 
 This is the documentation page for the Linux components of the sensors-hal iio.
 
-* Configuration
-** runtime configuration (startup)
+# Configuration
+## runtime configuration (startup)
 
 Configuration file can be used to set parameters at runtime (during init).
 If a parameter is set in the configuration file, default value for that parameter will be discarded.
@@ -29,69 +29,55 @@ where SENSORTYPE can be one of these values:
 
 Example of configuration file usage (default /etc/stm-sensors-hal/config):
 
-#+begin_src conf
-#max odr that can be used is 250Hz
+```
+# max odr that can be used is 250Hz
 max-odr = 250
 
-#accel rotation matrix
+# accel rotation matrix
 rot-matrix-1.accel = "1.0,0,0,0,1.0,0,0,0,1.0"
-#accel position in mm
+# accel position in mm
 placement-1.accel = "10,20,30"
 
-#accel full-scale to support reading of at least 70m/s^2
+# accel full-scale to support reading of at least 70m/s^2
 max-range.accel = 70
-#magn full-scale to support reading of at least 2000uT
+# magn full-scale to support reading of at least 2000uT
 max-range.magn = 2000
-#gyro full-scale to support reading of at least 8rad/s
+# gyro full-scale to support reading of at least 8rad/s
 max-range.gyro = 8
-#+end_src
+```
 
-** Default settings
+## Default settings
 
 Default parameters can be set at compile time by changing the CMakeLists.txt cflags (under core, see core documentation).
 
-* Build instructions
+# Build instructions
 
 1> clone this repository into desired folder:
 
-#+begin_src shell
-git clone https://github.com/STMicroelectronics/st-mems-android-linux-sensors-hal.git
-#+end_src
+> git clone https://github.com/STMicroelectronics/st-mems-android-linux-sensors-hal.git
 
-** release build
+## release build
 
-#+begin_src shell
-cmake -DCMAKE_BUILD_TYPE=Release ${PROJECT_SOURCE_PATH}
-#+end_src
+> cmake -DCMAKE_BUILD_TYPE=Release ${PROJECT_SOURCE_PATH}
 
-** debug build
+## debug build
 
-#+begin_src shell
-cmake -DCMAKE_BUILD_TYPE=Debug ${PROJECT_SOURCE_PATH}
-#+end_src
+> cmake -DCMAKE_BUILD_TYPE=Debug ${PROJECT_SOURCE_PATH}
 
-** export compile commands
+## export compile commands
 
-#+begin_src shell
-cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ${PROJECT_SOURCE_PATH}
-#+end_src
+> cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ${PROJECT_SOURCE_PATH}
 
-** cross-compile
+## cross-compile
 
 - arm64
 
-#+begin_src shell
-cmake -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-arm64.cmake ${PROJECT_SOURCE_PATH}
-#+end_src
+> cmake -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-arm64.cmake ${PROJECT_SOURCE_PATH}
 
 - arm32
 
-#+begin_src shell
-cmake -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-arm32.cmake ${PROJECT_SOURCE_PATH}
-#+end_src
+> cmake -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-arm32.cmake ${PROJECT_SOURCE_PATH}
 
-** ninja build
+## ninja build
 
-#+begin_src shell
-cmake -GNinja ${PROJECT_SOURCE_PATH}
-#+end_src
+> cmake -GNinja ${PROJECT_SOURCE_PATH}

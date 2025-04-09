@@ -2,7 +2,7 @@
 #+SUBTITLE: notes
 #+AUTHOR: MEMS Software Solutions Team
 
-* Introduction
+# Introduction
 
 This repository hosts the STMicroelectronics HAL (Hardware Abstraction Layer) for mems sensors running in Android or Linux systems based on the STMicroelectronics github hosted [[https://github.com/STMicroelectronics/st-mems-android-linux-drivers-iio][IIO drivers]].
 
@@ -10,7 +10,7 @@ This HAL implementation is leaning on the [[https://git.kernel.org/cgit/linux/ke
 
 You can find a list of sensors supported directly into the source code [[file:core/SensorsSupported.cpp][here]].
 
-* Architecture
+# Architecture
 
 Four different components can be identified:
 
@@ -21,7 +21,7 @@ Four different components can be identified:
 - android legacy (Android 10 and inferior) :: Android [[https://source.android.com/devices/architecture/hal][legacy]] (pre full treble) adapter.
 - linux :: Linux implementation adapter.
 
-* Android
+# Android
 
 HAL is compiled using different makefiles in order to support the two different modes. Fortunately this is transparent at the end for the build system, correct declaration is needed in order to choose the version to build and install.
 
@@ -35,13 +35,13 @@ You can find the related documentation for Android here:
 - [[file:aidl/readme.org][AIDL]]
 - [[file:legacy/readme.org][Legacy]]
 
-* Linux
+# Linux
 
 In Linux, HAL is build as an executable using cmake. Current version does list the sensors found and exit, user needs to implement the final application.
 
 [[file:linux/readme.org][Here]] you can find the related documentation.
 
-* Core
+# Core
 
 This is the main component of the project. All the 'wrappers' are using this component for sending commands and receive data stream.
 

@@ -2,15 +2,15 @@
 #+SUBTITLE: notes
 #+AUTHOR: MEMS Software Solutions Team
 
-* Introduction
+# Introduction
 
 This is the documentation page for the Android multi-hal 2.x components of the sensors-hal iio.
 
-* Configuration
-** Android properties
+# Configuration
 
-Android allows properties to be configured both at run-time [[system https://source.android.com/devices/architecture/configuration/add-system-properties][system properties]], and using a properties file at build time..
-If a parameter is set by using system properties, default value for that property will be discarded.
+## Android properties
+
+Android allows properties to be configured both at run-time [[system https://source.android.com/devices/architecture/configuration/add-system-properties][system properties]], and using a properties file at build time. If a parameter is set by using system properties, default value for that property will be discarded.
 
 - persist.vendor.stm.sensors.max-odr
 - persist.vendor.stm.sensors.max-range.SENSORTYPE
@@ -31,125 +31,124 @@ The max-odr property is common to all hardware sensor
 The max-range is shared between all sensors of the same type
 
 Example of properties usage, for inizializig them at Android boot,
-create a file as follow with properties settings (i.e. device/<vendor>/<board>/stm_sensors_hal.prop),
+create a file as follow with properties settings (i.e. device/\<vendor>/\<board>/stm_sensors_hal.prop),
 containing:
-
-#+begin_src conf
+```
 persist.vendor.stm.sensors.max-odr = 250 #max odr that can be used is 250Hz for all sensors
-
 persist.vendor.stm.sensors.rot-matrix-1.accel-0 = "1,0,0,0,1,0,0,0,1" #rotation matrix for acel index 0
 persist.vendor.stm.sensors.placement-1.accel-0 = "10,20,30"           #position in cm for accel index 0
-
 persist.vendor.stm.sensors.max-range.accel = 70 #accel full-scale to support reading of at least 70m/s^2
 persist.vendor.stm.sensors.max-range.magn = 2000 #magn full-scale to support reading of at least 2000uT
 persist.vendor.stm.sensors.max-range.gyro = 8 #gyro full-scale to support reading of at least 8rad/s
-#+end_src
+```
 
-Add the following line in file in device makefile (device/<vendor>/<board>/device.mk) by adding these lines:
+Add the following line to the device makefile (device/\<vendor>/\<board>/device.mk):
 
-#+begin_src makefile
-        TARGET_VENDOR_PROP += device/<vendor>/<board>/stm_sensors_hal.prop
-#+end_src
+> TARGET_VENDOR_PROP += device/\<vendor>/\<board>/stm_sensors_hal.prop
 
-Example of Android properties usage when inizializig them at run-time:
-#+begin_src shell
+Example of Android properties usage when initializing them at run-time:
+
+```
 setprop persist.vendor.stm.sensors.max-odr 250
 setprop persist.vendor.stm.sensors.rot-matrix-1.accel-0 "1,0,0,0,1,0,0,0,1"
 setprop persist.vendor.stm.sensors.placement-1.accel-0 "10,20,30"
-
 setprop persist.vendor.stm.sensors.max-range.accel 70
 setprop persist.vendor.stm.sensors.max-range.magn 2000
 setprop persist.vendor.stm.sensors.max-range.gyro 8
-#+end_src
+```
 
-** Default settings
+## Default settings
 
 Default parameters can be set at compile time by changing the Android.bp cflags (under core, see core documentation).
 
-* Build instructions
+# Build instructions
 
 1> clone this repository into desired folder (i.e. hardware/st/sensors-hal):
 
-#+begin_src shell
-git clone https://github.com/STMicroelectronics/st-mems-android-linux-sensors-hal.git hardware/st/sensors-hal
-#+end_src
+> git clone https://github.com/STMicroelectronics/st-mems-android-linux-sensors-hal.git hardware/st/sensors-hal
 
-2> enable soong module (i.e. hardware/st/sensors-hal/multi-hal/Android.bp):
+2> enable multi-hal soong module (i.e. hardware/st/sensors-hal/multi-hal/Android.bp):
 
-#+begin_src makefile
-...
-enabled: true,
-...
-#+end_src
+```
+diff --git a/multi-hal/Android.bp b/multi-hal/Android.bp  
+index 96a69c1..3f99ff0 100644  
+--- a/multi-hal/Android.bp  
++++ b/multi-hal/Android.bp  
+@@ -19,7 +19,7 @@ cc_defaults {  
+owner: "STMicroelectronics",  
+vendor: true,  
+proprietary: true,  
+- enabled: false,  
++ enabled: true,  
+srcs: [  
+"AdditionalInfoManager.cpp",  
+"SensorsSubHal.cpp",
+```
 
-3> create the hals.conf file (device/<vendor>/<board>/multi-hal/hals.conf) that lists the names of the sub-hals to load:
-
-#+begin_src conf
+3> create the hals.conf file (device/\<vendor>/\<board>/multi-hal/hals.conf) that lists the names of the sub-hals to load:
+```
 android.hardware.sensors@2.1-subhal.stmicroelectronics.so
-#+end_src
+```
 
-4> modify the device makefile (i.e. device/<vendor>/<board>/device.mk) by adding these lines:
+4> modify the device makefile (i.e. device/\<vendor>/\<board>/device.mk) by adding these lines:
+```
+- for multi-hal HIDL
+		# Build stm-sensors-hal with multi-hal HIDL 2.1 interface
+		PRODUCT_PACKAGES += \
+			android.hardware.sensors@2.1-service.multihal \
+			android.hardware.sensors@2.1-subhal.stmicroelectronics
 
-** multi-hal HIDL
+- for multi-hal AIDL
 
-#+begin_src makefile
-# Build stm-sensors-hal with multi-hal HIDL 2.1 interface
-PRODUCT_PACKAGES += \
-	android.hardware.sensors@2.1-service.multihal \
-	android.hardware.sensors@2.1-subhal.stmicroelectronics
+		# Build stm-sensors-hal with multi-hal AIDL interface
+		PRODUCT_PACKAGES += \
+			android.hardware.sensors-service.multihal \
+			android.hardware.sensors@2.1-subhal.stmicroelectronics
 
-** multi-hal AIDL
+	# Copy multi-hal config file
+	PRODUCT_COPY_FILES += \
+		$(LOCAL_PATH)/multi-hal/hals.conf:$(TARGET_COPY_OUT_VENDOR)/etc/sensors/hals.conf
 
-#+begin_src makefile
-# Build stm-sensors-hal with multi-hal AIDL interface
-PRODUCT_PACKAGES += \
-	android.hardware.sensors-service.multihal \
-	android.hardware.sensors@2.1-subhal.stmicroelectronics
+	# Copy sensors config file(s)
+	PRODUCT_COPY_FILES += \
+		frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:\$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.accelerometer.xml \
+		frameworks/native/data/etc/android.hardware.sensor.ambient_temperature.xml:\$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.ambient_temperature.xml \
+		frameworks/native/data/etc/android.hardware.sensor.compass.xml:\$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.compass.xml \
+		frameworks/native/data/etc/android.hardware.sensor.gyroscope.xml:\$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.gyroscope.xml \
+		frameworks/native/data/etc/android.hardware.sensor.hifi_sensors.xml:\$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.hifi_sensors.xml \
+		frameworks/native/data/etc/android.hardware.sensor.relative_humidity.xml:\$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.relative_humidity.xml \
+		frameworks/native/data/etc/android.hardware.sensor.stepcounter.xml:\$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.stepcounter.xml \
+		frameworks/native/data/etc/android.hardware.sensor.stepdetector.xml:\$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.stepdetector.xml
+```
 
-# Copy multi-hal config file
-PRODUCT_COPY_FILES += \
-	$(LOCAL_PATH)/multi-hal/hals.conf:$(TARGET_COPY_OUT_VENDOR)/etc/sensors/hals.conf
+5> modify the sepolicy file_contexts file (i.e. device/\<vendor>/\<board>/sepolicy/file_contexts) by adding these lines:
+```
+- for multi-hal HIDL:
+	/vendor/bin/hw/android\.hardware\.sensors@2\.1-service\.multihal  u:object_r:hal_sensors_default_exec:s0
 
-# Copy sensors config file(s)
-PRODUCT_COPY_FILES += \
-	frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.accelerometer.xml \
-	frameworks/native/data/etc/android.hardware.sensor.ambient_temperature.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.ambient_temperature.xml \
-	frameworks/native/data/etc/android.hardware.sensor.compass.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.compass.xml \
-	frameworks/native/data/etc/android.hardware.sensor.gyroscope.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.gyroscope.xml \
-	frameworks/native/data/etc/android.hardware.sensor.hifi_sensors.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.hifi_sensors.xml \
-	frameworks/native/data/etc/android.hardware.sensor.relative_humidity.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.relative_humidity.xml \
-	frameworks/native/data/etc/android.hardware.sensor.stepcounter.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.stepcounter.xml \
-	frameworks/native/data/etc/android.hardware.sensor.stepdetector.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.stepdetector.xml
-#+end_src
+- for multi-hal AIDL:
+	/vendor/bin/hw/android\.hardware\.sensors-service\.multihal u:object_r:hal_sensors_default_exec:s0
+```
 
-5> modify the sepolicy file_contexts file (i.e. device/<vendor>/<board>/sepolicy/file_contexts) by adding these lines:
-
-** multi-hal HIDL
-#+begin_src conf
-/vendor/bin/hw/android\.hardware\.sensors@2\.1-service\.multihal  u:object_r:hal_sensors_default_exec:s0
-#+end_src
-
-** multi-hal AIDL
-#+begin_src conf
-/vendor/bin/hw/android\.hardware\.sensors-service\.multihal u:object_r:hal_sensors_default_exec:s0
-#+end_src
-
-6> modify the sepolicy hal_sensors.te file (i.e. device/<vendor>/<board>/sepolicy/hal_sensors.te) by adding these lines:
-
-#+begin_src conf
+6> modify the sepolicy hal_sensors.te file (i.e. device/\<vendor>/\<board>/sepolicy/hal_sensors.te) by adding these lines:
+```
 # allow access to sysfs device iio
 allow hal_sensors_default sysfs:dir { open read };
 allow hal_sensors_default sysfs:file { open read write getattr };
 allow hal_sensors_default sensors_device:chr_file rw_file_perms;
-#+end_src
+allow hal_sensors_default iio_device:chr_file { open read ioctl };  
 
-7> modify the uevent rules file (i.e. device/<vendor>/<board>/ueventd.rc) by adding these lines:
+# allow vendor data persistence  
+allow hal_sensors_default sensor_vendor_data_file:file { open read write getattr create };
+```
 
-#+begin_src conf
-#common iio char devices
+7> modify the uevent rules file (i.e. device/\<vendor>/\<board>/ueventd.rc) by adding these lines:
+
+```
+# common iio char devices
 /dev/iio:device* 0666 system system
 
-#sensors common
+# sensors common
 /sys/bus/iio/devices/iio:device* buffer/enable 0666 system system
 /sys/bus/iio/devices/iio:device* buffer/length 0666 system system
 /sys/bus/iio/devices/iio:device* sampling_frequency 0666 system system
@@ -161,7 +160,7 @@ allow hal_sensors_default sensors_device:chr_file rw_file_perms;
 /sys/bus/iio/devices/iio:device* scan_elements/in_timestamp_en 0666 system system
 /sys/bus/iio/devices/iio:device* scan_elements/in_count_en 0666 system system
 
-#accelerometer sensor
+# accelerometer sensor
 /sys/bus/iio/devices/iio:device* in_accel_x_scale 0666 system system
 /sys/bus/iio/devices/iio:device* in_accel_y_scale 0666 system system
 /sys/bus/iio/devices/iio:device* in_accel_z_scale 0666 system system
@@ -169,7 +168,7 @@ allow hal_sensors_default sensors_device:chr_file rw_file_perms;
 /sys/bus/iio/devices/iio:device* scan_elements/in_accel_y_en 0666 system system
 /sys/bus/iio/devices/iio:device* scan_elements/in_accel_z_en 0666 system system
 
-#gyroscope sensor
+# gyroscope sensor
 /sys/bus/iio/devices/iio:device* in_anglvel_x_scale 0666 system system
 /sys/bus/iio/devices/iio:device* in_anglvel_y_scale 0666 system system
 /sys/bus/iio/devices/iio:device* in_anglvel_z_scale 0666 system system
@@ -177,7 +176,7 @@ allow hal_sensors_default sensors_device:chr_file rw_file_perms;
 /sys/bus/iio/devices/iio:device* scan_elements/in_anglvel_y_en 0666 system system
 /sys/bus/iio/devices/iio:device* scan_elements/in_anglvel_z_en 0666 system system
 
-#magnetometer sensor
+# magnetometer sensor
 /sys/bus/iio/devices/iio:device* in_magn_x_scale 0666 system system
 /sys/bus/iio/devices/iio:device* in_magn_y_scale 0666 system system
 /sys/bus/iio/devices/iio:device* in_magn_z_scale 0666 system system
@@ -185,21 +184,21 @@ allow hal_sensors_default sensors_device:chr_file rw_file_perms;
 /sys/bus/iio/devices/iio:device* scan_elements/in_magn_y_en 0666 system system
 /sys/bus/iio/devices/iio:device* scan_elements/in_magn_z_en 0666 system system
 
-#step counter sensor
+# step counter sensor
 /sys/bus/iio/devices/iio:device* scan_elements/in_step_counter_en 0666 system system
 /sys/bus/iio/devices/iio:device* max_delivery_rate 0666 system system
 
-#temperature sensor
+# temperature sensor
 /sys/bus/iio/devices/iio:device* scan_elements/in_temp_en 0666 system system
 
-#gesture sensor
+# gesture sensor
 /sys/bus/iio/devices/iio:device* scan_elements/in_gesture_en 0666 system system
 
-#pressure sensor
+# pressure sensor
 /sys/bus/iio/devices/iio:device* scan_elements/in_pressure_en 0666 system system
 
-#humidity sensor
+# humidity sensor
 /sys/bus/iio/devices/iio:device* scan_elements/in_humidityrelative_en 0666 system system
-#+end_src
+```
 
 8> build aosp as described into [[https://source.android.com/setup/build/building][official documentation]].
