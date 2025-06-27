@@ -234,6 +234,7 @@ int device_iio_utils::get_device_by_name(const char *name)
     DIR *dp;
     char dname[DEVICE_IIO_MAX_NAME_LENGTH];
     char dfilename[DEVICE_IIO_MAX_FILENAME_LEN + 1];
+    char format[16];
     int ret;
     int fnamelen;
 
@@ -260,7 +261,9 @@ int device_iio_utils::get_device_by_name(const char *name)
                 continue;
             }
 
-            ret = fscanf(deviceFile, "%s", dname);
+            /* avoid exceed buffer dname array size (CWE-120) */
+            snprintf(format, sizeof(format), "%%%ds", DEVICE_IIO_MAX_NAME_LENGTH);
+            ret = fscanf(deviceFile, format, dname);
             if (ret <= 0) {
                 fclose(deviceFile);
                 break;
@@ -291,6 +294,7 @@ int device_iio_utils::get_devices_name(struct device_iio_type_name devices[],
     int err, number, numstrlen;
     unsigned int device_num = 0;
     char thisname[DEVICE_IIO_MAX_FILENAME_LEN], *filename;
+    char format[16];
 
     err = sysfs_opendir(device_iio_dir, &dp);
     if (err) {
@@ -329,7 +333,9 @@ int device_iio_utils::get_devices_name(struct device_iio_type_name devices[],
                 }
 
                 free(filename);
-                fscanf(nameFile, "%s", thisname);
+
+                snprintf(format, sizeof(format), "%%%ds", DEVICE_IIO_MAX_FILENAME_LEN);
+                fscanf(nameFile, format, thisname);
                 fclose(nameFile);
 
                 memcpy(devices[device_num].name, thisname,
