@@ -594,6 +594,10 @@ static int loadIIODevices(std::vector<STSensorHAL_iio_devices_data> &iioDeviceDa
         data.dev_id = iio_devices[i].num;
         data.moduleId = device_iio_utils::get_module_id(data.iio_sysfs_path.c_str());
 
+        /* if module ID not available set to default 1 */
+        if (data.moduleId < 0)
+            data.moduleId  = 1;
+
         iioDeviceDataList.push_back(data);
 
         continue;
