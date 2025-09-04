@@ -399,7 +399,7 @@ const std::array<struct SensorsSupported, 199> sensorsSupportedList = {
 
     /* LPS22HD */
     SensorsSupported::Pressure("lps22hd_press", "LPS22HD Pressure Sensor", 0.0f),
-    SensorsSupported::AmbientTemperature("lps33hd_temp", "LPS22HD Temperature Sensor", 0.0f),
+    SensorsSupported::AmbientTemperature("lps22hd_temp", "LPS22HD Temperature Sensor", 0.0f),
 
     /* LPS22HB */
     SensorsSupported::Pressure("lps22hb_press", "LPS22HB Pressure Sensor", 0.0f),
