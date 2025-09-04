@@ -34,4 +34,9 @@ cc_library_static {
         "libutils",
         "libbase",
     ],
+    cflags: [
+        "-Wall",
+        "-Wextra",
+        "-DHAL_ENABLE_VERBOSE=0"
+    ],
 }

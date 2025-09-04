@@ -61,6 +61,12 @@ public:
      * @message: message string to be printed
      */
     virtual void debug(const std::string &message) const = 0;
+
+    /**
+     * verbose: print verbose message |(debug only)
+     * @message: message string to be printed
+     */
+    virtual void verbose(const std::string &message) const = 0;
 };
 
 } // namespace core

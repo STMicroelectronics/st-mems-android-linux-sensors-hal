@@ -88,6 +88,11 @@ class Console : public IConsole {
     {
         (void) message;
     }
+
+    void verbose(const std::string &message) const override
+    {
+        (void) message;
+    }
 };
 
 IConsole& IConsole::getInstance(void)

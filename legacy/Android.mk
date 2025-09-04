@@ -69,7 +69,8 @@ LOCAL_MODULE_OWNER := STMicroelectronics
 
 LOCAL_CFLAGS += \
     -Wall \
-    -Wextra
+    -Wextra \
+    -DHAL_ENABLE_VERBOSE=0
 
 ifeq ($(DEBUG),y)
 LOCAL_CFLAGS += -g -O0

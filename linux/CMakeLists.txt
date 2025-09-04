@@ -25,6 +25,8 @@ project(${PROJECT_NAME} VERSION ${PROJECT_VERSION}
         DESCRIPTION ${PROJECT_DESCRIPTION}
         LANGUAGES CXX C ASM)
 
+add_compile_options(-DHAL_ENABLE_VERBOSE=0)
+
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../core libstm-sensors-core)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../core/libs/accel-calibration libstm-accel-calibration)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../core/libs/gyro-calibration libstm-gyro-calibration)

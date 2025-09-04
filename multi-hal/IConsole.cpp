@@ -44,6 +44,8 @@ public:
     void error(const std::string& message) const override;
 
     void debug(const std::string& message) const override;
+
+    void verbose(const std::string &message) const override;
 };
 
 void Console::info(const std::string& message) const
@@ -72,6 +74,12 @@ void Console::debug(const std::string& message) const
     std::string messageToPrint = message + "\n";
 
     ALOGD("%s", messageToPrint.c_str());
+}
+
+void Console::verbose(const std::string &message) const
+{
+    if (HAL_ENABLE_VERBOSE != 0)
+        debug(message);
 }
 
 }  // namespace multihal

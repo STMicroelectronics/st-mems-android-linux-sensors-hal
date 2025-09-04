@@ -37,6 +37,8 @@ public:
     void error(const std::string &message) const override;
 
     void debug(const std::string &message) const override;
+
+    void verbose(const std::string &message) const override;
 };
 
 void Console::info(const std::string &message) const
@@ -61,6 +63,12 @@ void Console::error(const std::string &message) const
 void Console::debug(const std::string &message) const
 {
     info(message);
+}
+
+void Console::verbose(const std::string &message) const
+{
+    if (HAL_ENABLE_VERBOSE != 0)
+        info(message);
 }
 
 IConsole& IConsole::getInstance(void)
