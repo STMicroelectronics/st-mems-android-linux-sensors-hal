@@ -1,52 +1,52 @@
-#+TITLE: stm-sensors-hal-iio Android AIDL
-#+SUBTITLE: notes
-#+AUTHOR: MEMS Software Solutions Team
-
 # Introduction
 
 This is the documentation page for the Android AIDL components of the sensors-hal iio.
 
 # Configuration
+
 ## Android properties
 
-Android allows properties to be configured both at run-time [[system https://source.android.com/devices/architecture/configuration/add-system-properties][system properties]], and using a properties file at build time. If a parameter is set by using system properties, default value for that property will be discarded.
+| Property                    | Description                                 | Example      |
+|-----------------------------|---------------------------------------------|--------------|
+| `persist.vendor.stm.sensors.max-odr` | Maximum ODR common for all sensors        |    `250`     |
+| `persist.vendor.stm.sensors.max-range.SENSORTYPE`   | Sensor full-scale   |     `70`     |
+| `persist.vendor.stm.sensors.rot-matrix-1.SENSORTYPE-INSTANCE` | Rotation matrix #1 for sensor instance | `"1,0,0,0,1,0,0,0,1"` |
+| `persist.vendor.stm.sensors.rot-matrix-2.SENSORTYPE-INSTANCE` | Rotation matrix #2 for sensor instance | `"1,0,0,0,1,0,0,0,1"` |
+| `persist.vendor.stm.sensors.placement-1.SENSORTYPE-INSTANCE` | Sensor placement #1 in mm for sensor instance | `"10,20,30"` |
+| `persist.vendor.stm.sensors.placement-2.SENSORTYPE-INSTANCE` | Sensor placement #2 in mm for sensor instance | `"10,20,30"` |
 
-- persist.vendor.stm.sensors.max-odr
-- persist.vendor.stm.sensors.max-range.SENSORTYPE
-- persist.vendor.stm.sensors.rot-matrix-1.SENSORTYPE-INSTANCE
-- persist.vendor.stm.sensors.rot-matrix-2.SENSORTYPE-INSTANCE
-- persist.vendor.stm.sensors.placement-1.SENSORTYPE-INSTANCE
-- persist.vendor.stm.sensors.placement-2.SENSORTYPE-INSTANCE
+where:
+- **SENSORTYPE** can be one of the following sensor types:
+	1. `accel` &mdash; Accelerometer
+	2. `magn` &mdash; Magnetometer
+	3. `gyro` &mdash; Gyroscope
 
-where SENSORTYPE can be one of these values:
+- **INSTANCE** is a numeric index identifying the sensor instance:
+	- If there is only one instance, the index will be `0`
+	- For multiple instances, use `0`, `1`, `2`, etc., to distinguish between them
 
-- accel
-- magn
-- gyro
+- **max-odr** is a property common to all hardware sensor
+- **max-range** is a property shared between all sensors of the same type
+- **rot-matrix-1** is a property that represents the rotation of the sensor axes with respect to how it is mounted
+- **rot-matrix-2** is a property that represents the rotation of the mounted sensor axes with respect to the Android reference. The final rotation matrix reported in the Additional Info sensor placement message is the product of rot-matrix-1 and rot-matrix-2. If rot-matrix-2 is not specified, only rot-matrix-1 will be applied. If rot-matrix-1 is also not specified, the identity matrix will be used. The final rotation matrix provides the orientation of the Android device coordinate frame relative to the local coordinate frame of the sensor.
+- **placement-1** is a property that represents the geometric center of the sensor placement with respect to how it is mounted
+- **placement-2** is a property that represents the sensor placement of the mounted sensor axes with respect to the Android reference. The final location vector represents the translation from the origin of the Android sensor coordinate system to the geometric center of the sensor, specified in millimeters (mm). If a rotation matrix (rot-matrix-2) exists, the rotation matrix is ​​applied to placement-1 and the result is added to placement-2 component by component to obtain the final placement specified by the additional sensor info message. If the rotation matrix rot-matrix-2 does not exist, the final placement will be simply placement-1.
 
-and INSTANCE is an index which identifies the instance of that sensor (if mono instantiating the index will be 0)
+Example of properties usage, for inizializig them at Android boot, create a file as follow with properties settings (i.e. device/\<vendor>/\<board>/stm_sensors_hal.prop), containing:
+| Porperty                    | Description                                 |
+|-----------------------------|---------------------------------------------|
+| `persist.vendor.stm.sensors.max-odr = 250` | max ODR that can be used is 250 Hz for all sensors |
+| `persist.vendor.stm.sensors.rot-matrix-1.accel-0 = "1,0,0,0,1,0,0,0,1"` | rotation matrix #1 for accel index 0 |
+| `persist.vendor.stm.sensors.placement-1.accel-0 = "10,20,30"` | sensor position #1 in cm for accel index 0 |
+| `persist.vendor.stm.sensors.max-range.accel = 70` | accel full-scale to support reading of at least 70m/s^2 |
+| `persist.vendor.stm.sensors.max-range.magn = 2000` | magn full-scale to support reading of at least 2000uT |
+| `persist.vendor.stm.sensors.max-range.gyro = 8` | gyro full-scale to support reading of at least 8rad/s |
 
-The max-odr property is common to all hardware sensor
-The max-range is shared between all sensors of the same type
-
-Example of properties usage, for inizializig them at Android boot,
-create a file as follow with properties settings (i.e. device/\<vendor>/\<board>/stm_sensors_hal.prop),
-containing:
-
-```
-persist.vendor.stm.sensors.max-odr = 250 #max odr that can be used is 250Hz for all sensors
-persist.vendor.stm.sensors.rot-matrix-1.accel-0 = "1,0,0,0,1,0,0,0,1" #rotation matrix for acel index 0
-persist.vendor.stm.sensors.placement-1.accel-0 = "10,20,30"           #position in cm for accel index 0
-persist.vendor.stm.sensors.max-range.accel = 70 #accel full-scale to support reading of at least 70m/s^2
-persist.vendor.stm.sensors.max-range.magn = 2000 #magn full-scale to support reading of at least 2000uT
-persist.vendor.stm.sensors.max-range.gyro = 8 #gyro full-scale to support reading of at least 8rad/s
-```
-
-Add the following line in file in device makefile (device/\<vendor>/\<board>/device.mk) by adding these lines:
+Add the following line to the device makefile (device/\<vendor>/\<board>/device.mk):
 
 > TARGET_VENDOR_PROP += device/\<vendor>/\<board>/stm_sensors_hal.prop
 
-Example of Android properties usage when inizializig them at run-time:
+Example of Android properties usage when initializing them at run-time:
 
 ```
 setprop persist.vendor.stm.sensors.max-odr 250
@@ -59,31 +59,27 @@ setprop persist.vendor.stm.sensors.max-range.gyro 8
 
 ## Android features
 
-It is possible during the HAL build phase to enable specific features by adding following definitions in the Android.bp file:
- - HAL_ENABLE_DIRECT_REPORT_CHANNEL :: [possible values: 0 (disabled) or not 0 (enabled)]
- - HAL_ENABLE_SENSOR_ADDITIONAL_INFO :: [possible values: 0 (disabled) or not 0 (enabled)]
+| Feature/Parameter                | Description  | Possible Values / Example |
+|----------------------------------|--------------|---------------------------|
+| `HAL_ENABLE_DIRECT_REPORT_CHANNEL` | Enables direct report channel feature during HAL build. | `0` (disabled) or any non-zero value (enabled) |
+| `HAL_ENABLE_SENSOR_ADDITIONAL_INFO` | Enables sensor additional info feature during HAL build. | `0` (disabled) or any non-zero value (enabled) |
+| `HAL_PRIVATE_DATA_PATH` | Absolute path (in data vendor) for persistent sensor calibration data.  | Example: `/data/vendor/sensors` |
 
-To guarantee the persistence of the sensor calibration data, it is also necessary to define a path in which the HAL must be able to create, write and read files.
-This occurs via the Android.bp parameter:
- HAL_PRIVATE_DATA_PATH :: [data vendor absolute path for persistent data]
-
-To allow access to persistence data files from the HAL, it is necessary to properly configure the SELinux rules and add the creation of the directory via the device-specific mk files.
+> **Note:**  
+> - To guarantee persistence of sensor calibration data, set `HAL_PRIVATE_DATA_PATH` to a directory where the HAL can create, write, and read files.
+> - Proper SELinux rules and directory creation in device-specific `.mk` files are required to allow HAL access to persistent data files.
 
 ## Default settings
 
 Default parameters can alternatively be set at compile time by changing the Android.bp cflags (under core, see core documentation).
 
-# Build instructions
+# Build instructions (Android 13 and above)
 
-1> clone this repository into desired folder (i.e. hardware/st/sensors-hal):
-
+1. clone this repository into desired folder (i.e. hardware/st/sensors-hal):
 
 > git clone https://github.com/STMicroelectronics/st-mems-android-linux-sensors-hal.git hardware/st/sensors-hal
 
-
-## Android 13 and above
-
-2> enable soong module (i.e. hardware/st/sensors-hal/aidl/Android.bp):
+2. enable soong module (i.e. hardware/st/sensors-hal/aidl/Android.bp):
 
 ```
 diff --git a/aidl/Android.bp b/aidl/Android.bp
@@ -101,7 +97,7 @@ index 3c96edb..4637961 100644
          "libbase",
 ```
 
-3> modify the device makefile (i.e. device/\<vendor>/\<board>/device.mk) by adding these lines:
+3. modify the device makefile (i.e. device/\<vendor>/\<board>/device.mk) by adding these lines:
 
 ```
 # Build stm-sensors-hal in full treble mode
@@ -120,11 +116,11 @@ PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.sensor.stepdetector.xml:system/etc/permissions/android.hardware.sensor.stepdetector.xml
 ```
 
-4> modify the sepolicy file_contexts file (i.e. device/\<vendor>/\<board>/sepolicy/file_contexts) by adding these lines:
+4. modify the sepolicy file_contexts file (i.e. device/\<vendor>/\<board>/sepolicy/file_contexts) by adding these lines:
 
 > /vendor/bin/hw/android\.hardware\.sensors@aidl-service\.stmicroelectronics u:object_r:hal_sensors_default_exec:s0
 
-5> modify the sepolicy hal_sensors.te file (i.e. device/\<vendor>/\<board>/sepolicy/hal_sensors.te) by adding these lines:
+5. modify the sepolicy hal_sensors.te file (i.e. device/\<vendor>/\<board>/sepolicy/hal_sensors.te) by adding these lines:
 
 ```
 # allow access to sysfs device iio
@@ -137,7 +133,7 @@ allow hal_sensors_default iio_device:chr_file { open read ioctl };
 allow hal_sensors_default sensor_vendor_data_file:file { open read write getattr create };
 ```
 
-6> modify the uevent rules file (i.e. device/\<vendor>/\<board>/ueventd.rc) by adding these lines:
+6. modify the uevent rules file (i.e. device/\<vendor>/\<board>/ueventd.rc) by adding these lines:
 
 ```
 # common iio char devices
@@ -185,6 +181,8 @@ allow hal_sensors_default sensor_vendor_data_file:file { open read write getattr
 
 # temperature sensor
 /sys/bus/iio/devices/iio:device* scan_elements/in_temp_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_temp_scale 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_temp_offset 0666 system system
 
 # gesture sensor
 /sys/bus/iio/devices/iio:device* scan_elements/in_gesture_en 0666 system system
@@ -196,4 +194,4 @@ allow hal_sensors_default sensor_vendor_data_file:file { open read write getattr
 /sys/bus/iio/devices/iio:device* scan_elements/in_humidityrelative_en 0666 system system
 ```
 
-7> build aosp as described into [[https://source.android.com/setup/build/building][official documentation]].
+7. build aosp as described into [official documentation](https://source.android.com/setup/build/building).

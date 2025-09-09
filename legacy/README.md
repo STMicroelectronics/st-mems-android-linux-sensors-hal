@@ -1,22 +1,16 @@
-#+TITLE: stm-sensors-hal-iio Android legacy
-#+SUBTITLE: notes
-#+AUTHOR: MEMS Software Solutions Team
-
-* Introduction
+# Introduction
 
 This is the documentation page for the Android legacy components of the sensors-hal iio.
 
-* Build instructions
+# Build instructions
 
-1> clone this repository into desired folder (i.e. hardware/st/sensors-hal):
+1. clone this repository into desired folder (i.e. hardware/st/sensors-hal):
 
-#+begin_src shell
-git clone https://github.com/STMicroelectronics/st-mems-android-linux-sensors-hal.git hardware/st/sensors-hal
-#+end_src
+> git clone https://github.com/STMicroelectronics/st-mems-android-linux-sensors-hal.git hardware/st/sensors-hal
 
-2> modify the uevent rules file (i.e. device/<vendor>/<board>/ueventd.rc) by adding these lines:
+2. modify the uevent rules file (i.e. `device/<vendor>/<board>/ueventd.rc`) by adding these lines:
 
-#+begin_src conf
+```
 #common iio char devices
 /dev/iio:device* 0666 system system
 
@@ -62,23 +56,25 @@ git clone https://github.com/STMicroelectronics/st-mems-android-linux-sensors-ha
 
 #temperature sensor
 /sys/bus/iio/devices/iio:device* scan_elements/in_temp_en 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_temp_scale 0666 system system
+/sys/bus/iio/devices/iio:device* scan_elements/in_temp_offset 0666 system system
 
 #gesture sensor
 /sys/bus/iio/devices/iio:device* scan_elements/in_gesture_en 0666 system system
-#+end_src
+```
 
-** Android 10
+## For Android 10 only
 
-3> modify the device makefile (i.e. device/<vendor>/<board>/device.mk) by adding these lines:
+3. modify the device makefile (i.e. `device/<vendor>/<board>/device.mk`) by adding these lines:
 
-#+begin_src makefile
-# Build stm-sensors-hal in legacy mode
+```
 PRODUCT_PACKAGES += \
 	android.hardware.sensors@1.0-service \
 	android.hardware.sensors@1.0-impl \
 	sensors.default
+```
 
-# Copy sensors config file(s)
+```
 PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml \
 	frameworks/native/data/etc/android.hardware.sensor.ambient_temperature.xml:system/etc/permissions/android.hardware.sensor.ambient_temperature.xml \
@@ -88,11 +84,11 @@ PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.sensor.relative_humidity.xml:system/etc/permissions/android.hardware.sensor.relative_humidity.xml \
 	frameworks/native/data/etc/android.hardware.sensor.stepcounter.xml:system/etc/permissions/android.hardware.sensor.stepcounter.xml \
 	frameworks/native/data/etc/android.hardware.sensor.stepdetector.xml:system/etc/permissions/android.hardware.sensor.stepdetector.xml
-#+end_src
+```
 
-4> create new manifest.xml file that describe hal service (i.e. device/<vendor>/<board>/stm-sensors-hal/manifest.xml) with this content:
+4. create new manifest.xml file that describe hal service (i.e. `device/<vendor>/<board>/stm-sensors-hal/manifest.xml`) with this content:
 
-#+begin_src conf
+```
 <manifest version="1.0" type="device">
 	<hal format="hidl">
 		<name>android.hardware.sensors</name>
@@ -104,26 +100,28 @@ PRODUCT_COPY_FILES += \
 		</interface>
 	</hal>
 </manifest>
-#+end_src
+```
 
-5> modify the device board config (i.e. device/<vendor>/<board>/BoardConfig.mk) by adding these lines:
+5. modify the device board config (i.e. `device/<vendor>/<board>/BoardConfig.mk`) by adding these lines:
 
-#+begin_src makefile
-DEVICE_MANIFEST_FILE += device/<vendor>/<board>/stm-sensors-hal/manifest.xml
-#+end_src
+> DEVICE_MANIFEST_FILE += `device/<vendor>/<board>/stm-sensors-hal/manifest.xml`
 
-6> build aosp as described into [[https://source.android.com/setup/build/building][official documentation]].
+6. export the environment variable TARGET_USES_STM_LEGACY_SENSORSHAL to true:
 
-** Android 9 and inferior
+> export TARGET_USES_STM_LEGACY_SENSORSHAL=true
 
-3> modify the device makefile (i.e. device/<vendor>/<board>/device.mk) by adding these lines:
+7. build aosp as described into [official documentation](https://source.android.com/setup/build/building).
 
-#+begin_src makefile
-# Build stm-sensors-hal in legacy mode
+## For Android 9 and inferior
+
+3. modify the device makefile (i.e. `device/<vendor>/<board>/device.mk`) by adding these lines:
+
+```
 PRODUCT_PACKAGES += \
 	sensors.default
+```
 
-# Copy sensors config file(s)
+```
 PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml \
 	frameworks/native/data/etc/android.hardware.sensor.ambient_temperature.xml:system/etc/permissions/android.hardware.sensor.ambient_temperature.xml \
@@ -133,6 +131,10 @@ PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.sensor.relative_humidity.xml:system/etc/permissions/android.hardware.sensor.relative_humidity.xml \
 	frameworks/native/data/etc/android.hardware.sensor.stepcounter.xml:system/etc/permissions/android.hardware.sensor.stepcounter.xml \
 	frameworks/native/data/etc/android.hardware.sensor.stepdetector.xml:system/etc/permissions/android.hardware.sensor.stepdetector.xml
-#+end_src
+```
 
-4> build aosp as described into [[https://source.android.com/setup/build/building][official documentation]].
+4. export the environment variable TARGET_USES_STM_LEGACY_SENSORSHAL to true:
+
+> export TARGET_USES_STM_LEGACY_SENSORSHAL=true
+
+5. build aosp as described into [official documentation](https://source.android.com/setup/build/building).
