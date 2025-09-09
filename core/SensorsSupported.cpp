@@ -70,7 +70,7 @@ SensorsSupported SensorsSupported::RelativeHumidity(const std::string &d_name, c
     return SensorsSupported(d_name, STMSensorType(SensorType::RELATIVE_HUMIDITY), DEVICE_IIO_HUMIDITYRELATIVE, a_name, power, x);
 }
 
-const std::array<struct SensorsSupported, 200> sensorsSupportedList = {
+const std::array<struct SensorsSupported, 178> sensorsSupportedList = {
     /* ISM330IS */
     SensorsSupported::Accel("ism330is_accel", "ISM330IS Accelerometer Sensor", 0.0f),
     SensorsSupported::Magn("ism330is_magn", "ISM330IS Magnetometer Sensor", 0.0f),
@@ -185,8 +185,10 @@ const std::array<struct SensorsSupported, 200> sensorsSupportedList = {
     /* LSM6DS33 */
     SensorsSupported::Accel("lsm6ds33_accel", "LSM6DS33 Accelerometer Sensor", 240E-3f),
     SensorsSupported::Gyro("lsm6ds33_gyro", "LSM6DS33 Gyroscope Sensor", 0.0f),
+    SensorsSupported::Magn("lsm6ds33_magn", "LSM6DS33 Magnetometer Sensor", 0.0f),
     SensorsSupported::StepDetector("lsm6ds33_step_d", "LSM6DS33 Step Detector Sensor", 0.0f),
     SensorsSupported::SignMotion("lsm6ds33_sign_motion", "LSM6DS33 Significant Motion Sensor", 0.0f),
+    SensorsSupported::Pressure("lsm6ds33_press", "LSM6DS33 Pressure Sensor", 0.0f),
 
     /* LSM6DS3 */
     SensorsSupported::Accel("lsm6ds3_accel", "LSM6DS3 Accelerometer Sensor", 240E-3f),
@@ -230,7 +232,7 @@ const std::array<struct SensorsSupported, 200> sensorsSupportedList = {
     SensorsSupported::Gyro("asm330lhhxg1_gyro", "ASM330LHHXG1 Gyroscope Sensor", 0.0f),
 
     /* ISM330DLC */
-    SensorsSupported::Accel("ism330dlc", "ISM330DLC Accelerometer Sensor", 0.0f),
+    SensorsSupported::Accel("ism330dlc_accel", "ISM330DLC Accelerometer Sensor", 0.0f),
     SensorsSupported::Magn("ism330dlc_magn", "ISM330DLC Magnetometer Sensor", 0.0f),
     SensorsSupported::Gyro("ism330dlc_gyro", "ISM330DLC Gyroscope Sensor", 0.0f),
 
@@ -238,46 +240,10 @@ const std::array<struct SensorsSupported, 200> sensorsSupportedList = {
     SensorsSupported::Accel("ism303dac_accel", "ISM303DAC Accelerometer Sensor", 0.0f),
     SensorsSupported::Magn("ism303dac_magn", "ISM303DAC Magnetometer Sensor", 0.0f),
 
-    /* LSM6DS0 */
-    SensorsSupported::Accel("lsm6ds0_accel", "LSM6DS0 Accelerometer Sensor", 240E-3f),
-    SensorsSupported::Gyro("lsm6ds0_gyro", "LSM6DS0 Gyroscope Sensor", 0.0f),
-
     /* LSM9DS1 */
     SensorsSupported::Accel("lsm9ds1_accel", "LSM9DS1 Accelerometer Sensor", 240E-3f),
     SensorsSupported::Magn("lsm9ds1_magn", "LSM9DS1 Magnetometer Sensor", 0.0f),
     SensorsSupported::Gyro("lsm9ds1_gyro", "LSM9DS1 Gyroscope Sensor", 0.0f),
-
-    /* LSM303DLHC */
-    SensorsSupported::Accel("lsm303dlhc_accel", "LSM303DLHC Accelerometer Sensor", 0.0f),
-    SensorsSupported::Magn("lsm303dlhc_magn", "LSM303DLHC Magnetometer Sensor", 0.0f),
-
-    /* LSM330 */
-    SensorsSupported::Accel("lsm330_accel", "LSM330 Accelerometer Sensor", 0.0f),
-    SensorsSupported::Gyro("lsm330_gyro", "LSM330 Gyroscope Sensor", 0.0f),
-
-    /* LSM330D */
-    SensorsSupported::Accel("lsm330d_accel", "LSM330D Accelerometer Sensor", 0.0f),
-    SensorsSupported::Gyro("lsm330d_gyro", "LSM330D Gyroscope Sensor", 0.0f),
-
-    /* LSM330DL */
-    SensorsSupported::Accel("lsm330dl_accel", "LSM330DL Accelerometer Sensor", 0.0f),
-    SensorsSupported::Gyro("lsm330dl_gyro", "LSM330DL Gyroscope Sensor", 0.0f),
-
-    /* LSM330DLC */
-    SensorsSupported::Accel("lsm330dlc_accel", "LSM330DLC Accelerometer Sensor", 0.0f),
-    SensorsSupported::Gyro("lsm330dlc_gyro", "LSM330DLC Gyroscope Sensor", 0.0f),
-
-    /* LSM303DLH */
-    SensorsSupported::Accel("lsm303dlh_accel", "LSM303DLH Accelerometer Sensor", 0.0f),
-    SensorsSupported::Magn("lsm303dlh_magn", "LSM303DLH Magnetometer Sensor", 0.0f),
-
-    /* LSM303DLM */
-    SensorsSupported::Accel("lsm303dlm_accel", "LSM303DLM Accelerometer Sensor", 0.0f),
-    SensorsSupported::Magn("lsm303dlm_magn", "LSM303DLM Magnetometer Sensor", 0.0f),
-
-    /* LSM303DL */
-    SensorsSupported::Accel("lsm303dl_accel", "LSM303DL Accelerometer Sensor", 0.0f),
-    SensorsSupported::Magn("lsm303dl_magn", "LSM303DL Magnetometer Sensor", 0.0f),
 
     /* LSM303AH */
     SensorsSupported::Accel("lsm303ah_accel", "LSM303AH Accelerometer Sensor", 0.0f),
@@ -291,7 +257,7 @@ const std::array<struct SensorsSupported, 200> sensorsSupportedList = {
     SensorsSupported::Magn("lsm303agr_magn", "LSM303AGR Magnetometer Sensor", 0.0f),
 
     /* H3LIS331DL */
-    SensorsSupported::Accel("h3lis331dl", "H3LIS331DL Accelerometer Sensor", 0.0f),
+    SensorsSupported::Accel("h3lis331dl_accel", "H3LIS331DL Accelerometer Sensor", 0.0f),
 
     /* IIS2DLPC */
     SensorsSupported::Accel("iis2dlpc_accel", "IIS2DLPC Accelerometer Sensor", 0.0f),
@@ -311,21 +277,19 @@ const std::array<struct SensorsSupported, 200> sensorsSupportedList = {
     /* LIS3DHH */
     SensorsSupported::Accel("lis3dhh", "LIS3DHH Accelerometer Sensor", 0.0f),
 
-    /* IIS2ICLX */
-    SensorsSupported::Accel("iis2iclx_accel", "IIS2ICLX Accelerometer Sensor", 0.0f, xy),
-    SensorsSupported::Magn("iis2iclx_magn", "IIS2ICLX Magnetometer Sensor", 0.0f),
-
-    /* IIS2DH */
-    SensorsSupported::Accel("iis2dh", "IIS2DH Accelerometer Sensor", 0.0f),
-
     /* IIS3DHHC */
     SensorsSupported::Accel("iis3dhhc", "IIS3DHHC Accelerometer Sensor", 0.0f),
 
-    /* LIS3DH */
-    SensorsSupported::Accel("lis3dh", "LIS3DH Accelerometer Sensor", 0.0f),
+    /* IIS2ICLX */
+    SensorsSupported::Accel("iis2iclx_accel", "IIS2ICLX Accelerometer Sensor", 0.0f, xy),
+    SensorsSupported::Magn("iis2iclx_magn", "IIS2ICLX Magnetometer Sensor", 0.0f),
+    SensorsSupported::Magn("iis2iclx_press", "IIS2ICLX Pressure Sensor", 0.0f),
 
-    /* LIS331DLH */
-    SensorsSupported::Accel("lis331dlh", "LIS331DLH Accelerometer Sensor", 0.0f),
+    /* IIS2DH */
+    SensorsSupported::Accel("iis2dh_accel", "IIS2DH Accelerometer Sensor", 0.0f),
+
+    /* LIS3DH */
+    SensorsSupported::Accel("lis3dh_accel", "LIS3DH Accelerometer Sensor", 0.0f),
 
     /* LIS2HH12 */
     SensorsSupported::Accel("lis2hh12_accel", "LIS2HH12 Accelerometer Sensor", 0.0f),
@@ -337,13 +301,16 @@ const std::array<struct SensorsSupported, 200> sensorsSupportedList = {
     SensorsSupported::Accel("ais2ih_accel", "AIS2IH Accelerometer Sensor", 0.0f),
 
     /* LIS2DH */
-    SensorsSupported::Accel("lis2dh", "LIS2DH Accelerometer Sensor", 0.0f),
+    SensorsSupported::Accel("lis2dh12_accel", "LIS2DH Accelerometer Sensor", 0.0f),
 
     /* LIS2DUXS12 */
     SensorsSupported::Accel("lis2duxs12_accel", "LIS2DUXS12 Accelerometer Sensor", 0.0f),
 
     /* LIS2DUX12 */
     SensorsSupported::Accel("lis2dux12_accel", "LIS2DUX12 Accelerometer Sensor", 0.0f),
+
+    /* IIS2DULPX */
+    SensorsSupported::Accel("iis2dulpx_accel", "IIS2DULPX Accelerometer Sensor", 0.0f),
 
     /* LIS2DU12 */
     SensorsSupported::Accel("lis2du12_accel", "LIS2DU12 Accelerometer Sensor", 0.0f),
@@ -357,34 +324,15 @@ const std::array<struct SensorsSupported, 200> sensorsSupportedList = {
     /* IIS2MDC */
     SensorsSupported::Magn("iis2mdc_magn", "IIS2MDC Magnetometer Sensor", 0.0f),
 
-    /* L3G4200D */
-    SensorsSupported::Gyro("l3g4200d", "L3G4200D Gyroscope Sensor", 0.0f),
-
-    /* L3GD20 */
-    SensorsSupported::Gyro("l3gd20", "L3GD20 Gyroscope Sensor", 0.0f),
-
-    /* LSM9DS0 */
-    SensorsSupported::Gyro("lsm9ds0_gyro", "LSM9DS0 Gyroscope Sensor", 0.0f),
-
     /* ILPS28QSW */
-    SensorsSupported::Pressure("ilps28qsw", "ILPS28QSW Pressure Sensor", 0.0f),
+    SensorsSupported::Pressure("ilps28qsw_press", "ILPS28QSW Pressure Sensor", 0.0f),
 
     /* ILPS22QS */
-    SensorsSupported::Pressure("ilps22qs", "ILPS22QS Pressure Sensor", 0.0f),
-
-    /* LPS331AP */
-    SensorsSupported::Pressure("lps331ap", "LPS331AP Pressure Sensor", 0.0f),
-
-    /* LPS25H */
-    SensorsSupported::Pressure("lps25h", "LPS25H Pressure Sensor", 0.0f),
+    SensorsSupported::Pressure("ilps22qs_press", "ILPS22QS Pressure Sensor", 0.0f),
 
     /* LPS33HW */
     SensorsSupported::Pressure("lps33hw_press", "LPS33HW Pressure Sensor", 0.0f),
     SensorsSupported::AmbientTemperature("lps33hw_temp", "LPS33HW Temperature Sensor", 0.0f),
-
-    /* LPS35HW */
-    SensorsSupported::Pressure("lps35hw_press", "LPS35HW Pressure Sensor", 0.0f),
-    SensorsSupported::AmbientTemperature("lps35hw_temp", "LPS35HW Temperature Sensor", 0.0f),
 
     /* LPS22CH */
     SensorsSupported::Pressure("lps22ch_press", "LPS22CH Pressure Sensor", 0.0f),
