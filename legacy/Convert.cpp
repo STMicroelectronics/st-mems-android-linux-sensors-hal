@@ -20,6 +20,7 @@
 
 #include "halVersion.h"
 #include "Convert.h"
+#include "Utils.h"
 
 static bool convertFromSTMSensorType(const stm::core::SensorType &type,
                                      int &sensorType,
@@ -266,9 +267,9 @@ void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorDa
         if (sensorData.getData().size() < 3) {
             return;
         }
-        event->magnetic.x = sensorData.getData().at(0);
-        event->magnetic.y = sensorData.getData().at(1);
-        event->magnetic.z = sensorData.getData().at(2);
+        event->magnetic.x = Conversion::G_to_uTesla(sensorData.getData().at(0));
+        event->magnetic.y = Conversion::G_to_uTesla(sensorData.getData().at(1));
+        event->magnetic.z = Conversion::G_to_uTesla(sensorData.getData().at(2));
         break;
     case SensorType::ACCELEROMETER:
     case SensorType::ORIENTATION:
@@ -306,12 +307,12 @@ void convertFromSTMSensorData(const stm::core::ISTMSensorsCallbackData &sensorDa
         if (sensorData.getData().size() < 6) {
             return;
         }
-        event->uncalibrated_magnetic.x_uncalib = sensorData.getData().at(0);
-        event->uncalibrated_magnetic.y_uncalib = sensorData.getData().at(1);
-        event->uncalibrated_magnetic.z_uncalib = sensorData.getData().at(2);
-        event->uncalibrated_magnetic.x_bias = sensorData.getData().at(3);
-        event->uncalibrated_magnetic.y_bias = sensorData.getData().at(4);
-        event->uncalibrated_magnetic.z_bias = sensorData.getData().at(5);
+        event->uncalibrated_magnetic.x_uncalib = Conversion::G_to_uTesla(sensorData.getData().at(0));
+        event->uncalibrated_magnetic.y_uncalib = Conversion::G_to_uTesla(sensorData.getData().at(1));
+        event->uncalibrated_magnetic.z_uncalib = Conversion::G_to_uTesla(sensorData.getData().at(2));
+        event->uncalibrated_magnetic.x_bias = Conversion::G_to_uTesla(sensorData.getData().at(3));
+        event->uncalibrated_magnetic.y_bias = Conversion::G_to_uTesla(sensorData.getData().at(4));
+        event->uncalibrated_magnetic.z_bias = Conversion::G_to_uTesla(sensorData.getData().at(5));
         break;
     case SensorType::GYROSCOPE_UNCALIBRATED:
     case SensorType::ACCELEROMETER_UNCALIBRATED:

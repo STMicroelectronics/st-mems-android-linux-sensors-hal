@@ -11,7 +11,7 @@
 
 #include "Matrix.h"
 
-static constexpr float GRAVITY_EARTH = 9.80665f;
+static constexpr float EARTH_GRAVITY = 9.80665f;
 
 struct Conversion {
     static constexpr float mdegC_to_degC(float mdegC) {
@@ -23,19 +23,19 @@ struct Conversion {
     }
 
     static constexpr float ms2_to_millig(float ms2) {
-        return (ms2 * 1000.0f) / GRAVITY_EARTH;
+        return (ms2 * 1000.0f) / EARTH_GRAVITY;
     }
 
     static constexpr float ms2_to_g(float ms2) {
-        return ms2 / GRAVITY_EARTH;
+        return ms2 / EARTH_GRAVITY;
     }
 
     static constexpr float g_to_ms2(float g) {
-        return g * GRAVITY_EARTH;
+        return g * EARTH_GRAVITY;
     }
 
     static constexpr float millig_to_ms2(float millig) {
-        return (millig * GRAVITY_EARTH) / 1000.0f;
+        return (millig * EARTH_GRAVITY) / 1000.0f;
     }
 
     static constexpr float rads_to_degs(float rads) {
