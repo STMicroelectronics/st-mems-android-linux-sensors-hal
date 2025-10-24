@@ -311,6 +311,8 @@ int main(int argc, char** argv)
 
             std::cout << "sensor: "
                       << static_cast<uint16_t>(s->getType())
+                      << " handle: "
+                      << s->getHandle()
                       << " odr: "
                       << sensor_under_test->odr
                       << std::endl;

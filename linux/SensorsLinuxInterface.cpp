@@ -112,12 +112,56 @@ SensorsLinuxInterface::onNewSensorsData(const std::vector<ISTMSensorsCallbackDat
 {
     /* just dump sensors data */
     for (auto& s : sensorsData) {
-            std::vector<float> data = s.getData();
+        std::vector<float> data = s.getData();
+        switch (s.getSensorType()) {
+        case SensorType::ACCELEROMETER:
+        case SensorType::MAGNETOMETER:
+        case SensorType::GYROSCOPE:
+        case SensorType::LINEAR_ACCELERATION:
+        case SensorType::GRAVITY:
+        case SensorType::ROTATION_VECTOR:
+        case SensorType::GEOMAGNETIC_ROTATION_VECTOR:
+        case SensorType::ORIENTATION:
             console.info("#" + std::to_string(s.getSensorHandle()) + ": " +
                          std::to_string(data[0]) + ", " +
                          std::to_string(data[1]) + ", " +
                          std::to_string(data[2]) + " T " +
                          std::to_string(s.getTimestamp()));
+            break;
+        case SensorType::GAME_ROTATION_VECTOR:
+            console.info("#" + std::to_string(s.getSensorHandle()) + ": " +
+                         std::to_string(data[0]) + ", " +
+                         std::to_string(data[1]) + ", " +
+                         std::to_string(data[2]) + ", " +
+                         std::to_string(data[3]) + " T " +
+                         std::to_string(s.getTimestamp()));
+            break;
+        case SensorType::AMBIENT_TEMPERATURE:
+        case SensorType::INTERNAL_TEMPERATURE:
+        case SensorType::PRESSURE:
+        case SensorType::LIGHT:
+        case SensorType::PROXIMITY:
+        case SensorType::RELATIVE_HUMIDITY:
+            console.info("#" + std::to_string(s.getSensorHandle()) + ": " +
+                         std::to_string(data[0]) + " T " +
+                         std::to_string(s.getTimestamp()));
+            break;
+        case SensorType::ACCELEROMETER_UNCALIBRATED:
+        case SensorType::GYROSCOPE_UNCALIBRATED:
+        case SensorType::MAGNETOMETER_UNCALIBRATED:
+            console.info("#" + std::to_string(s.getSensorHandle()) + ": " +
+                         std::to_string(data[0]) + ", " +
+                         std::to_string(data[1]) + ", " +
+                         std::to_string(data[2]) + " bias " +
+                         std::to_string(data[3]) + ", " +
+                         std::to_string(data[4]) + ", " +
+                         std::to_string(data[5]) + " T " +
+                         std::to_string(s.getTimestamp()));
+            break;
+        default:
+            console.info("#" + std::to_string(s.getSensorHandle()) + ": unknown sensor type");
+            break;
+        }
     }
 }
 
