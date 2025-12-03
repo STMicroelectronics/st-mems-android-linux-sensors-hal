@@ -97,7 +97,7 @@ bool SensorPlacement::invertRotationMatrix(Matrix<3, 3, float>& matrix)
     float determinant = matrix[0][0] * invMatrix[0][0] +
                         matrix[0][1] * invMatrix[1][0] +
                         matrix[0][2] * invMatrix[2][0];
-    if (determinant < 1e-6) {
+    if (std::fabs(determinant) < 1e-6) {
         return false;
     }
 
