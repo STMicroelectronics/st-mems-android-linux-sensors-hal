@@ -38,7 +38,6 @@ Gyroscope::Gyroscope(HWSensorBaseCommonData *data, const char *name,
 {
     (void) wakeup;
 
-    rotMatrix = propertiesManager.getRotationMatrix(handle);
     biasFileName = std::string("gyro_bias_") + std::to_string(moduleId) + std::string(".dat");
     biasTFileName = std::string("gyro_bias_temperature_") + std::to_string(moduleId) + std::string(".dat");
 
@@ -105,6 +104,8 @@ void Gyroscope::postSetup(void)
 
 int Gyroscope::Enable(int handle, bool enable, bool lock_en_mutex)
 {
+    rotMatrix = propertiesManager.getRotationMatrix(GetHandle());
+
     if (HAL_ENABLE_GYRO_CALIBRATION != 0) {
         bool old_status;
         int err;

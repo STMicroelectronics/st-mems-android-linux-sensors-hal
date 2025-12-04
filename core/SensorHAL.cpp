@@ -943,6 +943,7 @@ int st_hal_open_sensors(void **pdata, STMSensorsList &sensorsList)
                                                   sensorData.maxRateHz,
                                                   sensorData.fifoRsvdCount,
                                                   sensorData.fifoMaxEventCount,
+                                                  node.first,
                                                   false,
                                                   node.second.payload->getModuleId());
 

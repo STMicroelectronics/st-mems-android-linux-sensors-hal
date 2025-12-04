@@ -39,7 +39,6 @@ Accelerometer::Accelerometer(HWSensorBaseCommonData *data,
 {
     (void) wakeup;
 
-    rotMatrix = propertiesManager.getRotationMatrix(handle);
     biasFileName = std::string("accel_bias_") + std::to_string(moduleId) + std::string(".dat");
 
     sensor_t_data.resolution = data->channels[0].scale;
@@ -75,6 +74,8 @@ void Accelerometer::postSetup(void)
 
 int Accelerometer::Enable(int handle, bool enable, bool lock_en_mutex)
 {
+    rotMatrix = propertiesManager.getRotationMatrix(GetHandle());
+
     if (HAL_ENABLE_ACCEL_CALIBRATION != 0) {
         bool old_status;
         int err;

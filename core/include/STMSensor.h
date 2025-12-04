@@ -40,6 +40,7 @@ public:
               float maxRateHz,
               uint32_t fifoRsvdCount,
               uint32_t fifoMaxCount,
+              int nodeId,
               bool wakeUp,
               int moduleId);
 
@@ -52,6 +53,7 @@ public:
               float power,
               uint32_t fifoRsvdCount,
               uint32_t fifoMaxCount,
+              int nodeId,
               bool wakeUp,
               int moduleId);
 
@@ -71,6 +73,7 @@ public:
     uint32_t getFifoMaxCount(void) const;
     bool isWakeUp(void) const;
     int getModuleId(void) const;
+    int getNodeId(void) const;
 
 private:
     /**
@@ -139,6 +142,11 @@ private:
      * Maximum number of samples that can be stored in fifo (shared space in fifo)
      */
     const uint32_t fifoMaxCount;
+
+    /**
+     * Sensor nodeId number, used to identify the sensor class instance
+     */
+    const int nodeId;
 
     /**
      * True if sensor can wake up the system from suspend

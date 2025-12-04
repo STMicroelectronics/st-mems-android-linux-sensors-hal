@@ -42,7 +42,6 @@ Magnetometer::Magnetometer(HWSensorBaseCommonData *data, const char *name,
 {
     (void) wakeup;
 
-    rotMatrix = propertiesManager.getRotationMatrix(handle);
     biasFileName = std::string("magn_bias_") + std::to_string(moduleId) + std::string(".dat");
 
     sensor_t_data.resolution = GAUSS_TO_UTESLA(data->channels[0].scale);
@@ -77,6 +76,8 @@ void Magnetometer::postSetup(void)
 
 int Magnetometer::Enable(int handle, bool enable, bool lock_en_mutex)
 {
+    rotMatrix = propertiesManager.getRotationMatrix(GetHandle());
+
     if (HAL_ENABLE_MAGN_CALIBRATION != 0) {
         bool old_status;
         int err;

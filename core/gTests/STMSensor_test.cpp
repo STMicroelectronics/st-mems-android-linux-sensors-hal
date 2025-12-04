@@ -48,6 +48,7 @@ TEST_F(STMSensorTest, verifyParameters)
                     414, // maxRateHz
                     5, // fifoRsvdCount
                     220, // fifoMaxCount
+                    1, // nodeId
                     false, // wakeUp
                     0 // moduleId
                     );
@@ -76,6 +77,7 @@ TEST_F(STMSensorTest, verifyParameters)
                          1.0, // power
                          0, // fifoRsvdCount
                          0, // fifoMaxCount
+                         1, // nodeId
                          true, // wakeUp
                          0 // moduleId
                          );

@@ -150,8 +150,8 @@ void PropertiesManager::loadUniqueSensorMap(const STMSensorsList& sensorsList)
         if (!isSupported(sensor.getType()))
             continue;
 
-        uniqueSensorMap[sensor.getHandle()] = sensor.getType();
-        uniqueSensorInstance[sensor.getHandle()] = getSensorInstance(sensor.getType());
+        uniqueSensorMap[sensor.getNodeId()] = sensor.getType();
+        uniqueSensorInstance[sensor.getNodeId()] = getSensorInstance(sensor.getType());
     }
 }
 

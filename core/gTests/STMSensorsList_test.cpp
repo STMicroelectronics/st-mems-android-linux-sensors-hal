@@ -34,6 +34,7 @@ STMSensor accel(std::string("name"), // name
                 10, // maxRateHz
                 0, // fifoRsvdCount
                 0, // fifoMaxCount
+                1, // nodeId
                 false, // wakeUp
                 0 // moduleId
                 );
@@ -49,6 +50,7 @@ STMSensor accelName2(std::string("name_2"), // name
                      10, // maxRateHz
                      0, // fifoRsvdCount
                      0, // fifoMaxCount
+                     2, // nodeId
                      false, // wakeUp
                      0 // moduleId
                 );
@@ -64,6 +66,7 @@ STMSensor magnMinRateHzNegative(std::string("name"), // name
                                 10, // maxRateHz
                                 0, // fifoRsvdCount
                                 0, // fifoMaxCount
+                                3, // nodeId
                                 false, // wakeUp
                                 0 // moduleId
                                 );
@@ -79,6 +82,7 @@ STMSensor magnMinRateHzBigger(std::string("name"), // name
                               10, // maxRateHz
                               0, // fifoRsvdCount
                               0, // fifoMaxCount
+                              4, // nodeId
                               false, // wakeUp
                               0 // moduleId
                               );
@@ -154,6 +158,7 @@ TEST_F(STMSensorsListTest, addSensor_maxRangeNotZero)
                                       0, // maxRateHz
                                       0, // fifoRsvdCount
                                       0, // fifoMaxCount
+                                      5, // nodeId
                                       false, // wakeUp
                                       0 // moduleId
                                       );
@@ -178,6 +183,7 @@ TEST_F(STMSensorsListTest, addSensor_fifoRsvdAndFifoMax)
                                   100, // maxRateHz
                                   100, // fifoRsvdCount
                                   0, // fifoMaxCount
+                                  6, // nodeId
                                   false, // wakeUp
                                   0 // moduleId
                                   );
