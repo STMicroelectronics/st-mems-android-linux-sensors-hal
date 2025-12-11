@@ -70,7 +70,7 @@ SensorsSupported SensorsSupported::RelativeHumidity(const std::string &d_name, c
     return SensorsSupported(d_name, STMSensorType(SensorType::RELATIVE_HUMIDITY), DEVICE_IIO_HUMIDITYRELATIVE, a_name, power, x);
 }
 
-const std::array<struct SensorsSupported, 178> sensorsSupportedList = {
+const std::array<struct SensorsSupported, 186> sensorsSupportedList = {
     /* ISM330IS */
     SensorsSupported::Accel("ism330is_accel", "ISM330IS Accelerometer Sensor", 0.0f),
     SensorsSupported::Magn("ism330is_magn", "ISM330IS Magnetometer Sensor", 0.0f),
@@ -106,6 +106,18 @@ const std::array<struct SensorsSupported, 178> sensorsSupportedList = {
     SensorsSupported::Magn("lsm6dsv32x_magn", "LSM6DSV32X Magnetometer Sensor", 0.0f),
     SensorsSupported::Gyro("lsm6dsv32x_gyro", "LSM6DSV32X Gyroscope Sensor", 0.0f),
     SensorsSupported::Pressure("lsm6dsv32x_press", "LSM6DSV32X Pressure Sensor", 0.0f),
+
+    /* LSM6DSV80X */
+    SensorsSupported::Accel("lsm6dsv80x_accel", "LSM6DSV80X Accelerometer Sensor", 0.0f),
+    SensorsSupported::Magn("lsm6dsv80x_magn", "LSM6DSV80X Magnetometer Sensor", 0.0f),
+    SensorsSupported::Gyro("lsm6dsv80x_gyro", "LSM6DSV80X Gyroscope Sensor", 0.0f),
+    SensorsSupported::Pressure("lsm6dsv80x_press", "LSM6DSV80X Pressure Sensor", 0.0f),
+
+    /* LSM6DSV320X */
+    SensorsSupported::Accel("lsm6dsv320x_accel", "LSM6DSV320X Accelerometer Sensor", 0.0f),
+    SensorsSupported::Magn("lsm6dsv320x_magn", "LSM6DSV320X Magnetometer Sensor", 0.0f),
+    SensorsSupported::Gyro("lsm6dsv320x_gyro", "LSM6DSV320X Gyroscope Sensor", 0.0f),
+    SensorsSupported::Pressure("lsm6dsv320x_press", "LSM6DSV320X Pressure Sensor", 0.0f),
 
     /* LSM6DSV */
     SensorsSupported::Accel("lsm6dsv_accel", "LSM6DSV Accelerometer Sensor", 0.0f),
