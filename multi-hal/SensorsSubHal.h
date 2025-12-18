@@ -103,8 +103,6 @@ private:
 
     std::mutex mLoadAndSaveLock;
 
-    bool initializedOnce;
-
     std::unique_ptr<IHalProxyCallbackWrapperBase> mCallback;
 
     void postEvents(const std::vector<V2_1::Event>& events, bool wakeup);

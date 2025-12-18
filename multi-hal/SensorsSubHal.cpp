@@ -54,7 +54,6 @@ template <class SubHalClass>
 SensorsSubHalBase<SubHalClass>::SensorsSubHalBase()
     : sensorsCore(ISTMSensorsHAL::getInstance()),
       console(IConsole::getInstance()),
-      initializedOnce(false),
       propertiesManager(PropertiesManager::getInstance())
 {
     propertiesManager.getMaxRanges(androidPropertiesLoader);
@@ -102,15 +101,6 @@ template <class SubHalClass>
 Return<V1_0::Result> SensorsSubHalBase<SubHalClass>::initialize(std::unique_ptr<IHalProxyCallbackWrapperBase>& halProxyCallback)
 {
     mCallback = std::move(halProxyCallback);
-
-    if (initializedOnce) {
-        if (sensorsCore.initialize(*dynamic_cast<ISTMSensorsCallback *>(this))) {
-            console.error("failed to initialize the core library");
-            return V1_0::Result::BAD_VALUE;
-        }
-
-        initializedOnce = true;
-    }
 
     frameworkRequestPollrateNs.clear();
     frameworkRequestLatencyNs.clear();
