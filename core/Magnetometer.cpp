@@ -161,19 +161,30 @@ void Magnetometer::ProcessData(SensorBaseData *data)
         magnCalibration.run(magnData, data->timestamp);
         magnCalibration.getBias(bias);
 
+        // Update the offset with the bias values
         data->offset[0] = bias[3][0];
         data->offset[1] = bias[3][1];
         data->offset[2] = bias[3][2];
 
+        // Apply the bias correction to the raw data including soft
+        // iron distortion compensation
+        data->processed[0] = (data->raw[0] - data->offset[0]) * bias[0][0] +
+                             (data->raw[1] - data->offset[1]) * bias[0][1] +
+                             (data->raw[2] - data->offset[2]) * bias[0][2];
+        data->processed[1] = (data->raw[0] - data->offset[0]) * bias[1][0] +
+                             (data->raw[1] - data->offset[1]) * bias[1][1] +
+                             (data->raw[2] - data->offset[2]) * bias[1][2];
+        data->processed[2] = (data->raw[0] - data->offset[0]) * bias[2][0] +
+                             (data->raw[1] - data->offset[1]) * bias[2][1] +
+                             (data->raw[2] - data->offset[2]) * bias[2][2];
         data->accuracy = SENSOR_STATUS_ACCURACY_HIGH;
     } else {
         data->accuracy = SENSOR_STATUS_UNRELIABLE;
         memset(data->offset, 0, 3 * sizeof(float));
+        data->processed[0] = data->raw[0];
+        data->processed[1] = data->raw[1];
+        data->processed[2] = data->raw[2];
     }
-
-    data->processed[0] = data->raw[0] - data->offset[0];
-    data->processed[1] = data->raw[1] - data->offset[1];
-    data->processed[2] = data->raw[2] - data->offset[2];
 
     sensor_event.data.data2[0] = data->processed[0];
     sensor_event.data.data2[1] = data->processed[1];
