@@ -70,7 +70,7 @@ SensorsSupported SensorsSupported::RelativeHumidity(const std::string &d_name, c
     return SensorsSupported(d_name, STMSensorType(SensorType::RELATIVE_HUMIDITY), DEVICE_IIO_HUMIDITYRELATIVE, a_name, power, x);
 }
 
-const std::array<struct SensorsSupported, 189> sensorsSupportedList = {
+const std::array<struct SensorsSupported, 197> sensorsSupportedList = {
     /* ISM330IS */
     SensorsSupported::Accel("ism330is_accel", "ISM330IS Accelerometer Sensor", 0.0f),
     SensorsSupported::Magn("ism330is_magn", "ISM330IS Magnetometer Sensor", 0.0f),
@@ -122,6 +122,12 @@ const std::array<struct SensorsSupported, 189> sensorsSupportedList = {
     SensorsSupported::Magn("lsm6dsv320x_magn", "LSM6DSV320X Magnetometer Sensor", 0.0f),
     SensorsSupported::Gyro("lsm6dsv320x_gyro", "LSM6DSV320X Gyroscope Sensor", 0.0f),
     SensorsSupported::Pressure("lsm6dsv320x_press", "LSM6DSV320X Pressure Sensor", 0.0f),
+
+    /* ISM6HG256X */
+    SensorsSupported::Accel("ism6hg256x_accel", "ISM6HG256X Accelerometer Sensor", 0.0f),
+    SensorsSupported::Magn("ism6hg256x_magn", "ISM6HG256X Magnetometer Sensor", 0.0f),
+    SensorsSupported::Gyro("ism6hg256x_gyro", "ISM6HG256X Gyroscope Sensor", 0.0f),
+    SensorsSupported::Pressure("ism6hg256x_press", "ISM6HG256X Pressure Sensor", 0.0f),
 
     /* LSM6DSV */
     SensorsSupported::Accel("lsm6dsv_accel", "LSM6DSV Accelerometer Sensor", 0.0f),
@@ -246,6 +252,14 @@ const std::array<struct SensorsSupported, 189> sensorsSupportedList = {
     /* ASM330LHHXG1 */
     SensorsSupported::Accel("asm330lhhxg1_accel", "ASM330LHHXG1 Accelerometer Sensor", 0.0f),
     SensorsSupported::Gyro("asm330lhhxg1_gyro", "ASM330LHHXG1 Gyroscope Sensor", 0.0f),
+
+    /* ASM330LHHG1 */
+    SensorsSupported::Accel("asm330lhhg1_accel", "ASM330LHHG1 Accelerometer Sensor", 0.0f),
+    SensorsSupported::Gyro("asm330lhhg1_gyro", "ASM330LHHG1 Gyroscope Sensor", 0.0f),
+
+    /* ASM330LHBG1 */
+    SensorsSupported::Accel("asm330lhbg1_accel", "ASM330LHBG1 Accelerometer Sensor", 0.0f),
+    SensorsSupported::Gyro("asm330lhbg1_gyro", "ASM330LHBG1 Gyroscope Sensor", 0.0f),
 
     /* ISM330DLC */
     SensorsSupported::Accel("ism330dlc_accel", "ISM330DLC Accelerometer Sensor", 0.0f),
