@@ -20,10 +20,6 @@
 #include <array>
 #include <string>
 
-#define GRAVITY_EARTH				(9.80665f)
-#define LOCAL_EARTH_MAGNETIC_FIELD		(50.0f)
-#define DEG2RAD(deg)				(deg * M_PI / 180.0f)
-
 struct STMGeomagFusion {
     static STMGeomagFusion& getInstance(void);
     STMGeomagFusion(const STMGeomagFusion &) = delete;
