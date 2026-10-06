@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018 The Android Open Source Project
- * Copyright (C) 2015-2020 STMicroelectronics
+ * Copyright (C) 2015-2026 STMicroelectronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,12 @@
 #include <errno.h>
 #include <array>
 
+#define CIRCULAR_BUFFER_MAX_NUM_CHANNELS        (8)
+
 typedef struct SensorBaseData {
-    float raw[4];
-    float offset[4];
-    float processed[5];
+    float raw[CIRCULAR_BUFFER_MAX_NUM_CHANNELS];
+    float offset[CIRCULAR_BUFFER_MAX_NUM_CHANNELS];
+    float processed[CIRCULAR_BUFFER_MAX_NUM_CHANNELS];
     int64_t timestamp;
     int64_t hwTimestamp;
     int8_t accuracy;

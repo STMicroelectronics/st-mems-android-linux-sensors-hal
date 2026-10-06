@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018 The Android Open Source Project
- * Copyright (C) 2015-2020 STMicroelectronics
+ * Copyright (C) 2015-2026 STMicroelectronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,13 @@
 #include <poll.h>
 #include <mutex>
 
-#include "SensorBase.h"
+#include <CircularBuffer.h>
 #include <IUtils.h>
 #include <IConsole.h>
 #include <STMTimesync.h>
 #include <PropertiesManager.h>
+
+#include "SensorBase.h"
 
 extern "C" {
     #include "utils.h"
@@ -37,7 +39,7 @@ namespace core {
 #define HW_SENSOR_BASE_DEFAULT_IIO_BUFFER_LEN    (2)
 #define HW_SENSOR_BASE_IIO_SYSFS_PATH_MAX        (200)
 #define HW_SENSOR_BASE_IIO_DEVICE_NAME_MAX       (30)
-#define HW_SENSOR_BASE_MAX_CHANNELS              (8)
+#define HW_SENSOR_BASE_MAX_NUM_CHANNELS          (CIRCULAR_BUFFER_MAX_NUM_CHANNELS)
 
 struct HWSensorBaseCommonData {
     char device_iio_sysfs_path[HW_SENSOR_BASE_IIO_SYSFS_PATH_MAX];
@@ -45,7 +47,7 @@ struct HWSensorBaseCommonData {
     unsigned int device_iio_dev_num;
 
     int num_channels;
-    struct device_iio_info_channel channels[HW_SENSOR_BASE_MAX_CHANNELS];
+    struct device_iio_info_channel channels[HW_SENSOR_BASE_MAX_NUM_CHANNELS];
 
     struct device_iio_scales sa;
 } typedef HWSensorBaseCommonData;

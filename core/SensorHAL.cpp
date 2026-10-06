@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018 The Android Open Source Project
- * Copyright (C) 2015-2020 STMicroelectronics
+ * Copyright (C) 2015-2026 STMicroelectronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+#include <cerrno>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -263,7 +264,11 @@ static std::shared_ptr<SensorBase> st_hal_create_class_sensor(STSensorHAL_iio_de
 
     if ((strlen(data->iio_sysfs_path.c_str()) + 1 > HW_SENSOR_BASE_IIO_SYSFS_PATH_MAX) ||
         (strlen(data->deviceName.c_str()) + 1 > HW_SENSOR_BASE_IIO_DEVICE_NAME_MAX) ||
-        (data->num_channels > HW_SENSOR_BASE_MAX_CHANNELS)) {
+        (data->num_channels > HW_SENSOR_BASE_MAX_NUM_CHANNELS)) {
+            console.error("Invalid sensor data: exceeds maximum allowed lengths or channels. Device name: " +
+                          data->deviceName + ", IIO sysfs path: " +
+                          data->iio_sysfs_path + ", Num channels: " +
+                          std::to_string(data->num_channels));
         return nullptr;
     }
 
@@ -539,6 +544,13 @@ static int loadIIODevices(std::vector<STSensorHAL_iio_devices_data> &iioDeviceDa
         if (err < 0 && err != -ENOENT) {
             console.error(std::string(iio_devices[i].name) + ": failed to read IIO channels informations.");
             continue;
+        }
+
+        if (data.num_channels > HW_SENSOR_BASE_MAX_NUM_CHANNELS) {
+            console.error(std::string(iio_devices[i].name) +
+                          ": number of channels exceeds the maximum supported. This device will be skipped.");
+
+            goto st_hal_load_free_iio_channels;
         }
 
         err = device_iio_utils::enable_sensor(data.iio_sysfs_path.c_str(), false);
