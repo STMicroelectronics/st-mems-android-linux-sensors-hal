@@ -350,6 +350,10 @@ void convertFromSTMSensorData(const ::stm::core::ISTMSensorsCallbackData& sensor
         event.u.uncal.y_bias = sensorData.getData().at(4);
         event.u.uncal.z_bias = sensorData.getData().at(5);
         break;
+    case SensorType::LIGHT:
+    case SensorType::PRESSURE:
+        event.u.scalar = sensorData.getData().at(0);
+        break;
     case SensorType::META_DATA:
         event.u.meta.what = V1_0::MetaDataEventType::META_DATA_FLUSH_COMPLETE;
         break;
